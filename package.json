@@ -6,10 +6,10 @@
   "scripts": {
     "build": "parcel build src/index.ts --out-file p5.teach.js --out-dir dist --no-source-maps",
     "dev": "parcel watch src/index.ts --out-file p5.teach.js --out-dir dist --no-source-maps",
-    "test": "jest"
+    "test": "jest",
+    "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "keywords": [],
-  "author": "<jithinks112@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "p5": "^1.2.0"
@@ -19,6 +19,7 @@
     "@types/p5": "^0.9.1",
     "jest": "^26.6.3",
     "parcel-bundler": "^1.12.4",
+    "prettier": "^2.3.0",
     "ts-jest": "^26.5.6",
     "typescript": "^4.2.4"
   }

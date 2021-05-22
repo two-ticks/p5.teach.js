@@ -1,5 +1,5 @@
-const global:any = globalThis;
+const global: any = globalThis;
 
-import { myCircle } from "./lib/myCircle" 
+import { myCircle } from './lib/myCircle';
 
 global.myCircle = myCircle;
