@@ -3,6 +3,7 @@ function setup() {
 }
 
 function draw() {
-  background('black');
-  myCircle()
+  background(220);
+  animeJSWriter();
+  noLoop();
 }
