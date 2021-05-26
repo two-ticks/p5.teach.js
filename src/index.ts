@@ -11,3 +11,7 @@ global.typeWriter = typeWriter;
 import { animeJSWriter } from './lib/animeJSWriter';
 
 global.animeJSWriter = animeJSWriter;
+
+import { writeText } from './lib/writeText';
+
+global.writeText = writeText;
