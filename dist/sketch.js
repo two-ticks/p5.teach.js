@@ -4,11 +4,15 @@ function setup() {
 
 function draw() {
   background(220);
-
-  let a = new writeText('Circle : x² + y² = 4²', width / 4, height / 3);
-  let b = new writeText('Circle : (x-1)² + y² = 4²', width / 5, height / 2);
-
-  a.play(); //default duration = 180
-  b.play(3600);
+  let texx = new writeTex(
+    '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}',
+    4000
+  );
+  let texxx = new writeTex(
+    '\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
+    2000,
+    width/2,
+    height/2
+  );
   noLoop();
 }

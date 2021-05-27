@@ -15,3 +15,7 @@ global.animeJSWriter = animeJSWriter;
 import { writeText } from './lib/writeText';
 
 global.writeText = writeText;
+
+import { writeTex } from './lib/writeTex';
+
+global.writeTex = writeTex;

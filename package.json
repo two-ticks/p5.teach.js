@@ -13,7 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "animejs": "^3.2.1",
-    "p5": "^1.2.0"
+    "p5": "^1.2.0",
+    "tex-to-svg": "^0.2.0"
   },
   "devDependencies": {
     "@types/animejs": "^3.1.3",

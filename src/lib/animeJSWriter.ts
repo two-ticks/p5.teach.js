@@ -34,6 +34,6 @@ export function animeJSWriter(...args: any[]) {
       //loop : true,
     });
   }
-    noLoop()
+    //noLoop()
   
 }
