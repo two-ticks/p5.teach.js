@@ -131,43 +131,6 @@ function myCircle() {
 }
 
 exports.myCircle = myCircle;
-},{}],"lib/typeWriter.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.typeWriter = void 0;
-
-function typeWriter() {
-  //arguments : sentence, n, x, y, speed
-  // TODO: implement this
-  var args = [];
-
-  for (var _i = 0; _i < arguments.length; _i++) {
-    args[_i] = arguments[_i];
-  }
-
-  var sentence = args[0];
-  var n = args[1];
-  var x = args[2];
-  var y = args[3];
-  var speed = args[4];
-  fill(237, 34, 93);
-  textSize(98);
-  noStroke();
-
-  if (n < sentence.length) {
-    text(sentence.substring(0, n + 1), x, y);
-    n += 1;
-    setTimeout(function () {
-      typeWriter(sentence, n, x, y, speed);
-    }, speed);
-    noLoop();
-  }
-}
-
-exports.typeWriter = typeWriter;
 },{}],"../node_modules/animejs/lib/anime.es.js":[function(require,module,exports) {
 "use strict";
 
@@ -1935,7 +1898,7 @@ anime.random = function (min, max) {
 
 var _default = anime;
 exports.default = _default;
-},{}],"lib/animeJSWriter.ts":[function(require,module,exports) {
+},{}],"lib/addText.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -1947,81 +1910,38 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.animeJSWriter = void 0;
+exports.addText = void 0;
 
-var animejs_1 = __importDefault(require("animejs"));
-
-function animeJSWriter() {
-  //arguments : sentence, n, x, y, duration
-  // TODO: implement this
-  var args = [];
-
-  for (var _i = 0; _i < arguments.length; _i++) {
-    args[_i] = arguments[_i];
-  }
-
-  var div = createDiv('<svg width="200" height="220" viewBox="0 0 1000 1000"> <path id="MJX-5-TEX-I-3C0" d="M132 -11Q98 -11 98 22V33L111 61Q186 219 220 334L228 358H196Q158 358 142 355T103 336Q92 329 81 318T62 297T53 285Q51 284 38 284Q19 284 19 294Q19 300 38 329T93 391T164 429Q171 431 389 431Q549 431 553 430Q573 423 573 402Q573 371 541 360Q535 358 472 358H408L405 341Q393 269 393 222Q393 170 402 129T421 65T431 37Q431 20 417 5T381 -10Q370 -10 363 -7T347 17T331 77Q330 86 330 121Q330 170 339 226T357 318T367 358H269L268 354Q268 351 249 275T206 114T175 17Q164 -11 132 -11Z"></path></svg>');
-  div.style("transform", "rotate(180deg)");
-  div.id("anime-demo");
-  div.position(10, 0);
-  var pathEls = document.querySelectorAll("path");
-
-  for (var i = 0; i < pathEls.length; i++) {
-    var pathEl = pathEls[i];
-    var offset = animejs_1.default.setDashoffset(pathEl);
-    pathEl.setAttribute("stroke-dashoffset", offset); //console.log(pathEl);
-
-    animejs_1.default({
-      targets: pathEl,
-      strokeDashoffset: [animejs_1.default.setDashoffset, 0],
-      easing: "easeInOutCubic",
-      duration: 4000,
-      //delay : i*500,
-      begin: function begin(anim) {
-        pathEl.setAttribute("stroke", "black");
-        pathEl.setAttribute("fill", "none");
-      },
-      complete: function complete(anim) {
-        pathEl.setAttribute("fill", "black");
-      },
-      autoplay: true //loop : true,
-
-    });
-  } //noLoop()
-
-}
-
-exports.animeJSWriter = animeJSWriter;
-},{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"lib/writeText.ts":[function(require,module,exports) {
-"use strict";
-
-var __importDefault = this && this.__importDefault || function (mod) {
-  return mod && mod.__esModule ? mod : {
-    "default": mod
-  };
-};
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.writeText = void 0;
-
-var animejs_1 = __importDefault(require("animejs")); //TODO : add methods to call different animations by 'animation-type' argument
+var animejs_1 = __importDefault(require("animejs")); //TODO : position and size
+//TODO : fix 'write' animation
+//TODO : fix duration and delay
 
 
-var writeText =
+var addText =
 /** @class */
 function () {
-  function writeText(sentence, x, y) {
+  function addText(sentence, x, y) {
     this.writeTextElement = createElement('h1', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
     this.writeTextElement.position(x, y);
   }
 
-  writeText.prototype.play = function (timeDuration) {
+  addText.prototype.play = function (animation_type, timeDuration) {
+    if (animation_type === void 0) {
+      animation_type = 'write';
+    }
+
     if (timeDuration === void 0) {
       timeDuration = 180;
     }
 
+    if (animation_type == 'write') {
+      this.write(timeDuration);
+    } else if (animation_type == 'all-at-once') {
+      console.log('all at once');
+    }
+  };
+
+  addText.prototype.write = function (timeDuration) {
     animejs_1.default.timeline({
       loop: false
     }).add({
@@ -2037,10 +1957,10 @@ function () {
     });
   };
 
-  return writeText;
+  return addText;
 }();
 
-exports.writeText = writeText;
+exports.addText = addText;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"../node_modules/mathjax-full/js/util/PrioritizedList.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -40285,7 +40205,7 @@ function TeXToSVG(str, opts) {
 
 module.exports = TeXToSVG;
 
-},{"mathjax-full/js/mathjax.js":"../node_modules/mathjax-full/js/mathjax.js","mathjax-full/js/input/tex.js":"../node_modules/mathjax-full/js/input/tex.js","mathjax-full/js/output/svg.js":"../node_modules/mathjax-full/js/output/svg.js","mathjax-full/js/adaptors/liteAdaptor.js":"../node_modules/mathjax-full/js/adaptors/liteAdaptor.js","mathjax-full/js/handlers/html.js":"../node_modules/mathjax-full/js/handlers/html.js","mathjax-full/js/a11y/assistive-mml.js":"../node_modules/mathjax-full/js/a11y/assistive-mml.js","mathjax-full/js/input/tex/AllPackages.js":"../node_modules/mathjax-full/js/input/tex/AllPackages.js"}],"lib/writeTex.ts":[function(require,module,exports) {
+},{"mathjax-full/js/mathjax.js":"../node_modules/mathjax-full/js/mathjax.js","mathjax-full/js/input/tex.js":"../node_modules/mathjax-full/js/input/tex.js","mathjax-full/js/output/svg.js":"../node_modules/mathjax-full/js/output/svg.js","mathjax-full/js/adaptors/liteAdaptor.js":"../node_modules/mathjax-full/js/adaptors/liteAdaptor.js","mathjax-full/js/handlers/html.js":"../node_modules/mathjax-full/js/handlers/html.js","mathjax-full/js/a11y/assistive-mml.js":"../node_modules/mathjax-full/js/a11y/assistive-mml.js","mathjax-full/js/input/tex/AllPackages.js":"../node_modules/mathjax-full/js/input/tex/AllPackages.js"}],"lib/addTeX.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -40297,17 +40217,17 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.writeTex = void 0;
+exports.addTeX = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
-var tex_to_svg_1 = __importDefault(require("tex-to-svg")); //TODO : duration automation and clear 
+var tex_to_svg_1 = __importDefault(require("tex-to-svg")); //TODO : duration automation and clear
 
 
-var writeTex =
+var addTeX =
 /** @class */
 function () {
-  function writeTex(sentence, timeDuration, x, y, width_svg, height_svg) {
+  function addTeX(sentence, timeDuration, x, y, width_svg, height_svg) {
     if (x === void 0) {
       x = 10;
     }
@@ -40324,13 +40244,40 @@ function () {
       height_svg = 300;
     }
 
+    this.x = 10;
+    this.y = 10;
+    this.timeDuration = timeDuration;
+    this.x = x;
+    this.y = y;
+    this.sentence = sentence;
+    this.width_svg = width_svg;
+    this.height_svg = height_svg;
     this.SVGEquation = tex_to_svg_1.default(sentence);
+  }
+
+  addTeX.prototype.play = function (animation_type, timeDuration) {
+    if (animation_type === void 0) {
+      animation_type = 'write';
+    }
+
+    if (timeDuration == null) {
+      timeDuration = 50 * this.sentence.length;
+    }
+
+    if (animation_type == 'write') {
+      this.write(timeDuration);
+    } else if (animation_type == 'all-at-once') {
+      this.all_at_once(timeDuration);
+    }
+  };
+
+  addTeX.prototype.all_at_once = function (timeDuration) {
     this.writeTexElement = createDiv(this.SVGEquation);
-    var svg = document.querySelectorAll('svg');
-    svg[0].setAttribute('width', width_svg + "px");
-    svg[0].setAttribute('height', height_svg + "px");
+    var svg = this.writeTexElement.elt.querySelectorAll('svg');
+    svg[0].setAttribute('width', this.width_svg + "px");
+    svg[0].setAttribute('height', this.height_svg + "px");
     var g = this.writeTexElement.elt.querySelectorAll('g');
-    this.writeTexElement.position(x, y);
+    this.writeTexElement.position(this.x, this.y);
     var pathEls = this.writeTexElement.elt.querySelectorAll('path'); //nodelist
 
     for (var i = 0; i < pathEls.length; i++) {
@@ -40342,9 +40289,11 @@ function () {
         strokeDashoffset: [animejs_1.default.setDashoffset, 0],
         easing: 'easeInOutCubic',
         //easing: 'easeOutExpo',
-        duration: timeDuration,
+        duration: this.timeDuration,
         //delay: i * 1000,
-        delay: animejs_1.default.stagger(500),
+        delay: animejs_1.default.stagger(1000, {
+          direction: 'normal'
+        }),
         begin: function begin(anim) {
           pathEl.setAttribute('stroke', 'black');
           pathEl.setAttribute('fill', 'none');
@@ -40358,12 +40307,47 @@ function () {
         autoplay: true
       });
     }
-  }
+  };
 
-  return writeTex;
+  addTeX.prototype.write = function (timeDuration) {
+    this.writeTexElement = createDiv(this.SVGEquation);
+    var svg = this.writeTexElement.elt.querySelectorAll('svg');
+    svg[0].setAttribute('width', this.width_svg + "px");
+    svg[0].setAttribute('height', this.height_svg + "px");
+    var g = this.writeTexElement.elt.querySelectorAll('g'); // g[0].setAttribute('fill', 'none');
+    // g[0].setAttribute('stroke-width', '10px');
+
+    this.writeTexElement.position(this.x, this.y); //const pathEls = this.writeTexElement.elt.querySelectorAll('path'); //nodelist
+
+    animejs_1.default.timeline({
+      loop: false
+    }).add({
+      targets: this.writeTexElement.elt.querySelectorAll('path'),
+      //scale: [4, 1],
+      fill: ['rgba(0,0,0,0)', '#000000'],
+      //stroke : "black",
+      //stroke-width: "10px",
+      strokeDashoffset: [animejs_1.default.setDashoffset, 0],
+      opacity: [0, 1],
+      begin: function begin(anim) {
+        g[0].setAttribute('fill', 'none');
+        g[0].setAttribute('stroke-width', '10px');
+      },
+      complete: function complete(anim) {
+        g[0].setAttribute('fill', 'black');
+      },
+      easing: 'easeInOutCubic',
+      duration: timeDuration,
+      delay: animejs_1.default.stagger(400, {
+        start: 0
+      })
+    });
+  };
+
+  return addTeX;
 }();
 
-exports.writeTex = writeTex;
+exports.addTeX = addTeX;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js","tex-to-svg":"../node_modules/tex-to-svg/TeXToSVG.js"}],"index.ts":[function(require,module,exports) {
 
 "use strict";
@@ -40377,22 +40361,14 @@ var myCircle_1 = require("./lib/myCircle");
 
 global.myCircle = myCircle_1.myCircle;
 
-var typeWriter_1 = require("./lib/typeWriter");
+var addText_1 = require("./lib/addText");
 
-global.typeWriter = typeWriter_1.typeWriter;
+global.addText = addText_1.addText;
 
-var animeJSWriter_1 = require("./lib/animeJSWriter");
+var addTeX_1 = require("./lib/addTeX");
 
-global.animeJSWriter = animeJSWriter_1.animeJSWriter;
-
-var writeText_1 = require("./lib/writeText");
-
-global.writeText = writeText_1.writeText;
-
-var writeTex_1 = require("./lib/writeTex");
-
-global.writeTex = writeTex_1.writeTex;
-},{"./lib/myCircle":"lib/myCircle.ts","./lib/typeWriter":"lib/typeWriter.ts","./lib/animeJSWriter":"lib/animeJSWriter.ts","./lib/writeText":"lib/writeText.ts","./lib/writeTex":"lib/writeTex.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+global.addTeX = addTeX_1.addTeX;
+},{"./lib/myCircle":"lib/myCircle.ts","./lib/addText":"lib/addText.ts","./lib/addTeX":"lib/addTeX.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -40420,7 +40396,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62667" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64764" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

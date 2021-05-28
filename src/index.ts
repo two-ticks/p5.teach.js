@@ -4,18 +4,10 @@ import { myCircle } from './lib/myCircle';
 
 global.myCircle = myCircle;
 
-import { typeWriter } from './lib/typeWriter';
+import { addText } from './lib/addText';
 
-global.typeWriter = typeWriter;
+global.addText = addText;
 
-import { animeJSWriter } from './lib/animeJSWriter';
+import { addTeX } from './lib/addTeX';
 
-global.animeJSWriter = animeJSWriter;
-
-import { writeText } from './lib/writeText';
-
-global.writeText = writeText;
-
-import { writeTex } from './lib/writeTex';
-
-global.writeTex = writeTex;
+global.addTeX = addTeX;
