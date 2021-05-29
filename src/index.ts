@@ -4,10 +4,23 @@ import { myCircle } from './lib/myCircle';
 
 global.myCircle = myCircle;
 
-import { addText } from './lib/addText';
+import { Text } from './lib/Text';
 
-global.addText = addText;
+global.Text = Text;
 
-import { addTeX } from './lib/addTeX';
+import { TeX } from './lib/TeX';
 
-global.addTeX = addTeX;
+global.TeX = TeX;
+
+import { shift } from './lib/shift';
+
+global.shift = shift;
+
+
+import { T_scale } from './lib/scale';
+
+global.T_scale = T_scale;
+
+import { play } from './lib/play';
+
+global.play = play;
