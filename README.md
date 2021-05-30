@@ -23,18 +23,28 @@
 1. Run `yarn build` to export the final js file
 2. Final js file is exported as `dist/p5.teach.js`
 
-# Text and TeX
+# Reference
+
+## MObjects : TeX and Text
+
+`TeX` creates TeX 
 
 ```js
-`addTeX` adds TeX to the canvas
-let tex = new addTeX(
+let tex = new TeX(
   '\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
   2000,
   width / 2,
   height / 2
 );
 ```
+
 `object.play('animation-type')` plays the choosen animation
 
 `object.shiftTo(x,y)` shifts the object to specified position
 
+## TODO
+
+- [ ] time line controls
+- [ ] update values in text and TeX
+- [ ] Scene : how to implement ?
+- [ ] documentation
