@@ -163,6 +163,23 @@ export function play(
         duration: timeDuration,
         delay: anime.stagger(180, { start: 1000 })
       });
+    } else if (animation_type == 'blink') {
+      console.log('blink');
+
+      const animation: any = anime({
+        targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [0, 1, 0],
+        //translateZ: 0,
+        easing: 'easeOutSine',
+        // complete: function (anim) {
+        //   animation.reverse();
+        // },
+        duration: timeDuration,
+        delay: anime.stagger(200),
+        loop: true
+      });
     }
   }
   //Text animation

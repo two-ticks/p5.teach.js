@@ -40521,6 +40521,22 @@ function play(_object, animation_type, timeDuration) {
           start: 1000
         })
       });
+    } else if (animation_type == 'blink') {
+      console.log('blink');
+      var animation = animejs_1.default({
+        targets: _object.writeTexElement.elt.querySelectorAll('svg'),
+        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [0, 1, 0],
+        //translateZ: 0,
+        easing: 'easeOutSine',
+        // complete: function (anim) {
+        //   animation.reverse();
+        // },
+        duration: timeDuration,
+        delay: animejs_1.default.stagger(200),
+        loop: true
+      });
     }
   } //Text animation
   else if (_object instanceof Text_1.Text) {
@@ -40614,7 +40630,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57629" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62300" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

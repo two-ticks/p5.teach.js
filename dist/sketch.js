@@ -24,7 +24,7 @@ function scene() {
 
   //tex_1.play(); //DEFAULT: write
   //play(tex_2,'all-at-once');
-  play(tex_2, 'appear', 2000);
+  play(tex_2, 'blink', 500);
   //T_scale (text_1, 2);
   //play(text_1);
   //fadeIn(tex_2, 2000);
