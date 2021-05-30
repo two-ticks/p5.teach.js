@@ -7,6 +7,7 @@ import { add } from './add';
 
 /**
  * Animation functions
+ * 
  * @param    {Object} - object of TeX or Text class
  * @param    {String} - animation type
  * @param    {number} - time duration
@@ -129,7 +130,7 @@ export function play(
           _object.writeTexElement.style('opacity', '1'); //clear all stray elements
         },
         duration: timeDuration,
-        delay: anime.stagger(180, { start: 1000 })
+        delay: anime.stagger(180, { start: 1000, direction: 'normal'})
       });
     } else if (animation_type == 'dissolve') {
       console.log('dissolve called');

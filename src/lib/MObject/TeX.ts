@@ -2,6 +2,29 @@ import TeXToSVG from 'tex-to-svg';
 
 //TODO : duration automation and clear
 
+/**
+ * TeX class
+ *
+ * @param    {String} - escaped TeX input
+ * @param    {number} - x
+ * @param    {number} - y
+ * @param    {number} - width
+ * @param    {number} - height
+ *
+ * @example
+ *
+ * example for playing animation of type 'appear' for TeX object:
+ * ```js
+ * let tex_1 = new TeX(
+ *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
+ *   200,
+ *   300,
+ *   200,
+ *   100
+ * );
+ * ```
+ * @experimental
+ */
 export class TeX {
   writeTexElement: any;
   SVGEquation: any;
@@ -28,16 +51,13 @@ export class TeX {
     this.SVGEquation = TeXToSVG(sentence);
   }
 
-  
-
   // all_at_once(timeDuration: number) {
-    
+
   // }
 
   // write(timeDuration: number) {
-    
+
   // }
 
   // position and scaling methods
-
 }

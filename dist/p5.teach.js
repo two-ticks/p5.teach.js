@@ -38438,6 +38438,30 @@ exports.TeX = void 0;
 
 var tex_to_svg_1 = __importDefault(require("tex-to-svg")); //TODO : duration automation and clear
 
+/**
+ * TeX class
+ *
+ * @param    {String} - escaped TeX input
+ * @param    {number} - x
+ * @param    {number} - y
+ * @param    {number} - width
+ * @param    {number} - height
+ *
+ * @example
+ *
+ * example for playing animation of type 'appear' for TeX object:
+ * ```js
+ * let tex_1 = new TeX(
+ *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
+ *   200,
+ *   300,
+ *   200,
+ *   100
+ * );
+ * ```
+ * @experimental
+ */
+
 
 var TeX =
 /** @class */
@@ -40343,6 +40367,7 @@ var add_1 = require("./add"); //TODO : use add function to initiate, then play a
 
 /**
  * Animation functions
+ *
  * @param    {Object} - object of TeX or Text class
  * @param    {String} - animation type
  * @param    {number} - time duration
@@ -40481,7 +40506,8 @@ function play(_object, animation_type, timeDuration) {
         },
         duration: timeDuration,
         delay: animejs_1.default.stagger(180, {
-          start: 1000
+          start: 1000,
+          direction: 'normal'
         })
       });
     } else if (animation_type == 'dissolve') {
@@ -40630,7 +40656,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62300" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56893" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
