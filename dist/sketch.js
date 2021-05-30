@@ -23,10 +23,11 @@ function scene() {
   let text_1 = new Text('p5-teach is a superb library!!', 200, 200);
 
   //tex_1.play(); //DEFAULT: write
-  play(tex_2,'all-at-once');
-  T_scale (text_1, 2);
-  play(text_1);
-  
+  //play(tex_2,'all-at-once');
+  play(tex_2, 'appear', 2000);
+  //T_scale (text_1, 2);
+  //play(text_1);
+  //fadeIn(tex_2, 2000);
   //shift(tex_1, width / 2, 200);
   //tex_1.scale(2);
   //play(tex_1);

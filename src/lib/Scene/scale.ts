@@ -1,7 +1,7 @@
-import { TeX } from './TeX';
-import { Text } from './Text';
+import { TeX } from '../MObject/TeX';
+import { Text } from '../MObject/Text';
 
-//TODO : clean and comment 
+//TODO : clean and comment
 //TODO : test
 
 export function T_scale(_object: any, scale_to: number) {

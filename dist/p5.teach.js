@@ -131,7 +131,7 @@ function myCircle() {
 }
 
 exports.myCircle = myCircle;
-},{}],"lib/Text.ts":[function(require,module,exports) {
+},{}],"lib/MObject/Text.ts":[function(require,module,exports) {
 "use strict"; //TODO : insure Text is not reserved by any other dependecies
 //TODO : position and size
 //TODO : fix 'write' animation
@@ -38422,7 +38422,7 @@ function TeXToSVG(str, opts) {
 
 module.exports = TeXToSVG;
 
-},{"mathjax-full/js/mathjax.js":"../node_modules/mathjax-full/js/mathjax.js","mathjax-full/js/input/tex.js":"../node_modules/mathjax-full/js/input/tex.js","mathjax-full/js/output/svg.js":"../node_modules/mathjax-full/js/output/svg.js","mathjax-full/js/adaptors/liteAdaptor.js":"../node_modules/mathjax-full/js/adaptors/liteAdaptor.js","mathjax-full/js/handlers/html.js":"../node_modules/mathjax-full/js/handlers/html.js","mathjax-full/js/a11y/assistive-mml.js":"../node_modules/mathjax-full/js/a11y/assistive-mml.js","mathjax-full/js/input/tex/AllPackages.js":"../node_modules/mathjax-full/js/input/tex/AllPackages.js"}],"lib/TeX.ts":[function(require,module,exports) {
+},{"mathjax-full/js/mathjax.js":"../node_modules/mathjax-full/js/mathjax.js","mathjax-full/js/input/tex.js":"../node_modules/mathjax-full/js/input/tex.js","mathjax-full/js/output/svg.js":"../node_modules/mathjax-full/js/output/svg.js","mathjax-full/js/adaptors/liteAdaptor.js":"../node_modules/mathjax-full/js/adaptors/liteAdaptor.js","mathjax-full/js/handlers/html.js":"../node_modules/mathjax-full/js/handlers/html.js","mathjax-full/js/a11y/assistive-mml.js":"../node_modules/mathjax-full/js/a11y/assistive-mml.js","mathjax-full/js/input/tex/AllPackages.js":"../node_modules/mathjax-full/js/input/tex/AllPackages.js"}],"lib/MObject/TeX.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -38476,7 +38476,7 @@ function () {
 }();
 
 exports.TeX = TeX;
-},{"tex-to-svg":"../node_modules/tex-to-svg/TeXToSVG.js"}],"lib/shift.ts":[function(require,module,exports) {
+},{"tex-to-svg":"../node_modules/tex-to-svg/TeXToSVG.js"}],"lib/Scene/shift.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38496,7 +38496,7 @@ function shift(_object, x, y) {
 }
 
 exports.shift = shift;
-},{}],"lib/scale.ts":[function(require,module,exports) {
+},{}],"lib/Scene/scale.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38504,9 +38504,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.T_scale = void 0;
 
-var TeX_1 = require("./TeX");
+var TeX_1 = require("../MObject/TeX");
 
-var Text_1 = require("./Text"); //TODO : clean and comment 
+var Text_1 = require("../MObject/Text"); //TODO : clean and comment
 //TODO : test
 
 
@@ -38525,7 +38525,7 @@ function T_scale(_object, scale_to) {
 }
 
 exports.T_scale = T_scale;
-},{"./TeX":"lib/TeX.ts","./Text":"lib/Text.ts"}],"../node_modules/animejs/lib/anime.es.js":[function(require,module,exports) {
+},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts"}],"../node_modules/animejs/lib/anime.es.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40292,7 +40292,34 @@ anime.random = function (min, max) {
 
 var _default = anime;
 exports.default = _default;
-},{}],"lib/play.ts":[function(require,module,exports) {
+},{}],"lib/Scene/add.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.add = void 0;
+
+var TeX_1 = require("../MObject/TeX");
+
+function add(_object) {
+  if (_object instanceof TeX_1.TeX) {
+    //tex animations
+    console.log('TeX');
+    _object.writeTexElement = createDiv(_object.SVGEquation);
+
+    var svg = _object.writeTexElement.elt.querySelectorAll('svg');
+
+    svg[0].setAttribute('width', _object.width_svg + "px");
+    svg[0].setAttribute('height', _object.height_svg + "px"); // g[0].setAttribute('fill', 'none');
+    // g[0].setAttribute('stroke-width', '10px');
+
+    _object.writeTexElement.position(_object.x, _object.y);
+  }
+}
+
+exports.add = add;
+},{"../MObject/TeX":"lib/MObject/TeX.ts"}],"lib/Scene/play.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -40306,11 +40333,28 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.play = void 0;
 
-var TeX_1 = require("./TeX");
+var TeX_1 = require("../MObject/TeX");
 
-var Text_1 = require("./Text");
+var Text_1 = require("../MObject/Text");
 
 var animejs_1 = __importDefault(require("animejs"));
+
+var add_1 = require("./add"); //TODO : use add function to initiate, then play animation
+
+/**
+ * Animation functions
+ * @param    {Object} - object of TeX or Text class
+ * @param    {String} - animation type
+ * @param    {number} - time duration
+ *
+ * @example
+ * example for playing animation of type 'appear' for TeX object:
+ * ```js
+ * play(tex_1, 'appear', 2000);
+ * ```
+ * @experimental
+ */
+
 
 function play(_object, animation_type, timeDuration) {
   if (animation_type === void 0) {
@@ -40322,24 +40366,26 @@ function play(_object, animation_type, timeDuration) {
   }
 
   if (_object instanceof TeX_1.TeX) {
-    //tex animations
+    //adding element before animation
+    if (!_object.writeTexElement) {
+      add_1.add(_object);
+    } //tex animations
+
+
     console.log('TeX');
 
     if (animation_type == 'write') {
       //write(_object, timeDuration);
-      _object.writeTexElement = createDiv(_object.SVGEquation);
-
-      var svg = _object.writeTexElement.elt.querySelectorAll('svg');
-
-      svg[0].setAttribute('width', _object.width_svg + "px");
-      svg[0].setAttribute('height', _object.height_svg + "px");
-
-      var g_1 = _object.writeTexElement.elt.querySelectorAll('g'); // g[0].setAttribute('fill', 'none');
-      // g[0].setAttribute('stroke-width', '10px');
-
-
-      _object.writeTexElement.position(_object.x, _object.y); //const pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
-
+      // _object.writeTexElement = createDiv(_object.SVGEquation);
+      // let svg = _object.writeTexElement.elt.querySelectorAll('svg');
+      // svg[0].setAttribute('width', `${_object.width_svg}px`);
+      // svg[0].setAttribute('height', `${_object.height_svg}px`);
+      // const g = _object.writeTexElement.elt.querySelectorAll('g');
+      // // g[0].setAttribute('fill', 'none');
+      // // g[0].setAttribute('stroke-width', '10px');
+      // _object.writeTexElement.position(_object.x, _object.y);
+      //const pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+      var g_1 = _object.writeTexElement.elt.querySelectorAll('g');
 
       animejs_1.default.timeline({
         loop: false
@@ -40366,16 +40412,12 @@ function play(_object, animation_type, timeDuration) {
       });
     } else if (animation_type == 'all-at-once') {
       //_object.all_at_once(timeDuration);
-      _object.writeTexElement = createDiv(_object.SVGEquation);
-
-      var svg = _object.writeTexElement.elt.querySelectorAll('svg');
-
-      svg[0].setAttribute('width', _object.width_svg + "px");
-      svg[0].setAttribute('height', _object.height_svg + "px");
-
+      // _object.writeTexElement = createDiv(_object.SVGEquation);
+      // let svg = _object.writeTexElement.elt.querySelectorAll('svg');
+      // svg[0].setAttribute('width', `${_object.width_svg}px`);
+      // svg[0].setAttribute('height', `${_object.height_svg}px`);
+      // _object.writeTexElement.position(_object.x, _object.y);
       var g_2 = _object.writeTexElement.elt.querySelectorAll('g');
-
-      _object.writeTexElement.position(_object.x, _object.y);
 
       var pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
 
@@ -40406,6 +40448,79 @@ function play(_object, animation_type, timeDuration) {
           autoplay: true
         });
       }
+    } else if (animation_type == 'fade-in') {
+      console.log('fadeIn called');
+      animejs_1.default({
+        targets: _object.writeTexElement.elt.querySelectorAll('svg'),
+        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [0, 1],
+        //translateZ: 0,
+        easing: 'easeOutExpo',
+        complete: function complete(anim) {
+          _object.writeTexElement.style('opacity', '1'); //clear all stray elements
+
+        },
+        duration: timeDuration,
+        delay: animejs_1.default.stagger(180, {
+          start: 1000
+        })
+      });
+    } else if (animation_type == 'appear') {
+      console.log('appear called');
+      animejs_1.default({
+        //targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+        targets: _object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [0, 1],
+        //translateZ: 0,
+        easing: 'easeOutExpo',
+        complete: function complete(anim) {
+          _object.writeTexElement.style('opacity', '1'); //clear all stray elements
+
+        },
+        duration: timeDuration,
+        delay: animejs_1.default.stagger(180, {
+          start: 1000
+        })
+      });
+    } else if (animation_type == 'dissolve') {
+      console.log('dissolve called'); //add(_object);
+
+      animejs_1.default({
+        //targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+        targets: _object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [1, 0],
+        //translateZ: 0,
+        easing: 'easeOutExpo',
+        complete: function complete(anim) {
+          _object.writeTexElement.style('opacity', '0'); //clear all stray elements
+
+        },
+        duration: timeDuration,
+        delay: animejs_1.default.stagger(180, {
+          start: 1000
+        })
+      });
+    } else if (animation_type == 'fade-out') {
+      console.log('fadeout called');
+      animejs_1.default({
+        targets: _object.writeTexElement.elt.querySelectorAll('svg'),
+        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [1, 0],
+        //translateZ: 0,
+        easing: 'easeOutExpo',
+        complete: function complete(anim) {
+          _object.writeTexElement.style('opacity', '0'); //clear all stray elements
+
+        },
+        duration: timeDuration,
+        delay: animejs_1.default.stagger(180, {
+          start: 1000
+        })
+      });
     }
   } //Text animation
   else if (_object instanceof Text_1.Text) {
@@ -40425,7 +40540,8 @@ function play(_object, animation_type, timeDuration) {
           duration: 950,
           delay: animejs_1.default.stagger(180, {
             start: timeDuration
-          })
+          }) //time duration must be replaced with delay
+
         });
       } else if (animation_type == 'all-at-once') {
         console.log('all at once');
@@ -40434,7 +40550,7 @@ function play(_object, animation_type, timeDuration) {
 }
 
 exports.play = play;
-},{"./TeX":"lib/TeX.ts","./Text":"lib/Text.ts","animejs":"../node_modules/animejs/lib/anime.es.js"}],"index.ts":[function(require,module,exports) {
+},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts","animejs":"../node_modules/animejs/lib/anime.es.js","./add":"lib/Scene/add.ts"}],"index.ts":[function(require,module,exports) {
 
 "use strict";
 
@@ -40447,26 +40563,30 @@ var myCircle_1 = require("./lib/myCircle");
 
 global.myCircle = myCircle_1.myCircle;
 
-var Text_1 = require("./lib/Text");
+var Text_1 = require("./lib/MObject/Text");
 
 global.Text = Text_1.Text;
 
-var TeX_1 = require("./lib/TeX");
+var TeX_1 = require("./lib/MObject/TeX");
 
 global.TeX = TeX_1.TeX;
 
-var shift_1 = require("./lib/shift");
+var shift_1 = require("./lib/Scene/shift");
 
 global.shift = shift_1.shift;
 
-var scale_1 = require("./lib/scale");
+var scale_1 = require("./lib/Scene/scale");
 
 global.T_scale = scale_1.T_scale;
 
-var play_1 = require("./lib/play");
+var play_1 = require("./lib/Scene/play");
 
 global.play = play_1.play;
-},{"./lib/myCircle":"lib/myCircle.ts","./lib/Text":"lib/Text.ts","./lib/TeX":"lib/TeX.ts","./lib/shift":"lib/shift.ts","./lib/scale":"lib/scale.ts","./lib/play":"lib/play.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var add_1 = require("./lib/Scene/add");
+
+global.add = add_1.add;
+},{"./lib/myCircle":"lib/myCircle.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -40494,7 +40614,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60759" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57629" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
