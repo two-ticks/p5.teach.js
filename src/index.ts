@@ -1,8 +1,8 @@
 const global: any = globalThis;
 
-import { myCircle } from './lib/myCircle';
+import { Scene } from './lib/Scene/scene';
 
-global.myCircle = myCircle;
+global.Scene = Scene;
 
 import { Text } from './lib/MObject/Text';
 

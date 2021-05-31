@@ -33,7 +33,7 @@ export function play(
       add(_object);
     }
     //tex animations
-    console.log('TeX');
+    //console.log('TeX');
     if (animation_type == 'write') {
       //write(_object, timeDuration);
       // _object.writeTexElement = createDiv(_object.SVGEquation);
@@ -109,7 +109,7 @@ export function play(
         //scale: [4, 1],
         opacity: [0, 1],
         //translateZ: 0,
-        easing: 'easeOutExpo',
+        easing: 'easeOutExpo', //fix : 'linear' if animation requires
         complete: function (anim) {
           _object.writeTexElement.style('opacity', '1'); //clear all stray elements
         },
