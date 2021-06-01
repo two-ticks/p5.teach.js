@@ -16,7 +16,6 @@ import { shift } from './lib/Scene/shift';
 
 global.shift = shift;
 
-
 import { T_scale } from './lib/Scene/scale';
 
 global.T_scale = T_scale;

@@ -1,8 +1,8 @@
 import { TeX } from '../MObject/TeX';
 import { Text } from '../MObject/Text';
 
-//TODO : clean and comment
-//TODO : test
+//TODO : add test cases
+//TODO : change name from T_scale to something else
 
 export function T_scale(_object: any, scale_to: number) {
   _object.width_svg = scale_to * _object.width_svg;

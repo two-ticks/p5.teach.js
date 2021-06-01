@@ -1,6 +1,6 @@
 import TeXToSVG from 'tex-to-svg';
 
-//TODO : duration automation and clear
+//TODO : add test cases
 
 /**
  * TeX class
@@ -36,13 +36,11 @@ export class TeX {
   sentence: string;
   constructor(
     sentence: string,
-    //timeDuration: number,
     x: number = 10,
     y: number = 10,
     width_svg: number = 300,
     height_svg: number = 300
   ) {
-    //this.timeDuration = timeDuration;
     this.x = x;
     this.y = y;
     this.sentence = sentence;
@@ -50,14 +48,4 @@ export class TeX {
     this.height_svg = height_svg;
     this.SVGEquation = TeXToSVG(sentence);
   }
-
-  // all_at_once(timeDuration: number) {
-
-  // }
-
-  // write(timeDuration: number) {
-
-  // }
-
-  // position and scaling methods
 }
