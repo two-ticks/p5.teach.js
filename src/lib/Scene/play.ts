@@ -20,7 +20,7 @@ import * as CONFIG from '../config.js';
  * ```
  * @experimental
  */
-export function play(
+export function play( //TODO: use '...args'  
   _object: any,
   animation_type: string = 'write',
   timeDuration: number

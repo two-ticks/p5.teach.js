@@ -6,7 +6,7 @@
   "scripts": {
     "build": "parcel build src/index.ts --out-file p5.teach.js --out-dir dist --no-source-maps",
     "dev": "parcel watch src/index.ts --out-file p5.teach.js --out-dir dist --no-source-maps",
-    "test": "jest",
+    "test": "jest --watchAll",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "keywords": [],
