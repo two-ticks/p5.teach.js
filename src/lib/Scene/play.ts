@@ -2,6 +2,7 @@ import { TeX } from '../MObject/TeX';
 import { Text } from '../MObject/Text';
 import anime from 'animejs';
 import { add } from './add';
+import * as CONFIG from '../config.js';
 
 //TODO : use add function to initiate, then play animation
 
@@ -39,7 +40,7 @@ export function play(
       anime.timeline({ loop: false }).add({
         targets: _object.writeTexElement.elt.querySelectorAll('path'),
         //scale: [4, 1],
-        fill: ['rgba(0,0,0,0)', '#000000'], //TODO : fill is black by default can be customised through config files
+        fill: ['rgba(0,0,0,0)', '#000000'], //TODO : fill is black by default can be customised through set fill methods
         //stroke : "black",     //TODO : customisable through config
         //stroke-width: "10px", //customisable through config
         strokeDashoffset: [anime.setDashoffset, 0],
@@ -53,7 +54,7 @@ export function play(
         },
         easing: 'easeInOutCubic',
         duration: timeDuration,
-        delay: anime.stagger(400, { start: 0 })
+        delay: anime.stagger(CONFIG.PLAY.STAGGERING_DELAY, { start: 0 })
       });
     } else if (animation_type == 'all-at-once') {
       const g = _object.writeTexElement.elt.querySelectorAll('g');

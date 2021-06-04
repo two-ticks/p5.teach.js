@@ -1,3 +1,4 @@
+
 function setup() {
   createCanvas(400, 400);
   background(220);
@@ -37,9 +38,10 @@ async function reel() {
   //play(tex, 'all-at-once'); //play(MObject, 'animation-type', [duration])
   //await scene.delay(2000);
   //add(tex1);
-  //play(tex,'write', 8000); //DEFAULT ANIMATION TYPE : write
+  play(tex,'write', 8000); //DEFAULT ANIMATION TYPE : write
   //play(tex, 'fade-out');   //fade-out
   //play(tex, 'dissolve',100);
   //play(tex1, 'fade-in');
-  play(tex1, 'appear', 9000);
+  //play(tex1, 'appear', 9000);
+  //transform(tex,tex1);
 }

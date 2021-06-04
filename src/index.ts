@@ -27,3 +27,7 @@ global.play = play;
 import { add } from './lib/Scene/add';
 
 global.add = add;
+
+import { transform } from './lib/Scene/transform';
+
+global.transform = transform;
