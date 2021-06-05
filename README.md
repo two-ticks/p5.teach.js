@@ -1,5 +1,45 @@
 # p5.teach.js
 
+## File Structure
+
+```bash
+│   .gitignore
+│   .prettierrc
+│   global.d.ts
+│   jest.config.js
+│   package.json
+│   README.md
+│   tsconfig.json
+│   yarn.lock
+│
+├───dist
+│       index.html
+│       p5.js
+│       p5.teach.js
+│       sketch.js
+│
+└───src
+    │   index.ts
+    │
+    ├───lib
+    │   │
+    │   ├───Geometry
+    │   ├───MObject
+    │   │       TeX.ts
+    │   │       Text.ts
+    │   │
+    │   ├───Scene
+    │   │       add.ts
+    │   │       camera.ts
+    │   │       play.ts
+    │   │       scale.ts
+    │   │       shift.ts
+    │   │       transform.ts
+    │   │
+    │   └───Sound
+    └───test
+```
+
 ## Setting up the development environment
 
 1. Yarn should be preinstalled
@@ -23,11 +63,11 @@
 1. Run `yarn build` to export the final js file
 2. Final js file is exported as `dist/p5.teach.js`
 
-# Reference
+## Reference
 
-## MObjects : TeX and Text
+### MObjects : TeX and Text
 
-`TeX` creates TeX 
+`TeX` creates TeX
 
 ```js
 let tex = new TeX(
@@ -44,7 +84,11 @@ let tex = new TeX(
 
 ## TODO
 
+- [x] animation of TeX using anime.js and tex-to-svg
+- [x] typing text animation
+- [x] TeX animation  [example](https://editor.p5js.org/radium.scientist/sketches/HrI2G92Vj)
 - [ ] time line controls
 - [ ] update values in text and TeX
 - [ ] Scene : how to implement ?
+- [ ] morphing and transforming
 - [ ] documentation

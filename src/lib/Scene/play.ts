@@ -2,12 +2,13 @@ import { TeX } from '../MObject/TeX';
 import { Text } from '../MObject/Text';
 import anime from 'animejs';
 import { add } from './add';
+import * as CONFIG from '../config.js';
 
 //TODO : use add function to initiate, then play animation
 
 /**
  * Animation functions
- * 
+ *
  * @param    {Object} - object of TeX or Text class
  * @param    {String} - animation type
  * @param    {number} - time duration
@@ -19,7 +20,7 @@ import { add } from './add';
  * ```
  * @experimental
  */
-export function play(
+export function play( //TODO: use '...args'  
   _object: any,
   animation_type: string = 'write',
   timeDuration: number
@@ -33,24 +34,14 @@ export function play(
       add(_object);
     }
     //tex animations
-    console.log('TeX');
+
     if (animation_type == 'write') {
-      //write(_object, timeDuration);
-      // _object.writeTexElement = createDiv(_object.SVGEquation);
-      // let svg = _object.writeTexElement.elt.querySelectorAll('svg');
-      // svg[0].setAttribute('width', `${_object.width_svg}px`);
-      // svg[0].setAttribute('height', `${_object.height_svg}px`);
-      // const g = _object.writeTexElement.elt.querySelectorAll('g');
-      // // g[0].setAttribute('fill', 'none');
-      // // g[0].setAttribute('stroke-width', '10px');
-      // _object.writeTexElement.position(_object.x, _object.y);
-      //const pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
       const g = _object.writeTexElement.elt.querySelectorAll('g');
       anime.timeline({ loop: false }).add({
         targets: _object.writeTexElement.elt.querySelectorAll('path'),
         //scale: [4, 1],
-        fill: ['rgba(0,0,0,0)', '#000000'], //TODO : fill is black by default can be customised through config files
-        //stroke : "black",     //customisable through config
+        fill: ['rgba(0,0,0,0)', '#000000'], //TODO : fill is black by default can be customised through set fill methods
+        //stroke : "black",     //TODO : customisable through config
         //stroke-width: "10px", //customisable through config
         strokeDashoffset: [anime.setDashoffset, 0],
         opacity: [0, 1],
@@ -63,16 +54,9 @@ export function play(
         },
         easing: 'easeInOutCubic',
         duration: timeDuration,
-        delay: anime.stagger(400, { start: 0 })
+        delay: anime.stagger(CONFIG.PLAY.STAGGERING_DELAY, { start: 0 })
       });
     } else if (animation_type == 'all-at-once') {
-      //_object.all_at_once(timeDuration);
-      // _object.writeTexElement = createDiv(_object.SVGEquation);
-      // let svg = _object.writeTexElement.elt.querySelectorAll('svg');
-      // svg[0].setAttribute('width', `${_object.width_svg}px`);
-      // svg[0].setAttribute('height', `${_object.height_svg}px`);
-
-      // _object.writeTexElement.position(_object.x, _object.y);
       const g = _object.writeTexElement.elt.querySelectorAll('g');
       const pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
 
@@ -84,7 +68,7 @@ export function play(
           targets: pathEl,
           strokeDashoffset: [anime.setDashoffset, 0],
           easing: 'easeInOutCubic',
-          //easing: 'easeOutExpo', //customisable through config
+          //easing: 'easeOutExpo', //TODO : customisable through config
           duration: timeDuration,
           delay: anime.stagger(1000, { direction: 'normal' }), //customisable through config
           begin: function (anim) {
@@ -104,14 +88,11 @@ export function play(
       console.log('fadeIn called');
 
       anime({
-        targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
+        targets: _object.writeTexElement.elt.querySelectorAll('svg'),
         opacity: [0, 1],
-        //translateZ: 0,
-        easing: 'easeOutExpo',
+        easing: 'easeOutExpo', //TODO : fix : 'linear' if animation requires
         complete: function (anim) {
-          _object.writeTexElement.style('opacity', '1'); //clear all stray elements
+          _object.writeTexElement.style('opacity', '1'); //clears all stray elements
         },
         duration: timeDuration,
         delay: anime.stagger(180, { start: 1000 })
@@ -120,27 +101,25 @@ export function play(
       console.log('appear called');
 
       anime({
-        //targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
         targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
+
         opacity: [0, 1],
-        //translateZ: 0,
+
         easing: 'easeOutExpo',
         complete: function (anim) {
           _object.writeTexElement.style('opacity', '1'); //clear all stray elements
         },
         duration: timeDuration,
-        delay: anime.stagger(180, { start: 1000, direction: 'normal'})
+        delay: anime.stagger(180, { start: 1000, direction: 'normal' })
       });
     } else if (animation_type == 'dissolve') {
       console.log('dissolve called');
-      //add(_object);
+
       anime({
-        //targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
         targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
+
         opacity: [1, 0],
-        //translateZ: 0,
+
         easing: 'easeOutExpo',
         complete: function (anim) {
           _object.writeTexElement.style('opacity', '0'); //clear all stray elements
@@ -152,11 +131,10 @@ export function play(
       console.log('fadeout called');
 
       anime({
-        targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
+        targets: _object.writeTexElement.elt.querySelectorAll('svg'),
+
         opacity: [1, 0],
-        //translateZ: 0,
+
         easing: 'easeOutExpo',
         complete: function (anim) {
           _object.writeTexElement.style('opacity', '0'); //clear all stray elements
@@ -168,15 +146,12 @@ export function play(
       console.log('blink');
 
       const animation: any = anime({
-        targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
+        targets: _object.writeTexElement.elt.querySelectorAll('svg'),
+
         opacity: [0, 1, 0],
-        //translateZ: 0,
+
         easing: 'easeOutSine',
-        // complete: function (anim) {
-        //   animation.reverse();
-        // },
+
         duration: timeDuration,
         delay: anime.stagger(200),
         loop: true

@@ -117,20 +117,178 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"lib/myCircle.ts":[function(require,module,exports) {
+})({"lib/Scene/scene.ts":[function(require,module,exports) {
 "use strict";
+
+var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+  function adopt(value) {
+    return value instanceof P ? value : new P(function (resolve) {
+      resolve(value);
+    });
+  }
+
+  return new (P || (P = Promise))(function (resolve, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function step(result) {
+      result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+    }
+
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+};
+
+var __generator = this && this.__generator || function (thisArg, body) {
+  var _ = {
+    label: 0,
+    sent: function sent() {
+      if (t[0] & 1) throw t[1];
+      return t[1];
+    },
+    trys: [],
+    ops: []
+  },
+      f,
+      y,
+      t,
+      g;
+  return g = {
+    next: verb(0),
+    "throw": verb(1),
+    "return": verb(2)
+  }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
+    return this;
+  }), g;
+
+  function verb(n) {
+    return function (v) {
+      return step([n, v]);
+    };
+  }
+
+  function step(op) {
+    if (f) throw new TypeError("Generator is already executing.");
+
+    while (_) {
+      try {
+        if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+        if (y = 0, t) op = [op[0] & 2, t.value];
+
+        switch (op[0]) {
+          case 0:
+          case 1:
+            t = op;
+            break;
+
+          case 4:
+            _.label++;
+            return {
+              value: op[1],
+              done: false
+            };
+
+          case 5:
+            _.label++;
+            y = op[1];
+            op = [0];
+            continue;
+
+          case 7:
+            op = _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+
+          default:
+            if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+              _ = 0;
+              continue;
+            }
+
+            if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+              _.label = op[1];
+              break;
+            }
+
+            if (op[0] === 6 && _.label < t[1]) {
+              _.label = t[1];
+              t = op;
+              break;
+            }
+
+            if (t && _.label < t[2]) {
+              _.label = t[2];
+
+              _.ops.push(op);
+
+              break;
+            }
+
+            if (t[2]) _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+        }
+
+        op = body.call(thisArg, _);
+      } catch (e) {
+        op = [6, e];
+        y = 0;
+      } finally {
+        f = t = 0;
+      }
+    }
+
+    if (op[0] & 5) throw op[1];
+    return {
+      value: op[0] ? op[1] : void 0,
+      done: true
+    };
+  }
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.myCircle = void 0;
+exports.Scene = void 0;
 
-function myCircle() {
-  fill('yellow');
-  circle(width / 2, height / 2, 20);
-}
+var Scene =
+/** @class */
+function () {
+  function Scene() {}
 
-exports.myCircle = myCircle;
+  Scene.prototype.delay = function (ms) {
+    return __awaiter(this, void 0, void 0, function () {
+      return __generator(this, function (_a) {
+        return [2
+        /*return*/
+        , new Promise(function (resolve) {
+          return setTimeout(resolve, ms);
+        })];
+      });
+    });
+  };
+
+  return Scene;
+}();
+
+exports.Scene = Scene;
 },{}],"lib/MObject/Text.ts":[function(require,module,exports) {
 "use strict"; //TODO : insure Text is not reserved by any other dependecies
 //TODO : position and size
@@ -38436,7 +38594,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TeX = void 0;
 
-var tex_to_svg_1 = __importDefault(require("tex-to-svg")); //TODO : duration automation and clear
+var tex_to_svg_1 = __importDefault(require("tex-to-svg")); //TODO : add test cases
 
 /**
  * TeX class
@@ -38466,8 +38624,7 @@ var tex_to_svg_1 = __importDefault(require("tex-to-svg")); //TODO : duration aut
 var TeX =
 /** @class */
 function () {
-  function TeX(sentence, //timeDuration: number,
-  x, y, width_svg, height_svg) {
+  function TeX(sentence, x, y, width_svg, height_svg) {
     if (x === void 0) {
       x = 10;
     }
@@ -38486,8 +38643,7 @@ function () {
 
 
     this.x = 10;
-    this.y = 10; //this.timeDuration = timeDuration;
-
+    this.y = 10;
     this.x = x;
     this.y = y;
     this.sentence = sentence;
@@ -38530,8 +38686,8 @@ exports.T_scale = void 0;
 
 var TeX_1 = require("../MObject/TeX");
 
-var Text_1 = require("../MObject/Text"); //TODO : clean and comment
-//TODO : test
+var Text_1 = require("../MObject/Text"); //TODO : add test cases
+//TODO : change name from T_scale to something else
 
 
 function T_scale(_object, scale_to) {
@@ -40316,8 +40472,51 @@ anime.random = function (min, max) {
 
 var _default = anime;
 exports.default = _default;
+},{}],"lib/config.js":[function(require,module,exports) {
+module.exports = {
+  PLAY: {
+    STROKE_WIDTH: '15px',
+    STROKE_COLOR: 'black',
+    STAGGERING_DELAY: 1000 //ms
+
+  }
+};
 },{}],"lib/Scene/add.ts":[function(require,module,exports) {
 "use strict";
+
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -40325,6 +40524,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.add = void 0;
 
 var TeX_1 = require("../MObject/TeX");
+
+var CONFIG = __importStar(require("../config.js"));
 
 function add(_object) {
   if (_object instanceof TeX_1.TeX) {
@@ -40335,16 +40536,59 @@ function add(_object) {
     var svg = _object.writeTexElement.elt.querySelectorAll('svg');
 
     svg[0].setAttribute('width', _object.width_svg + "px");
-    svg[0].setAttribute('height', _object.height_svg + "px"); // g[0].setAttribute('fill', 'none');
-    // g[0].setAttribute('stroke-width', '10px');
+    svg[0].setAttribute('height', _object.height_svg + "px");
 
     _object.writeTexElement.position(_object.x, _object.y);
+
+    var g = _object.writeTexElement.elt.querySelectorAll('g');
+
+    g[0].setAttribute('stroke-width', "" + CONFIG.PLAY.STROKE_WIDTH); //console.log(CONFIG.PLAY.STROKE_WIDTH);
+    //TODO : clean 
+    //g[0].setAttribute('fill', 'none');
+    // const pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+    //   for (var i = 0; i < pathEls.length; i++) {
+    //     var pathEl = pathEls[i];
+    //   }
   }
 }
 
 exports.add = add;
-},{"../MObject/TeX":"lib/MObject/TeX.ts"}],"lib/Scene/play.ts":[function(require,module,exports) {
+},{"../MObject/TeX":"lib/MObject/TeX.ts","../config.js":"lib/config.js"}],"lib/Scene/play.ts":[function(require,module,exports) {
 "use strict";
+
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -40363,7 +40607,9 @@ var Text_1 = require("../MObject/Text");
 
 var animejs_1 = __importDefault(require("animejs"));
 
-var add_1 = require("./add"); //TODO : use add function to initiate, then play animation
+var add_1 = require("./add");
+
+var CONFIG = __importStar(require("../config.js")); //TODO : use add function to initiate, then play animation
 
 /**
  * Animation functions
@@ -40397,19 +40643,7 @@ function play(_object, animation_type, timeDuration) {
     } //tex animations
 
 
-    console.log('TeX');
-
     if (animation_type == 'write') {
-      //write(_object, timeDuration);
-      // _object.writeTexElement = createDiv(_object.SVGEquation);
-      // let svg = _object.writeTexElement.elt.querySelectorAll('svg');
-      // svg[0].setAttribute('width', `${_object.width_svg}px`);
-      // svg[0].setAttribute('height', `${_object.height_svg}px`);
-      // const g = _object.writeTexElement.elt.querySelectorAll('g');
-      // // g[0].setAttribute('fill', 'none');
-      // // g[0].setAttribute('stroke-width', '10px');
-      // _object.writeTexElement.position(_object.x, _object.y);
-      //const pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
       var g_1 = _object.writeTexElement.elt.querySelectorAll('g');
 
       animejs_1.default.timeline({
@@ -40418,7 +40652,7 @@ function play(_object, animation_type, timeDuration) {
         targets: _object.writeTexElement.elt.querySelectorAll('path'),
         //scale: [4, 1],
         fill: ['rgba(0,0,0,0)', '#000000'],
-        //stroke : "black",     //customisable through config
+        //stroke : "black",     //TODO : customisable through config
         //stroke-width: "10px", //customisable through config
         strokeDashoffset: [animejs_1.default.setDashoffset, 0],
         opacity: [0, 1],
@@ -40431,17 +40665,11 @@ function play(_object, animation_type, timeDuration) {
         },
         easing: 'easeInOutCubic',
         duration: timeDuration,
-        delay: animejs_1.default.stagger(400, {
+        delay: animejs_1.default.stagger(CONFIG.PLAY.STAGGERING_DELAY, {
           start: 0
         })
       });
     } else if (animation_type == 'all-at-once') {
-      //_object.all_at_once(timeDuration);
-      // _object.writeTexElement = createDiv(_object.SVGEquation);
-      // let svg = _object.writeTexElement.elt.querySelectorAll('svg');
-      // svg[0].setAttribute('width', `${_object.width_svg}px`);
-      // svg[0].setAttribute('height', `${_object.height_svg}px`);
-      // _object.writeTexElement.position(_object.x, _object.y);
       var g_2 = _object.writeTexElement.elt.querySelectorAll('g');
 
       var pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
@@ -40455,7 +40683,7 @@ function play(_object, animation_type, timeDuration) {
           targets: pathEl,
           strokeDashoffset: [animejs_1.default.setDashoffset, 0],
           easing: 'easeInOutCubic',
-          //easing: 'easeOutExpo', //customisable through config
+          //easing: 'easeOutExpo', //TODO : customisable through config
           duration: timeDuration,
           delay: animejs_1.default.stagger(1000, {
             direction: 'normal'
@@ -40477,13 +40705,10 @@ function play(_object, animation_type, timeDuration) {
       console.log('fadeIn called');
       animejs_1.default({
         targets: _object.writeTexElement.elt.querySelectorAll('svg'),
-        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
         opacity: [0, 1],
-        //translateZ: 0,
         easing: 'easeOutExpo',
         complete: function complete(anim) {
-          _object.writeTexElement.style('opacity', '1'); //clear all stray elements
+          _object.writeTexElement.style('opacity', '1'); //clears all stray elements
 
         },
         duration: timeDuration,
@@ -40494,11 +40719,8 @@ function play(_object, animation_type, timeDuration) {
     } else if (animation_type == 'appear') {
       console.log('appear called');
       animejs_1.default({
-        //targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
         targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
         opacity: [0, 1],
-        //translateZ: 0,
         easing: 'easeOutExpo',
         complete: function complete(anim) {
           _object.writeTexElement.style('opacity', '1'); //clear all stray elements
@@ -40511,14 +40733,10 @@ function play(_object, animation_type, timeDuration) {
         })
       });
     } else if (animation_type == 'dissolve') {
-      console.log('dissolve called'); //add(_object);
-
+      console.log('dissolve called');
       animejs_1.default({
-        //targets: _object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
         targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
         opacity: [1, 0],
-        //translateZ: 0,
         easing: 'easeOutExpo',
         complete: function complete(anim) {
           _object.writeTexElement.style('opacity', '0'); //clear all stray elements
@@ -40533,10 +40751,7 @@ function play(_object, animation_type, timeDuration) {
       console.log('fadeout called');
       animejs_1.default({
         targets: _object.writeTexElement.elt.querySelectorAll('svg'),
-        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
         opacity: [1, 0],
-        //translateZ: 0,
         easing: 'easeOutExpo',
         complete: function complete(anim) {
           _object.writeTexElement.style('opacity', '0'); //clear all stray elements
@@ -40551,14 +40766,8 @@ function play(_object, animation_type, timeDuration) {
       console.log('blink');
       var animation = animejs_1.default({
         targets: _object.writeTexElement.elt.querySelectorAll('svg'),
-        //targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
         opacity: [0, 1, 0],
-        //translateZ: 0,
         easing: 'easeOutSine',
-        // complete: function (anim) {
-        //   animation.reverse();
-        // },
         duration: timeDuration,
         delay: animejs_1.default.stagger(200),
         loop: true
@@ -40592,7 +40801,59 @@ function play(_object, animation_type, timeDuration) {
 }
 
 exports.play = play;
-},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts","animejs":"../node_modules/animejs/lib/anime.es.js","./add":"lib/Scene/add.ts"}],"index.ts":[function(require,module,exports) {
+},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts","animejs":"../node_modules/animejs/lib/anime.es.js","./add":"lib/Scene/add.ts","../config.js":"lib/config.js"}],"lib/Scene/transform.ts":[function(require,module,exports) {
+"use strict"; //TODO : transform function : use morphing
+
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.transform = void 0;
+
+var config = __importStar(require("../config.js"));
+
+function transform(_object_init, _object_finl) {
+  console.log(config.hello[0]);
+
+  if (_object_init.writeTexElement && _object_finl.writeTexElement) {//TeX transformation
+  } else if (_object_init.writeTextElement && _object_finl.writeTextElement) {}
+}
+
+exports.transform = transform;
+},{"../config.js":"lib/config.js"}],"index.ts":[function(require,module,exports) {
 
 "use strict";
 
@@ -40601,9 +40862,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 var global = globalThis;
 
-var myCircle_1 = require("./lib/myCircle");
+var scene_1 = require("./lib/Scene/scene");
 
-global.myCircle = myCircle_1.myCircle;
+global.Scene = scene_1.Scene;
 
 var Text_1 = require("./lib/MObject/Text");
 
@@ -40628,7 +40889,11 @@ global.play = play_1.play;
 var add_1 = require("./lib/Scene/add");
 
 global.add = add_1.add;
-},{"./lib/myCircle":"lib/myCircle.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var transform_1 = require("./lib/Scene/transform");
+
+global.transform = transform_1.transform;
+},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -40656,7 +40921,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56893" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50123" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

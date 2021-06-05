@@ -1,35 +1,47 @@
+
 function setup() {
   createCanvas(400, 400);
-  scene();
+  background(220);
+  scene = new Scene();
+  reel();
 }
 
 function draw() {
   background(220);
 }
 
-function scene() {
-  let tex_1 = new TeX(
+async function reel() {
+  let tex = new TeX(
     '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}',
     50,
     175,
     300,
     50
   );
-  let tex_2 = new TeX(
-    '\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
-    width / 2,
-    height / 2
-  );
-  let text_1 = new Text('p5-teach is a superb library!!', 200, 200);
 
-  //tex_1.play(); //DEFAULT: write
-  play(tex_1,'all-at-once');
-  //play(tex_1, 'appear', 500);
-  //T_scale (text_1, 2);
-  //play(text_1);
-  //fadeIn(tex_2, 2000);
-  //shift(tex_1, width / 2, 200);
-  //tex_1.scale(2);
-  //play(tex_1);
-  //noLoop();
+  let tex1 = new TeX(
+    '\\begin{array}{c|rrrr} & x^3 & x^2 & x^1 &  x^0 \\\\ & 1 & -6 & 11 & -6 \\\\ {\\color{red}1} & \\downarrow & 1 & -5 & 6 \\\\ \\hline & 1 & -5 & 6 & |\\phantom{-} {\\color{blue}0} \\end{array}',
+    50,
+    50,
+    300,
+    300
+  );
+
+  // let tex1 = new TeX(
+  //   '\\begin{bmatrix} 1 & 2 & 2 \\\\ 2 & 3 & 4 \\\\ 4 & 4 & 2 \\end{bmatrix}',
+  //   150,
+  //   50,
+  //   100,
+  //   100
+  // );
+
+  //play(tex, 'all-at-once'); //play(MObject, 'animation-type', [duration])
+  //await scene.delay(2000);
+  //add(tex1);
+  play(tex,'write', 8000); //DEFAULT ANIMATION TYPE : write
+  //play(tex, 'fade-out');   //fade-out
+  //play(tex, 'dissolve',100);
+  //play(tex1, 'fade-in');
+  //play(tex1, 'appear', 9000);
+  //transform(tex,tex1);
 }

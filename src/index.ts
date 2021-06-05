@@ -1,8 +1,8 @@
 const global: any = globalThis;
 
-import { myCircle } from './lib/myCircle';
+import { Scene } from './lib/Scene/scene';
 
-global.myCircle = myCircle;
+global.Scene = Scene;
 
 import { Text } from './lib/MObject/Text';
 
@@ -16,7 +16,6 @@ import { shift } from './lib/Scene/shift';
 
 global.shift = shift;
 
-
 import { T_scale } from './lib/Scene/scale';
 
 global.T_scale = T_scale;
@@ -28,3 +27,7 @@ global.play = play;
 import { add } from './lib/Scene/add';
 
 global.add = add;
+
+import { transform } from './lib/Scene/transform';
+
+global.transform = transform;

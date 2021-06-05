@@ -6,13 +6,14 @@
   "scripts": {
     "build": "parcel build src/index.ts --out-file p5.teach.js --out-dir dist --no-source-maps",
     "dev": "parcel watch src/index.ts --out-file p5.teach.js --out-dir dist --no-source-maps",
-    "test": "jest",
+    "test": "jest --watchAll",
     "prettier": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "keywords": [],
   "license": "ISC",
   "dependencies": {
     "animejs": "^3.2.1",
+    "config.json": "^0.0.4",
     "p5": "^1.2.0",
     "tex-to-svg": "^0.2.0"
   },
