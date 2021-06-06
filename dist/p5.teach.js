@@ -295,6 +295,7 @@ exports.Scene = Scene;
 //TODO : fix 'write' animation
 //TODO : fix duration and delay
 //TODO : clean stray after porting write and all-at-once animations
+//TODO : fix size function
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -340,10 +341,6 @@ function () {
 
 
   Text.prototype.position = function (x, y) {
-    if (x === void 0) {
-      x = 10;
-    }
-
     if (y === void 0) {
       y = 10;
     }
@@ -361,8 +358,20 @@ function () {
 
 exports.Text = Text;
 
-function createText(sentence, x, y, size) {
-  var _object = new Text(sentence, x, y, size);
+function createText(sentence, x, y, sizePx) {
+  if (x === void 0) {
+    x = 10;
+  }
+
+  if (y === void 0) {
+    y = 10;
+  }
+
+  if (sizePx === void 0) {
+    sizePx = 28;
+  }
+
+  var _object = new Text(sentence, x, y, sizePx);
 
   return _object;
 }
@@ -40634,14 +40643,17 @@ function add(_object) {
     //     var pathEl = pathEls[i];
     //   }
   } else if (_object instanceof Text_1.Text) {
-    var sentence = _object.sentence;
-    var x = _object.x;
-    var y = _object.y;
-    _object.writeTextElement = createElement('h1', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
+    var sentence = _object.sentence; //const x = _object.x;
+    //const y = _object.y;
 
-    _object.writeTextElement.position(_object.x, _object.x);
+    _object.writeTextElement = createElement('div', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
 
-    _object.writeTextElement.style('font-size', _object.size + "px");
+    _object.writeTextElement.position(_object.x, _object.y); //_object.writeTextElement.position(_object.x, _object.x);
+
+
+    _object.writeTextElement.style('font-size', _object.sizePx + "px");
+
+    console.log(_object.sizePx);
 
     _object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
 
@@ -40723,7 +40735,7 @@ var CONFIG = __importStar(require("../config.js")); //TODO : use add function to
  */
 
 
-function play( //TODO: use '...args'  
+function play( //TODO: use '...args'
 _object, animation_type, timeDuration) {
   if (animation_type === void 0) {
     animation_type = 'write';
@@ -41024,7 +41036,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61341" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49701" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -3,6 +3,7 @@
 //TODO : fix 'write' animation
 //TODO : fix duration and delay
 //TODO : clean stray after porting write and all-at-once animations
+//TODO : fix size function
 
 export class Text {
   writeTextElement: any;
@@ -44,7 +45,7 @@ export class Text {
   // write(timeDuration: number) {
 
   // }
-  position(x: number = 10, y: number = 10) {
+  position(x: number, y: number = 10) {
     this.x = x;
     this.y = y;
     //this.writeTextElement.position(this.x, this.y);
@@ -56,10 +57,10 @@ export class Text {
 
 export function createText(
   sentence: string,
-  x: number,
-  y: number,
-  size: number
+  x: number = 10,
+  y: number = 10,
+  sizePx: number = 28
 ) {
-  const _object = new Text(sentence, x, y, size);
+  const _object = new Text(sentence, x, y, sizePx);
   return _object;
 }

@@ -11,11 +11,12 @@ function draw() {
 
 async function reel() {
   let tex = createTeX('\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}');
-  tex.position(100,50);
+  tex.position(100, 50);
   tex.size(200);
 
-  let texty = createText("playing with p5!");
-  texty.position(100,150);
+  let texty = createText('playing with p5!');
+  texty.position(50, 50);
+  texty.size(40);
   play(texty);
 
   let tex1 = new TeX(
