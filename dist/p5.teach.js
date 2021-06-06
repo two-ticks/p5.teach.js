@@ -304,16 +304,29 @@ exports.createText = exports.Text = void 0;
 var Text =
 /** @class */
 function () {
-  function Text(sentence, x, y, size) {
-    this.x = 10;
-    this.y = 10;
-    this.size = 28; //px
+  function Text(sentence, x, y, sizePx) {
+    if (x === void 0) {
+      x = 10;
+    }
 
+    if (y === void 0) {
+      y = 10;
+    }
+
+    if (sizePx === void 0) {
+      sizePx = 28;
+    }
+
+    this.x = x;
+    this.y = y;
     this.sentence = sentence;
-    this.writeTextElement = createElement('h1', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
-    this.writeTextElement.position(x, y);
-    this.writeTextElement.style('font-size', this.size + "px");
-    this.writeTextElement.style('opacity', '0'); //to hide text at initialisation
+    this.sizePx = sizePx; // this.writeTextElement = createElement(
+    //   'h1',
+    //   sentence.replace(/\S/g, "<span class='letter'>$&</span>")
+    // );
+    // this.writeTextElement.position(x, y);
+    // this.writeTextElement.style('font-size', `${this.size}px`);
+    // this.writeTextElement.style('opacity', '0'); //to hide text at initialisation
   } // play(animation_type: string = 'write', timeDuration: number = 180) {
   //   this.writeTextElement.style("opacity", '1');
   //   if (animation_type == 'write') {
@@ -326,10 +339,21 @@ function () {
   // }
 
 
-  Text.prototype.shiftTo = function (x, y) {
+  Text.prototype.position = function (x, y) {
+    if (x === void 0) {
+      x = 10;
+    }
+
+    if (y === void 0) {
+      y = 10;
+    }
+
     this.x = x;
-    this.y = y;
-    this.writeTextElement.position(this.x, this.y);
+    this.y = y; //this.writeTextElement.position(this.x, this.y);
+  };
+
+  Text.prototype.size = function (sizePx) {
+    this.sizePx = sizePx;
   };
 
   return Text;
@@ -338,7 +362,9 @@ function () {
 exports.Text = Text;
 
 function createText(sentence, x, y, size) {
-  return new Text(sentence, x, y, size);
+  var _object = new Text(sentence, x, y, size);
+
+  return _object;
 }
 
 exports.createText = createText;
@@ -38598,7 +38624,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TeX = void 0;
+exports.createTeX = exports.TeX = void 0;
 
 var tex_to_svg_1 = __importDefault(require("tex-to-svg")); //TODO : add test cases
 
@@ -38658,10 +38684,60 @@ function () {
     this.SVGEquation = tex_to_svg_1.default(sentence);
   }
 
+  TeX.prototype.position = function (x, y) {
+    if (x === void 0) {
+      x = 10;
+    }
+
+    if (y === void 0) {
+      y = 10;
+    }
+
+    this.x = x;
+    this.y = y;
+  };
+
+  TeX.prototype.size = function (width_svg, height_svg) {
+    if (width_svg === void 0) {
+      width_svg = 300;
+    }
+
+    if (height_svg === void 0) {
+      height_svg = 300;
+    }
+
+    this.width_svg = width_svg;
+    this.height_svg = height_svg;
+  };
+
   return TeX;
 }();
 
 exports.TeX = TeX;
+
+function createTeX(sentence, x, y, width_svg, height_svg) {
+  if (x === void 0) {
+    x = 10;
+  }
+
+  if (y === void 0) {
+    y = 10;
+  }
+
+  if (width_svg === void 0) {
+    width_svg = 300;
+  }
+
+  if (height_svg === void 0) {
+    height_svg = 300;
+  }
+
+  var _object = new TeX(sentence, x, y, width_svg, height_svg);
+
+  return _object;
+}
+
+exports.createTeX = createTeX;
 },{"tex-to-svg":"../node_modules/tex-to-svg/TeXToSVG.js"}],"lib/Scene/shift.ts":[function(require,module,exports) {
 "use strict";
 
@@ -40531,6 +40607,8 @@ exports.add = void 0;
 
 var TeX_1 = require("../MObject/TeX");
 
+var Text_1 = require("../MObject/Text");
+
 var CONFIG = __importStar(require("../config.js"));
 
 function add(_object) {
@@ -40549,17 +40627,19 @@ function add(_object) {
     var g = _object.writeTexElement.elt.querySelectorAll('g');
 
     g[0].setAttribute('stroke-width', "" + CONFIG.PLAY.STROKE_WIDTH); //console.log(CONFIG.PLAY.STROKE_WIDTH);
-    //TODO : clean 
+    //TODO : clean
     //g[0].setAttribute('fill', 'none');
     // const pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
     //   for (var i = 0; i < pathEls.length; i++) {
     //     var pathEl = pathEls[i];
     //   }
-  } else if (_object instanceof Text) {
-    _object.sentence = sentence;
+  } else if (_object instanceof Text_1.Text) {
+    var sentence = _object.sentence;
+    var x = _object.x;
+    var y = _object.y;
     _object.writeTextElement = createElement('h1', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
 
-    _object.writeTextElement.position(x, y);
+    _object.writeTextElement.position(_object.x, _object.x);
 
     _object.writeTextElement.style('font-size', _object.size + "px");
 
@@ -40569,7 +40649,7 @@ function add(_object) {
 }
 
 exports.add = add;
-},{"../MObject/TeX":"lib/MObject/TeX.ts","../config.js":"lib/config.js"}],"lib/Scene/play.ts":[function(require,module,exports) {
+},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts","../config.js":"lib/config.js"}],"lib/Scene/play.ts":[function(require,module,exports) {
 "use strict";
 
 var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
@@ -40895,6 +40975,7 @@ global.createText = Text_1.createText;
 var TeX_1 = require("./lib/MObject/TeX");
 
 global.TeX = TeX_1.TeX;
+global.createTeX = TeX_1.createTeX;
 
 var shift_1 = require("./lib/Scene/shift");
 
@@ -40943,7 +41024,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63243" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61341" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

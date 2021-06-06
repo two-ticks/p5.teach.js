@@ -7,12 +7,17 @@
 export class Text {
   writeTextElement: any;
   textWrapper: any;
-  x: number = 10;
-  y: number = 10;
+  x: number;
+  y: number;
   sentence: string;
-  sizePx: number = 28; //px
+  sizePx: number; //px
 
-  constructor(sentence: string, x: number, y: number, sizePx: number) {
+  constructor(
+    sentence: string,
+    x: number = 10,
+    y: number = 10,
+    sizePx: number = 28
+  ) {
     this.x = x;
     this.y = y;
     this.sentence = sentence;
@@ -39,12 +44,12 @@ export class Text {
   // write(timeDuration: number) {
 
   // }
-  position(x: number = 10, y: number =10) {
+  position(x: number = 10, y: number = 10) {
     this.x = x;
     this.y = y;
     //this.writeTextElement.position(this.x, this.y);
   }
-  size(sizePx : number = 28) {
+  size(sizePx: number) {
     this.sizePx = sizePx;
   }
 }

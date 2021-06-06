@@ -9,9 +9,10 @@ import { Text, createText } from './lib/MObject/Text';
 global.Text = Text;
 global.createText = createText;
 
-import { TeX } from './lib/MObject/TeX';
+import { TeX, createTeX } from './lib/MObject/TeX';
 
 global.TeX = TeX;
+global.createTeX = createTeX;
 
 import { shift } from './lib/Scene/shift';
 

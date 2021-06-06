@@ -13,7 +13,10 @@ async function reel() {
   let tex = createTeX('\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}');
   tex.position(100,50);
   tex.size(200);
-  tex.style("color","red");
+
+  let texty = createText("playing with p5!");
+  texty.position(100,150);
+  play(texty);
 
   let tex1 = new TeX(
     '\\begin{array}{c|rrrr} & x^3 & x^2 & x^1 &  x^0 \\\\ & 1 & -6 & 11 & -6 \\\\ {\\color{red}1} & \\downarrow & 1 & -5 & 6 \\\\ \\hline & 1 & -5 & 6 & |\\phantom{-} {\\color{blue}0} \\end{array}',
