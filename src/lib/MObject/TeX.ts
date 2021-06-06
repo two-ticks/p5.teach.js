@@ -48,4 +48,25 @@ export class TeX {
     this.height_svg = height_svg;
     this.SVGEquation = TeXToSVG(sentence);
   }
+
+  position(x: number = 10, y: number = 10) {
+    this.x = x;
+    this.y = y;
+  }
+
+  size(width_svg: number = 300, height_svg: number = 300) {
+    this.width_svg = width_svg;
+    this.height_svg = height_svg;
+  }
+}
+
+export function createTeX(
+  sentence: string,
+  x: number = 10,
+  y: number = 10,
+  width_svg: number = 300,
+  height_svg: number = 300
+) {
+  const _object = new TeX(sentence, x, y, width_svg, height_svg);
+  return _object;
 }

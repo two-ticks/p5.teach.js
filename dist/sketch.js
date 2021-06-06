@@ -10,13 +10,10 @@ function draw() {
 }
 
 async function reel() {
-  let tex = new TeX(
-    '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}',
-    50,
-    175,
-    300,
-    50
-  );
+  let tex = createTeX('\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}');
+  tex.position(100,50);
+  tex.size(200);
+  tex.style("color","red");
 
   let tex1 = new TeX(
     '\\begin{array}{c|rrrr} & x^3 & x^2 & x^1 &  x^0 \\\\ & 1 & -6 & 11 & -6 \\\\ {\\color{red}1} & \\downarrow & 1 & -5 & 6 \\\\ \\hline & 1 & -5 & 6 & |\\phantom{-} {\\color{blue}0} \\end{array}',
@@ -34,9 +31,7 @@ async function reel() {
   //   100
   // );
 
-  let mytext = createText('Hi p5', 50, 50, 300, 300);
-  play(mytext);
-  //play(tex, 'all-at-once'); //play(MObject, 'animation-type', [duration])
+  play(tex, 'all-at-once'); //play(MObject, 'animation-type', [duration])
   //await scene.delay(2000);
   //add(tex1);
   //play(tex,'write', 8000); //DEFAULT ANIMATION TYPE : write

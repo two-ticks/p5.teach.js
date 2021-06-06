@@ -10,13 +10,13 @@ export class Text {
   x: number = 10;
   y: number = 10;
   sentence: string;
-  size: number = 28; //px
+  sizePx: number = 28; //px
 
-  constructor(sentence: string, x: number, y: number, size: number) {
+  constructor(sentence: string, x: number, y: number, sizePx: number) {
     this.x = x;
     this.y = y;
     this.sentence = sentence;
-    this.size = size;
+    this.sizePx = sizePx;
 
     // this.writeTextElement = createElement(
     //   'h1',
@@ -39,10 +39,13 @@ export class Text {
   // write(timeDuration: number) {
 
   // }
-  shiftTo(x: number, y: number) {
+  position(x: number = 10, y: number =10) {
     this.x = x;
     this.y = y;
-    this.writeTextElement.position(this.x, this.y);
+    //this.writeTextElement.position(this.x, this.y);
+  }
+  size(sizePx : number = 28) {
+    this.sizePx = sizePx;
   }
 }
 
