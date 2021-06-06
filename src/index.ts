@@ -4,9 +4,10 @@ import { Scene } from './lib/Scene/scene';
 
 global.Scene = Scene;
 
-import { Text } from './lib/MObject/Text';
+import { Text, createText } from './lib/MObject/Text';
 
 global.Text = Text;
+global.createText = createText;
 
 import { TeX } from './lib/MObject/TeX';
 

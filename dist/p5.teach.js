@@ -299,7 +299,7 @@ exports.Scene = Scene;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Text = void 0;
+exports.createText = exports.Text = void 0;
 
 var Text =
 /** @class */
@@ -336,6 +336,12 @@ function () {
 }();
 
 exports.Text = Text;
+
+function createText(sentence, x, y, size) {
+  return new Text(sentence, x, y, size);
+}
+
+exports.createText = createText;
 },{}],"../node_modules/mathjax-full/js/util/PrioritizedList.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -40549,6 +40555,16 @@ function add(_object) {
     //   for (var i = 0; i < pathEls.length; i++) {
     //     var pathEl = pathEls[i];
     //   }
+  } else if (_object instanceof Text) {
+    _object.sentence = sentence;
+    _object.writeTextElement = createElement('h1', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
+
+    _object.writeTextElement.position(x, y);
+
+    _object.writeTextElement.style('font-size', _object.size + "px");
+
+    _object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
+
   }
 }
 
@@ -40627,7 +40643,8 @@ var CONFIG = __importStar(require("../config.js")); //TODO : use add function to
  */
 
 
-function play(_object, animation_type, timeDuration) {
+function play( //TODO: use '...args'  
+_object, animation_type, timeDuration) {
   if (animation_type === void 0) {
     animation_type = 'write';
   }
@@ -40775,6 +40792,10 @@ function play(_object, animation_type, timeDuration) {
     }
   } //Text animation
   else if (_object instanceof Text_1.Text) {
+      if (!_object.writeTextElement) {
+        add_1.add(_object);
+      }
+
       console.log('Text');
 
       _object.writeTextElement.style('opacity', '1');
@@ -40869,6 +40890,7 @@ global.Scene = scene_1.Scene;
 var Text_1 = require("./lib/MObject/Text");
 
 global.Text = Text_1.Text;
+global.createText = Text_1.createText;
 
 var TeX_1 = require("./lib/MObject/TeX");
 
@@ -40921,7 +40943,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50123" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63243" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

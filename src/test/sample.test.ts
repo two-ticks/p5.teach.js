@@ -9,20 +9,21 @@ import { shift } from '../lib/Scene/shift';
 
 
 
-it('dummy test', () => {
-  const arg1 = new TeX('abc');
-  const arg2 = 234;
-  const arg3 = 123;
+// it('dummy test', () => {
+//   const arg1 = new TeX('abc');
+//   const arg2 = 234;
+//   const arg3 = 123;
 
-  const testSomeFunction = jest.fn((arg1, arg2, arg3) => {
-    shift(arg1, arg2, arg3);
-  });
-  testSomeFunction(arg1, arg2, arg3);
-  expect(testSomeFunction).toHaveBeenCalledWith(arg1, arg2, arg3);
-});
+//   const testSomeFunction = jest.fn((arg1, arg2, arg3) => {
+//     shift(arg1, arg2, arg3);
+//   });
+//   testSomeFunction(arg1, arg2, arg3);
+//   expect(testSomeFunction).toHaveBeenCalledWith(arg1, arg2, arg3);
+// });
 
-it.todo('shift should not accept the wrong argument type');
+// it.todo('shift should not accept the wrong argument type');
 
+<<<<<<< HEAD
 test("load test",()=>{
 const load1 = 10;
 const load2 = 20;

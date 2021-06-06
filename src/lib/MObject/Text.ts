@@ -13,14 +13,18 @@ export class Text {
   size: number = 28; //px
 
   constructor(sentence: string, x: number, y: number, size: number) {
+    this.x = x;
+    this.y = y;
     this.sentence = sentence;
-    this.writeTextElement = createElement(
-      'h1',
-      sentence.replace(/\S/g, "<span class='letter'>$&</span>")
-    );
-    this.writeTextElement.position(x, y);
-    this.writeTextElement.style('font-size', `${this.size}px`);
-    this.writeTextElement.style('opacity', '0'); //to hide text at initialisation
+    this.size = size;
+
+    // this.writeTextElement = createElement(
+    //   'h1',
+    //   sentence.replace(/\S/g, "<span class='letter'>$&</span>")
+    // );
+    // this.writeTextElement.position(x, y);
+    // this.writeTextElement.style('font-size', `${this.size}px`);
+    // this.writeTextElement.style('opacity', '0'); //to hide text at initialisation
   }
 
   // play(animation_type: string = 'write', timeDuration: number = 180) {
@@ -40,4 +44,14 @@ export class Text {
     this.y = y;
     this.writeTextElement.position(this.x, this.y);
   }
+}
+
+export function createText(
+  sentence: string,
+  x: number,
+  y: number,
+  size: number
+) {
+  const _object = new Text(sentence, x, y, size);
+  return _object;
 }

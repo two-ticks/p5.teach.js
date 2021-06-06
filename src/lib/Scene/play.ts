@@ -160,6 +160,9 @@ export function play( //TODO: use '...args'
   }
   //Text animation
   else if (_object instanceof Text) {
+    if (!_object.writeTextElement) {
+      add(_object);
+    }
     console.log('Text');
     _object.writeTextElement.style('opacity', '1');
     if (animation_type == 'write') {

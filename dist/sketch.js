@@ -1,4 +1,3 @@
-
 function setup() {
   createCanvas(400, 400);
   background(220);
@@ -35,10 +34,12 @@ async function reel() {
   //   100
   // );
 
+  let mytext = createText('Hi p5', 50, 50, 300, 300);
+  play(mytext);
   //play(tex, 'all-at-once'); //play(MObject, 'animation-type', [duration])
   //await scene.delay(2000);
   //add(tex1);
-  play(tex,'write', 8000); //DEFAULT ANIMATION TYPE : write
+  //play(tex,'write', 8000); //DEFAULT ANIMATION TYPE : write
   //play(tex, 'fade-out');   //fade-out
   //play(tex, 'dissolve',100);
   //play(tex1, 'fade-in');
