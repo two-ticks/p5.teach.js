@@ -33,3 +33,9 @@ global.add = add;
 import { transform } from './lib/Scene/transform';
 
 global.transform = transform;
+
+import { Graph2D, create2DGraph } from './lib/Geometry/graph';
+
+global.Graph2D = Graph2D;
+global.create2DGraph = create2DGraph;
+

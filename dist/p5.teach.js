@@ -40966,7 +40966,141 @@ function transform(_object_init, _object_finl) {
 }
 
 exports.transform = transform;
-},{"../config.js":"lib/config.js"}],"index.ts":[function(require,module,exports) {
+},{"../config.js":"lib/config.js"}],"lib/Geometry/graph.ts":[function(require,module,exports) {
+"use strict"; // let xArr = [];
+// let yArr = [];
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.create2DGraph = exports.Graph2D = void 0;
+
+var animejs_1 = __importDefault(require("animejs"));
+
+var Graph2D =
+/** @class */
+function () {
+  function Graph2D(eqn, x, y, width_svg, height_svg) {
+    if (x === void 0) {
+      x = 10;
+    }
+
+    if (y === void 0) {
+      y = 10;
+    }
+
+    if (width_svg === void 0) {
+      width_svg = 300;
+    }
+
+    if (height_svg === void 0) {
+      height_svg = 300;
+    }
+
+    this.eqn = eqn;
+    this.x = x;
+    this.y = y;
+    this.width_svg = width_svg;
+    this.height_svg = height_svg;
+    this.pathData = createSVGPath(eqn);
+    this.graphContainer = createElement('div');
+    this.linePath = this.linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    this.linePath.setAttribute('fill', 'none');
+    this.linePath.setAttribute('stroke', 'black');
+    this.linePath.setAttribute('stroke-width', '40');
+    this.graphContainer.position(this.x, this.y);
+  }
+
+  Graph2D.prototype.position = function (x, y) {
+    if (y === void 0) {
+      y = 10;
+    }
+
+    this.x = x;
+    this.y = y;
+    this.graphContainer.position(this.x, this.y);
+  };
+
+  Graph2D.prototype.size = function (sizePx) {};
+
+  Graph2D.prototype.plot = function () {
+    this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    this.graphObject.setAttribute('width', "" + this.width_svg);
+    this.graphObject.setAttribute('height', "" + this.height_svg);
+    this.graphObject.setAttribute('viewBox', '-100 -100 18000 4000');
+    this.linePath.setAttribute('d', this.pathData);
+    this.graphObject.appendChild(this.linePath);
+    this.graphContainer.elt.appendChild(this.graphObject);
+  };
+
+  Graph2D.prototype.play = function () {
+    var pathElement = this.graphContainer.elt.querySelectorAll('path');
+    var lineDrawing = animejs_1.default({
+      targets: this.graphContainer.elt.querySelectorAll('path'),
+      strokeDashoffset: [animejs_1.default.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: 20000,
+      begin: function begin(anim) {
+        pathElement[0].setAttribute('stroke', 'black');
+        pathElement[0].setAttribute('fill', 'none');
+      },
+      complete: function complete(anim) {//document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  };
+
+  return Graph2D;
+}();
+
+exports.Graph2D = Graph2D;
+
+function createSVGPath(eqn, stepSize) {
+  if (stepSize === void 0) {
+    stepSize = 0.001;
+  }
+
+  var minX = 0;
+  var SVG_path = "M" + 1000 * minX + "," + eqn(minX);
+
+  for (var x = 0.001; x < 20; x += stepSize) {
+    // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
+    SVG_path = SVG_path.concat(" L" + 1000 * x + "," + eqn(x));
+  }
+
+  return SVG_path;
+}
+
+function create2DGraph(eqn, x, y, width_svg, height_svg) {
+  if (x === void 0) {
+    x = 10;
+  }
+
+  if (y === void 0) {
+    y = 10;
+  }
+
+  if (width_svg === void 0) {
+    width_svg = 300;
+  }
+
+  if (height_svg === void 0) {
+    height_svg = 300;
+  }
+
+  var _object = new Graph2D(eqn, x, y, width_svg, height_svg);
+
+  return _object;
+}
+
+exports.create2DGraph = create2DGraph;
+},{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"index.ts":[function(require,module,exports) {
 
 "use strict";
 
@@ -41008,7 +41142,12 @@ global.add = add_1.add;
 var transform_1 = require("./lib/Scene/transform");
 
 global.transform = transform_1.transform;
-},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var graph_1 = require("./lib/Geometry/graph");
+
+global.Graph2D = graph_1.Graph2D;
+global.create2DGraph = graph_1.create2DGraph;
+},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -41036,7 +41175,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49701" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62989" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
