@@ -13,7 +13,6 @@ async function reel() {
   texty.position(25, 175);
   texty.fill('red');
   texty.size(35);
-  texty.strokeWidth(4);
   texty.play();
   //play(texty); //can use this also
 }
