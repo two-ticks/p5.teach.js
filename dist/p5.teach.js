@@ -1906,7 +1906,8 @@ function add(_object) {
 
     _object.writeTextElement.style('color', "" + _object._fill);
 
-    _object.writeTextElement.style('text-stroke-width', "" + _object._strokeWidth);
+    _object.writeTextElement.style('text-stroke-width', "" + _object._strokeWidth); //TODO : not working without -webkit
+
 
     _object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
 
@@ -1933,6 +1934,7 @@ var Text_1 = require("../MObject/Text");
 var animejs_1 = __importDefault(require("animejs"));
 
 var add_1 = require("./add"); //TODO : text animation for all-at-once
+//TODO : add delays and timeDuration methods
 
 /**
  * Animation functions
@@ -1969,7 +1971,8 @@ _object, animation_type, timeDuration) {
 
       console.log('Text');
 
-      _object.writeTextElement.style('opacity', '1');
+      _object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
+
 
       if (animation_type == 'write') {
         animejs_1.default.timeline({
@@ -1987,6 +1990,132 @@ _object, animation_type, timeDuration) {
 
         });
       } else if (animation_type == 'all-at-once') {//console.log('all at once');
+      } else if (animation_type == 'fadeIn') {
+        console.log('fadeIn');
+        animejs_1.default({
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          //scale: [4, 1],
+          opacity: [0, 1],
+          //translateZ: 0,
+          easing: 'easeInOutCubic',
+          duration: 4000 //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+        });
+      } else if (animation_type == 'fadeOut') {
+        console.log('fadeOut');
+        animejs_1.default({
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          //scale: [4, 1],
+          opacity: [1, 0],
+          //translateZ: 0,
+          easing: 'easeInOutCubic',
+          duration: 4000 //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+        });
+      } else if (animation_type == 'erase') {
+        console.log('erase');
+        animejs_1.default({
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          scale: [4, 1],
+          opacity: [1, 0],
+          //translateZ: 0,
+          easing: 'easeInOutCubic',
+          duration: 1000,
+          delay: animejs_1.default.stagger(180) //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+        });
+      } else if (animation_type == 'dissolve') {
+        console.log('dissolve');
+        animejs_1.default({
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          //scale: [1, 20],
+          opacity: [1, random(0.5, 0.9), random(0.6, 0.8), random(0.5, 0.7), random(0.4, 0.6), random(0.6, 0.9), random(0, 0.4), random(0, 0.3), random(0, 0.2), 0],
+          //translateZ: 0,
+          easing: 'easeInExpo',
+          duration: 4000,
+          delay: animejs_1.default.stagger(10) //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+        });
+      } else if (animation_type == 'waveIn') {
+        console.log('waveIn');
+
+        _object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+          return el.style.display = 'inline-block';
+        });
+
+        _object.writeTextElement.style('overflow', 'hidden');
+
+        animejs_1.default.timeline({
+          loop: false
+        }).add({
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          translateY: ['1.1em', 0],
+          translateZ: 0,
+          duration: 750,
+          delay: function delay(el, i) {
+            return 50 * i;
+          }
+        }).add({
+          targets: _object.writeTextElement.elt,
+          opacity: 0,
+          duration: 1000,
+          easing: 'easeOutExpo',
+          delay: 1000
+        });
+      } else if (animation_type == 'waveOut') {
+        console.log('waveOut');
+
+        _object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+          return el.style.display = 'inline-block';
+        }); //_object.writeTextElement.style('overflow', 'hidden');
+
+
+        animejs_1.default.timeline({
+          loop: false
+        }).add({
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          translateY: [0, '1em'],
+          translateZ: 0,
+          opacity: [1, 0.5, 0.1, 0],
+          scale: [1, 0.2, 0],
+          duration: 2000,
+          delay: function delay(el, i) {
+            return 100 * i;
+          }
+        }).add({
+          targets: _object.writeTextElement.elt,
+          opacity: 0,
+          duration: 1000,
+          easing: 'easeInOutCubic',
+          delay: 1000
+        });
+      } else if (animation_type == 'spinOut') {
+        console.log('spinOut');
+
+        _object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+          return el.style.display = 'inline-block';
+        }); //_object.writeTextElement.style('overflow', 'hidden');
+
+
+        animejs_1.default.timeline({
+          loop: false
+        }).add({
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          //translateY: [0,'1em'],
+          rotateX: 360,
+          opacity: [1,, 0.5, 0],
+          //scale :[1,0],
+          duration: 2500,
+          delay: function delay(el, i) {
+            return 150 * i;
+          }
+        }).add({
+          targets: _object.writeTextElement.elt,
+          opacity: 0,
+          duration: 1000,
+          easing: 'easeInOutCubic',
+          delay: 1000
+        });
       }
     }
 }
@@ -2323,7 +2452,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60689" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63479" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

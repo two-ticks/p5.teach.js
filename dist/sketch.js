@@ -13,6 +13,6 @@ async function reel() {
   texty.position(25, 175);
   texty.fill('red');
   texty.size(35);
-  texty.play();
+  texty.play('spinOut');
   //play(texty); //can use this also
 }
