@@ -61,8 +61,12 @@ export class Text {
     }
   }
 
-  play(animationType: string = 'write', timeDuration: number = 0) {
-    play(this, animationType, timeDuration);
+  play(
+    animationType: string = 'write',
+    timeDuration: number = 0,
+    delayDuration: number = 0
+  ) {
+    play(this, animationType, timeDuration, delayDuration);
   }
 }
 

@@ -13,6 +13,12 @@ async function reel() {
   texty.position(25, 175);
   texty.fill('red');
   texty.size(35);
-  texty.play('spinOut');
+  texty.play('fadeIn', 4, 1);
+
+  let texty1 = createText('Ampere Circulation Law');
+  texty1.position(25, 275);
+  texty1.fill('red');
+  texty1.size(35);
+  texty1.play('waveOut', 4, 1);
   //play(texty); //can use this also
 }

@@ -1915,8 +1915,72 @@ function add(_object) {
 }
 
 exports.add = add;
-},{"../MObject/Text":"lib/MObject/Text.ts"}],"lib/Scene/play.ts":[function(require,module,exports) {
+},{"../MObject/Text":"lib/MObject/Text.ts"}],"lib/config.js":[function(require,module,exports) {
+module.exports = {
+  PLAY: {
+    STROKE_WIDTH: '15px',
+    STROKE_COLOR: 'black',
+    TIME_LENGHT_CHARACTER: 250,
+    WRITE_SCALE: 4,
+    WRITE_STAGGERING_DELAY: 150,
+    //ms
+    DISSOLVE_STAGGERING_DELAY: 10,
+    //ms
+    ERASE_STAGGERING_DELAY: 100,
+    //ms
+    ERASE_SCALE: 4,
+    WAVEIN_DURATION: 750,
+    //ms
+    WAVEIN_TRANSLATEY: '1.1em',
+    WAVEIN_STAGGERING_DELAY: 50,
+    // WAVEIN_DURATION_DIV: 1000,
+    // WAVEIN_DELAY_DIV: 1000,
+    WAVEOUT_DURATION: 2000,
+    WAVEOUT_TRANSLATEY: '1em',
+    WAVEOUT_STAGGERING_DELAY: 100,
+    // WAVEOUT_DELAY_DIV: 1000,
+    SPINOUT_DURATION: 2500,
+    SPINOUT_STAGGERING_DELAY: 150 // SPINOUT_DURATION_DIV: 1000,
+    // SPINOUT_DELAY_DIV: 1000
+
+  }
+};
+},{}],"lib/Scene/play.ts":[function(require,module,exports) {
 "use strict";
+
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function get() {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) {
+    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  }
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -1933,7 +1997,9 @@ var Text_1 = require("../MObject/Text");
 
 var animejs_1 = __importDefault(require("animejs"));
 
-var add_1 = require("./add"); //TODO : text animation for all-at-once
+var add_1 = require("./add");
+
+var CONFIG = __importStar(require("../config.js")); //TODO : text animation for all-at-once
 //TODO : add delays and timeDuration methods
 
 /**
@@ -1953,13 +2019,23 @@ var add_1 = require("./add"); //TODO : text animation for all-at-once
 
 
 function play( //TODO: use '...args'
-_object, animation_type, timeDuration) {
+_object, animation_type, timeDuration, //seconds
+delayDuration //seconds
+) {
   if (animation_type === void 0) {
     animation_type = 'write';
   }
 
+  if (delayDuration === void 0) {
+    delayDuration = 0;
+  }
+
+  timeDuration = 1000 * timeDuration; //sec to ms
+
+  delayDuration = 1000 * delayDuration; //sec to ms
+
   if (timeDuration == null) {
-    timeDuration = 50 * _object.sentence.length;
+    timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * _object.sentence.length;
   }
 
   if (false) {//TeX animation
@@ -1967,9 +2043,8 @@ _object, animation_type, timeDuration) {
   else if (_object instanceof Text_1.Text) {
       if (!_object.writeTextElement) {
         add_1.add(_object);
-      }
+      } //console.log('Text');
 
-      console.log('Text');
 
       _object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
 
@@ -1979,66 +2054,72 @@ _object, animation_type, timeDuration) {
           loop: false
         }).add({
           targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-          scale: [4, 1],
+          scale: [CONFIG.PLAY.WRITE_SCALE, 1],
           opacity: [0, 1],
           translateZ: 0,
           easing: 'easeOutExpo',
-          duration: 950,
-          delay: animejs_1.default.stagger(180, {
-            start: timeDuration
+          duration: timeDuration,
+          delay: animejs_1.default.stagger(CONFIG.PLAY.WRITE_STAGGERING_DELAY, {
+            start: delayDuration
           }) //time duration must be replaced with delay
 
         });
       } else if (animation_type == 'all-at-once') {//console.log('all at once');
       } else if (animation_type == 'fadeIn') {
-        console.log('fadeIn');
+        //console.log('fadeIn');
         animejs_1.default({
           targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
           //scale: [4, 1],
           opacity: [0, 1],
           //translateZ: 0,
           easing: 'easeInOutCubic',
-          duration: 4000 //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+          duration: timeDuration,
+          delay: delayDuration //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
 
         });
       } else if (animation_type == 'fadeOut') {
-        console.log('fadeOut');
+        //console.log('fadeOut');
         animejs_1.default({
           targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
           //scale: [4, 1],
           opacity: [1, 0],
           //translateZ: 0,
           easing: 'easeInOutCubic',
-          duration: 4000 //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+          duration: timeDuration,
+          delay: delayDuration //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
 
         });
       } else if (animation_type == 'erase') {
-        console.log('erase');
+        //console.log('erase');
         animejs_1.default({
           targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-          scale: [4, 1],
+          scale: [CONFIG.PLAY.ERASE_SCALE, 1],
           opacity: [1, 0],
           //translateZ: 0,
           easing: 'easeInOutCubic',
-          duration: 1000,
-          delay: animejs_1.default.stagger(180) //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+          duration: timeDuration,
+          //delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY),
+          delay: animejs_1.default.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY, {
+            start: delayDuration
+          }) //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
 
         });
       } else if (animation_type == 'dissolve') {
-        console.log('dissolve');
+        //console.log('dissolve');
         animejs_1.default({
           targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-          //scale: [1, 20],
           opacity: [1, random(0.5, 0.9), random(0.6, 0.8), random(0.5, 0.7), random(0.4, 0.6), random(0.6, 0.9), random(0, 0.4), random(0, 0.3), random(0, 0.2), 0],
           //translateZ: 0,
           easing: 'easeInExpo',
-          duration: 4000,
-          delay: animejs_1.default.stagger(10) //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+          duration: timeDuration,
+          delay: animejs_1.default.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY, {
+            start: delayDuration
+          }) //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+          //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
 
         });
       } else if (animation_type == 'waveIn') {
-        console.log('waveIn');
-
+        //console.log('waveIn');
         _object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
           return el.style.display = 'inline-block';
         });
@@ -2049,22 +2130,16 @@ _object, animation_type, timeDuration) {
           loop: false
         }).add({
           targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-          translateY: ['1.1em', 0],
+          translateY: [CONFIG.PLAY.WAVEIN_TRANSLATEY, 0],
           translateZ: 0,
-          duration: 750,
-          delay: function delay(el, i) {
-            return 50 * i;
-          }
-        }).add({
-          targets: _object.writeTextElement.elt,
-          opacity: 0,
-          duration: 1000,
-          easing: 'easeOutExpo',
-          delay: 1000
+          duration: CONFIG.PLAY.WAVEIN_DURATION,
+          delay: animejs_1.default.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY, {
+            start: delayDuration
+          }) //delay: (el, i) => CONFIG.PLAY.WAVEIN_STAGGERING_DELAY * i
+
         });
       } else if (animation_type == 'waveOut') {
-        console.log('waveOut');
-
+        //console.log('waveOut');
         _object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
           return el.style.display = 'inline-block';
         }); //_object.writeTextElement.style('overflow', 'hidden');
@@ -2074,24 +2149,18 @@ _object, animation_type, timeDuration) {
           loop: false
         }).add({
           targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-          translateY: [0, '1em'],
+          translateY: [0, CONFIG.PLAY.WAVEOUT_TRANSLATEY],
           translateZ: 0,
           opacity: [1, 0.5, 0.1, 0],
           scale: [1, 0.2, 0],
-          duration: 2000,
-          delay: function delay(el, i) {
-            return 100 * i;
-          }
-        }).add({
-          targets: _object.writeTextElement.elt,
-          opacity: 0,
-          duration: 1000,
-          easing: 'easeInOutCubic',
-          delay: 1000
+          duration: CONFIG.PLAY.WAVEOUT_DURATION,
+          delay: animejs_1.default.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY, {
+            start: delayDuration
+          }) //delay: (el, i) => CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY * i
+
         });
       } else if (animation_type == 'spinOut') {
-        console.log('spinOut');
-
+        //console.log('spinOut');
         _object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
           return el.style.display = 'inline-block';
         }); //_object.writeTextElement.style('overflow', 'hidden');
@@ -2103,25 +2172,20 @@ _object, animation_type, timeDuration) {
           targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
           //translateY: [0,'1em'],
           rotateX: 360,
-          opacity: [1,, 0.5, 0],
+          opacity: [0.5,, 0],
           //scale :[1,0],
-          duration: 2500,
-          delay: function delay(el, i) {
-            return 150 * i;
-          }
-        }).add({
-          targets: _object.writeTextElement.elt,
-          opacity: 0,
-          duration: 1000,
-          easing: 'easeInOutCubic',
-          delay: 1000
+          duration: CONFIG.PLAY.SPINOUT_DURATION,
+          //delay: (el, i) => CONFIG.PLAY.SPINOUT_STAGGERING_DELAY * i,
+          delay: animejs_1.default.stagger(CONFIG.PLAY.SPINOUT_STAGGERING_DELAY, {
+            start: delayDuration
+          })
         });
       }
     }
 }
 
 exports.play = play;
-},{"../MObject/Text":"lib/MObject/Text.ts","animejs":"../node_modules/animejs/lib/anime.es.js","./add":"lib/Scene/add.ts"}],"lib/MObject/Text.ts":[function(require,module,exports) {
+},{"../MObject/Text":"lib/MObject/Text.ts","animejs":"../node_modules/animejs/lib/anime.es.js","./add":"lib/Scene/add.ts","../config.js":"lib/config.js"}],"lib/MObject/Text.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2192,7 +2256,7 @@ function () {
     }
   };
 
-  Text.prototype.play = function (animationType, timeDuration) {
+  Text.prototype.play = function (animationType, timeDuration, delayDuration) {
     if (animationType === void 0) {
       animationType = 'write';
     }
@@ -2201,7 +2265,11 @@ function () {
       timeDuration = 0;
     }
 
-    play_1.play(this, animationType, timeDuration);
+    if (delayDuration === void 0) {
+      delayDuration = 0;
+    }
+
+    play_1.play(this, animationType, timeDuration, delayDuration);
   };
 
   return Text;
@@ -2383,14 +2451,14 @@ var Scene =
 function () {
   function Scene() {}
 
-  Scene.prototype.delay = function (ms) {
+  Scene.prototype.delay = function (sec) {
     return __awaiter(this, void 0, void 0, function () {
       return __generator(this, function (_a) {
         return [2
         /*return*/
         , new Promise(function (resolve) {
-          return setTimeout(resolve, ms);
-        })];
+          return setTimeout(resolve, 1000 * sec);
+        })]; //sec to ms 
       });
     });
   };
@@ -2452,7 +2520,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63479" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50618" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

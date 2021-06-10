@@ -1,6 +1,6 @@
 export class Scene {
   constructor() {}
-  async delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  async delay(sec: number) {
+    return new Promise((resolve) => setTimeout(resolve, 1000*sec)); //sec to ms 
   }
 }
