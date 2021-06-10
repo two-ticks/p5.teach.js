@@ -76,5 +76,8 @@ export function createText(
   y: number = 10,
   sizePx: number = 28 //px
 ) {
+  if (sizePx < 0) {
+    throw new Error('Size should be a whole number');
+  }
   return new Text(sentence, x, y, sizePx);
 }
