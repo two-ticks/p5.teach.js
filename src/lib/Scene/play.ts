@@ -1,8 +1,7 @@
 import { Text } from '../MObject/Text';
 import anime from 'animejs';
 import { add } from './add';
-import *  as CONFIG from '../config.js' ;
-
+import * as CONFIG from '../config.js';
 
 //TODO : fix relative time
 //TODO : text animation for all-at-once
@@ -31,7 +30,7 @@ export function play(
   this.animation_type = animation_type;
   this.timeDuration = timeDuration; //seconds
   this.delayDuration = delayDuration; //seconds
-  //testing for relative and absolute parameters
+  //testing for relative and absolute parameters //TODO : fix relative time
   if (typeof this.delayDuration === 'number') {
     this.delayDuration = 1000 * this.delayDuration; //sec to ms
     //console.log(this.delayDuration);
@@ -63,7 +62,7 @@ export function play(
     if (!_object.writeTextElement) {
       add(_object);
     }
-    //console.log('Text');
+    console.log('Text');
     _object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
 
     if (this.animation_type == 'write') {
@@ -80,24 +79,26 @@ export function play(
         this.delayDuration
       );
     } else if (this.animation_type == 'all-at-once') {
-      //console.log('all at once');
+      console.log('all at once');
     } else if (this.animation_type == 'fadeIn') {
-      //console.log('fadeIn');
-      anime({
-        targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-        //scale: [4, 1],
-        opacity: [0, 1],
-        //translateZ: 0,
-        easing: 'easeInOutCubic',
-        duration: this.timeDuration,
-        delay: this.delayDuration
-        //delay: anime.stagger(180, { start: this.timeDuration }) //time duration must be replaced with delay
-      });
+      console.log('fadeIn');
+      animationTimeline.add(
+        {
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          //scale: [4, 1],
+          opacity: [0, 1],
+          //translateZ: 0,
+          easing: 'easeInOutCubic',
+          duration: this.timeDuration
+          //delay:
+          //delay: anime.stagger(180, { start: this.timeDuration }) //time duration must be replaced with delay
+        },
+        this.delayDuration
+      );
     } else if (this.animation_type == 'fadeOut') {
-      //console.log('fadeOut');
-
-      if (this.delayDuration == '0') {
-        animationTimeline.add({
+      console.log('fadeOut');
+      animationTimeline.add(
+        {
           targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
           //scale: [4, 1],
           opacity: [1, 0],
@@ -106,100 +107,94 @@ export function play(
           duration: this.timeDuration
           //delay: this.delayDuration
           //delay: anime.stagger(180, { start: this.timeDuration }) //time duration must be replaced with delay
-        });
-        //console.log(animationTimeline);
-      } else {
-        animationTimeline.add(
-          {
-            targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-            //scale: [4, 1],
-            opacity: [1, 0],
-            //translateZ: 0,
-            easing: 'easeInOutCubic',
-            duration: this.timeDuration
-            //delay: this.delayDuration
-            //delay: anime.stagger(180, { start: this.timeDuration }) //time duration must be replaced with delay
-          },
-          this.delayDuration
-        );
-      }
+        },
+        this.delayDuration
+      );
     } else if (this.animation_type == 'erase') {
-      //console.log('erase');
-      anime({
-        targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-        scale: [CONFIG.PLAY.ERASE_SCALE, 1],
-        opacity: [1, 0],
-        //translateZ: 0,
-        easing: 'easeInOutCubic',
-        duration: this.timeDuration,
-        //delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY),
-        delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY, {
-          start: this.delayDuration
-        })
-        //delay: anime.stagger(180, { start: this.timeDuration }) //time duration must be replaced with delay
-      });
+      console.log('erase');
+      animationTimeline.add(
+        {
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          scale: [CONFIG.PLAY.ERASE_SCALE, 1],
+          opacity: [1, 0],
+          //translateZ: 0,
+          easing: 'easeInOutCubic',
+          duration: this.timeDuration,
+          //delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY),
+          delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY)
+          //delay: anime.stagger(180, { start: this.timeDuration }) //time duration must be replaced with delay
+        },
+        this.delayDuration
+      );
     } else if (this.animation_type == 'dissolve') {
-      //console.log('dissolve');
+      console.log('dissolve');
 
-      anime({
-        targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-        opacity: [
-          1,
-          random(0.5, 0.9),
-          random(0.6, 0.8),
-          random(0.5, 0.7),
-          random(0.4, 0.6),
-          random(0.6, 0.9),
-          random(0, 0.4),
-          random(0, 0.3),
-          random(0, 0.2),
-          0
-        ],
-        //translateZ: 0,
-        easing: 'easeInExpo',
-        duration: this.timeDuration,
-        delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY, {
-          start: this.delayDuration
-        })
-        //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
-        //delay: anime.stagger(180, { start: this.timeDuration }) //time duration must be replaced with delay
-      });
+      animationTimeline.add(
+        {
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          opacity: [
+            1,
+            random(0.5, 0.9),
+            random(0.6, 0.8),
+            random(0.5, 0.7),
+            random(0.4, 0.6),
+            random(0.6, 0.9),
+            random(0, 0.4),
+            random(0, 0.3),
+            random(0, 0.2),
+            0
+          ],
+          //translateZ: 0,
+          easing: 'easeInExpo',
+          duration: this.timeDuration,
+          delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+          //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+          //delay: anime.stagger(180, { start: this.timeDuration }) //time duration must be replaced with delay
+        },
+        this.delayDuration
+      );
     } else if (this.animation_type == 'waveIn') {
-      //console.log('waveIn');
-      _object.writeTextElement.elt
-        .querySelectorAll('.letter')
-        .forEach((el: any) => (el.style.display = 'inline-block'));
-      _object.writeTextElement.style('overflow', 'hidden');
-      anime.timeline({ loop: false }).add({
-        targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-        translateY: [CONFIG.PLAY.WAVEIN_TRANSLATEY, 0],
-        translateZ: 0,
-        duration: this.timeDuration,
-        delay: anime.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY, {
-          start: this.delayDuration
-        })
-        //delay: (el, i) => CONFIG.PLAY.WAVEIN_STAGGERING_DELAY * i
-      });
+      console.log('waveIn');
+
+      animationTimeline.add(
+        {
+          begin: function (anim) {
+            _object.writeTextElement.elt
+              .querySelectorAll('.letter')
+              .forEach((el: any) => (el.style.display = 'inline-block'));
+            _object.writeTextElement.style('overflow', 'hidden');
+          },
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          translateY: [CONFIG.PLAY.WAVEIN_TRANSLATEY, 0],
+          translateZ: 0,
+
+          duration: this.timeDuration,
+          delay: anime.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY)
+          //delay: (el, i) => CONFIG.PLAY.WAVEIN_STAGGERING_DELAY * i
+        },
+        this.delayDuration
+      );
     } else if (this.animation_type == 'waveOut') {
       //console.log('waveOut');
       _object.writeTextElement.elt
         .querySelectorAll('.letter')
         .forEach((el: any) => (el.style.display = 'inline-block'));
       //_object.writeTextElement.style('overflow', 'hidden');
-      anime.timeline({ loop: false }).add({
-        targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-        translateY: [0, CONFIG.PLAY.WAVEOUT_TRANSLATEY],
-        translateZ: 0,
-        opacity: [1, 0.5, 0.1, 0],
-        scale: [1, 0.2, 0],
-        duration: this.timeDuration,
-        delay: anime.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY, {
-          start: this.delayDuration
-        })
-        //delay: (el, i) => CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY * i
-      });
+      animationTimeline.add(
+        {
+          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          translateY: [0, CONFIG.PLAY.WAVEOUT_TRANSLATEY],
+          translateZ: 0,
+          opacity: [1, 0.5, 0.1, 0],
+          scale: [1, 0.2, 0],
+          duration: this.timeDuration,
+          delay: anime.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY)
+          //delay: (el, i) => CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY * i
+        },
+        this.delayDuration
+      );
     } else if (this.animation_type == 'spinOut') {
-      //console.log('spinOut');
+      console.log('spinOut');
       _object.writeTextElement.elt
         .querySelectorAll('.letter')
         .forEach((el: any) => (el.style.display = 'inline-block'));

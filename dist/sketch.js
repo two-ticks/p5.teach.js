@@ -5,7 +5,7 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  background(150);
 }
 
 async function reel() {
@@ -20,8 +20,9 @@ async function reel() {
   text2.fill('white');
   text2.size(35);
   //await scene.delay(2);
-  text2.play('write', 3, 0);
+  text2.play('fadeOut', 2, 0);
   //await scene.delay(2);
-  text2.play('fadeOut', 2, 3); // plays in place of waveIn
+  text2.play('fadeIn', 2, 3); // plays in place of waveIn
+  text2.play('waveIn', 2, 6);
   //play(texty); //can use this also
 }
