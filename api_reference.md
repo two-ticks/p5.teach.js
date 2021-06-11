@@ -1,6 +1,6 @@
-## API Reference
+# API Reference
 
-### createText(text, x, y, font-size)
+## `createText(text, x, y, font-size)`
 
 **Parameters**
 
@@ -52,18 +52,18 @@ function reel() {
 }
 ```
 
-| **Animations** | Description                                                     |
-| :------------- | :-------------------------------------------------------------- |
-| `write`        | Writes the text with a blurry effect at each new character      |
-| `fadeOut`      | Make a fade out effect                                          |
-| `fadeIn`       | Make a fade in effect                                           |
-| `waveIn`       | Make a wave in effect : appears on the screen with a wave       |
-| `waveOut`      | Make a wave out effect : disappears from the screen with a wave |
-| `erase`        | Make a eraser effect and make text disappear from the screen    |
-| `dissolve`     | Dissolves the text and make it disappear from the screen        |
-| `spinOut`      | Spins the text and make it disappear from the screen            |
+| **Animations** | Description                                                   |
+| :------------- | :------------------------------------------------------------ |
+| `write`        | Writes the text with a blurry effect at each new character    |
+| `fadeOut`      | Make a fade-out effect                                        |
+| `fadeIn`       | Make a fade-in effect                                         |
+| `waveIn`       | Make a wave in effect: appears on the screen with a wave      |
+| `waveOut`      | Make a wave out effect: disappear from the screen with a wave |
+| `erase`        | Make an eraser effect and make text disappear from the screen |
+| `dissolve`     | Dissolves the text and make it disappear from the screen      |
+| `spinOut`      | Spins the text and make it disappear from the screen          |
 
-### createTeX(tex, x, y, width, height)
+## `createTeX(tex, x, y, width, height)`
 
 **Parameters**
 
@@ -95,8 +95,8 @@ let tex = createTeX('\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}');
 | **Animations** | Description                                               |
 | :------------- | :-------------------------------------------------------- |
 | `write`        | Writes the TeX with a blurry effect at each new character |
-| `fadeOut`      | Make a fade out effect                                    |
-| `fadeIn`       | Make a fade in effect                                     |
+| `fadeOut`      | Make a fade-out effect                                    |
+| `fadeIn`       | Make a fade-in effect                                     |
 
 **Example**
 
