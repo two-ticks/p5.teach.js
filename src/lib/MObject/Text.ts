@@ -32,7 +32,7 @@ export class Text {
     //this.writeTextElement.position(this.x, this.y);
   }
   size(sizePx: number) {
-    this.sizePx = sizePx;
+    this.sizePx = sizePx; //font-size
   }
 
   //TODO : fix stroke - currently only -webkit supported

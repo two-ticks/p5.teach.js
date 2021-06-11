@@ -1,5 +1,12 @@
 # p5.teach.js
 
+p5.teach.js provide tools for teaching through p5.js, such as functions to animate text, TeX and shapes. Our goal is to introduce a simple, easy to use library to animate and make scenes.
+
+## Get Started
+
+## Documentation
+[API Reference](api_reference.md) 
+
 ## Setting up the development environment
 
 1. Yarn should be preinstalled
