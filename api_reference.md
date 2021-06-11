@@ -28,7 +28,7 @@ let myText = createText('Cat and Dogs');
 
 **Example**
 
-[🔗example sketch](https://editor.p5js.org/radium.scientist/sketches/1YDfYFeF9)
+[🔗example sketch](https://editor.p5js.org/radium.scientist/sketches/LVPT38ig-)
 
 ```js
 function setup() {
@@ -52,16 +52,16 @@ function reel() {
 }
 ```
 
-| **Animations** | Description |
-| :------------- | :---------- |
-| `write`        |             |
-| `fadeOut`      |             |
-| `fadeIn`       |             |
-| `waveIn`       |             |
-| `waveOut`      |             |
-| `erase`        |             |
-| `dissolve`     |             |
-| `spinOut`      |             |
+| **Animations** | Description                                                     |
+| :------------- | :-------------------------------------------------------------- |
+| `write`        | Writes the text with a blurry effect at each new character      |
+| `fadeOut`      | Make a fade out effect                                          |
+| `fadeIn`       | Make a fade in effect                                           |
+| `waveIn`       | Make a wave in effect : appears on the screen with a wave       |
+| `waveOut`      | Make a wave out effect : disappears from the screen with a wave |
+| `erase`        | Make a eraser effect and make text disappear from the screen    |
+| `dissolve`     | Dissolves the text and make it disappear from the screen        |
+| `spinOut`      | Spins the text and make it disappear from the screen            |
 
 ### createTeX(tex, x, y, width, height)
 
@@ -92,11 +92,11 @@ let tex = createTeX('\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}');
 | object.strokeWidth(strokeWidth)                                | sets stroke-width of tex            |
 | object.play("animation-type", [timeDuration], [delayDuration]) | play animation of specified type    |
 
-| **Animations** | Description |
-| :------------- | :---------- |
-| `write`        |             |
-| `fadeOut`      |             |
-| `fadeIn`       |             |
+| **Animations** | Description                                               |
+| :------------- | :-------------------------------------------------------- |
+| `write`        | Writes the TeX with a blurry effect at each new character |
+| `fadeOut`      | Make a fade out effect                                    |
+| `fadeIn`       | Make a fade in effect                                     |
 
 **Example**
 
