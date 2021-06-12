@@ -5,7 +5,8 @@ p5.teach.js provides tools for teaching through p5.js, such as functions to anim
 ## Get Started
 
 ## Documentation
-- [API Reference](api_reference.md) 
+
+- [API Reference](api_reference.md)
 - [Example Sketches](https://editor.p5js.org/radium.scientist/collections/-xxYz8cof)
 
 ## Setting up the development environment

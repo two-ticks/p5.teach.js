@@ -22,9 +22,9 @@ import * as CONFIG from '../config.js';
  */
 export function play(
   this: any, //TODO: use '...args'
-  _object: any,
+  object: any,
   animation_type: string = 'write',
-  timeDuration: number, //seconds
+  timeDuration: number = 0, //seconds
   delayDuration: number | string = 0 //seconds
 ) {
   this.animation_type = animation_type;
@@ -48,9 +48,9 @@ export function play(
 
   this.timeDuration = 1000 * this.timeDuration; //sec to ms
 
-  if (this.timeDuration == null) {
+  if (this.timeDuration == 0) {
     this.timeDuration =
-      CONFIG.PLAY.TIME_LENGHT_CHARACTER * _object.sentence.length;
+      CONFIG.PLAY.TIME_LENGHT_CHARACTER * object.sentence.length;
   }
   let animationTimeline = anime.timeline(); //initilising a timeline
 
@@ -58,17 +58,17 @@ export function play(
     //TeX animation
   }
   //Text animation
-  else if (_object instanceof Text) {
-    if (!_object.writeTextElement) {
-      add(_object);
+  else if (object instanceof Text) {
+    if (!object.writeTextElement) {
+      add(object);
     }
     console.log('Text');
-    _object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
+    object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
 
     if (this.animation_type == 'write') {
       animationTimeline.add(
         {
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           scale: [CONFIG.PLAY.WRITE_SCALE, 1],
           opacity: [0, 1],
           translateZ: 0,
@@ -84,7 +84,7 @@ export function play(
       console.log('fadeIn');
       animationTimeline.add(
         {
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           //scale: [4, 1],
           opacity: [0, 1],
           //translateZ: 0,
@@ -99,7 +99,7 @@ export function play(
       console.log('fadeOut');
       animationTimeline.add(
         {
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           //scale: [4, 1],
           opacity: [1, 0],
           //translateZ: 0,
@@ -114,7 +114,7 @@ export function play(
       console.log('erase');
       animationTimeline.add(
         {
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           scale: [CONFIG.PLAY.ERASE_SCALE, 1],
           opacity: [1, 0],
           //translateZ: 0,
@@ -131,7 +131,7 @@ export function play(
 
       animationTimeline.add(
         {
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           opacity: [
             1,
             random(0.5, 0.9),
@@ -159,12 +159,12 @@ export function play(
       animationTimeline.add(
         {
           begin: function (anim) {
-            _object.writeTextElement.elt
+            object.writeTextElement.elt
               .querySelectorAll('.letter')
               .forEach((el: any) => (el.style.display = 'inline-block'));
-            _object.writeTextElement.style('overflow', 'hidden');
+            object.writeTextElement.style('overflow', 'hidden');
           },
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           translateY: [CONFIG.PLAY.WAVEIN_TRANSLATEY, 0],
           translateZ: 0,
 
@@ -176,13 +176,13 @@ export function play(
       );
     } else if (this.animation_type == 'waveOut') {
       //console.log('waveOut');
-      _object.writeTextElement.elt
+      object.writeTextElement.elt
         .querySelectorAll('.letter')
         .forEach((el: any) => (el.style.display = 'inline-block'));
-      //_object.writeTextElement.style('overflow', 'hidden');
+      //object.writeTextElement.style('overflow', 'hidden');
       animationTimeline.add(
         {
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           translateY: [0, CONFIG.PLAY.WAVEOUT_TRANSLATEY],
           translateZ: 0,
           opacity: [1, 0.5, 0.1, 0],
@@ -195,12 +195,12 @@ export function play(
       );
     } else if (this.animation_type == 'spinOut') {
       console.log('spinOut');
-      _object.writeTextElement.elt
+      object.writeTextElement.elt
         .querySelectorAll('.letter')
         .forEach((el: any) => (el.style.display = 'inline-block'));
-      //_object.writeTextElement.style('overflow', 'hidden');
+      //object.writeTextElement.style('overflow', 'hidden');
       anime.timeline({ loop: false }).add({
-        targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+        targets: object.writeTextElement.elt.querySelectorAll('.letter'),
         //translateY: [0,'1em'],
         rotateX: 360, //360deg
         opacity: [0.5, , 0],

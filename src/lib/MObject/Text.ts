@@ -1,29 +1,31 @@
+import p5 from 'p5';
 import { play } from '../Scene/play';
 
 export class Text {
-  writeTextElement: any;
-  textWrapper: any;
   x: number;
   y: number;
   sentence: string;
-  sizePx: number; //px
-  _stroke: string;
-  _strokeWidth: number;
-  _fill: string;
+  _size: number; //px
+  // strokeColor: string;
+  // strokeWidth: number;
+  fillColor: p5.Color;
+
+  writeTextElement: any; //to be used by play function
+  textWrapper: any; //to be used by play function
 
   constructor(
     sentence: string,
     x: number = 10,
     y: number = 10,
-    sizePx: number = 28
+    _size: number = 28
   ) {
     this.x = x;
     this.y = y;
     this.sentence = sentence;
-    this.sizePx = sizePx;
-    this._stroke = 'black';
-    this._strokeWidth = 10;
-    this._fill = 'black';
+    this._size = _size;
+    // this.strokeColor = 'black';
+    // this._strokeWidth = 10;
+    this.fillColor = color('black');
   }
 
   position(x: number, y: number = 10) {
@@ -31,17 +33,17 @@ export class Text {
     this.y = y;
     //this.writeTextElement.position(this.x, this.y);
   }
-  size(sizePx: number) {
-    this.sizePx = sizePx; //font-size
+  size(_size: number) {
+    this._size = _size; //font-size
   }
 
   //TODO : fix stroke - currently only -webkit supported
 
   // stroke(strokeColor: string) {
   //   if (arguments.length === 0) {
-  //     return this._stroke;
+  //     return this.strokeColor;
   //   } else {
-  //     this._stroke = strokeColor;
+  //     this.strokeColor = strokeColor;
   //   }
   // }
 
@@ -53,11 +55,11 @@ export class Text {
   //   }
   // }
 
-  fill(fillColor: string) {
+  fill(fillColor: p5.Color) {
     if (arguments.length === 0) {
-      return this._fill;
+      return this.fillColor;
     } else {
-      this._fill = fillColor;
+      this.fillColor = fillColor;
     }
   }
 

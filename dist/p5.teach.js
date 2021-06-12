@@ -1894,23 +1894,16 @@ exports.add = void 0;
 
 var Text_1 = require("../MObject/Text");
 
-function add(_object) {
+function add(object) {
   if (false) {//tex animations
-  } else if (_object instanceof Text_1.Text) {
-    var sentence = _object.sentence;
-    _object.writeTextElement = createElement('div', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
+  } else if (object instanceof Text_1.Text) {
+    var sentence = object.sentence;
+    object.writeTextElement = createElement('div', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
+    object.writeTextElement.position(object.x, object.y);
+    object.writeTextElement.style('font-size', object._size + "px");
+    object.writeTextElement.style('color', "" + object.fillColor); //object.writeTextElement.style('text-stroke-width', `${object._strokeWidth}`); //TODO : not working without -webkit
 
-    _object.writeTextElement.position(_object.x, _object.y);
-
-    _object.writeTextElement.style('font-size', _object.sizePx + "px");
-
-    _object.writeTextElement.style('color', "" + _object._fill);
-
-    _object.writeTextElement.style('text-stroke-width', "" + _object._strokeWidth); //TODO : not working without -webkit
-
-
-    _object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
-
+    object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
   }
 }
 
@@ -2019,11 +2012,15 @@ var CONFIG = __importStar(require("../config.js")); //TODO : fix relative time
 
 
 function play( //TODO: use '...args'
-_object, animation_type, timeDuration, //seconds
+object, animation_type, timeDuration, //seconds
 delayDuration //seconds
 ) {
   if (animation_type === void 0) {
     animation_type = 'write';
+  }
+
+  if (timeDuration === void 0) {
+    timeDuration = 0;
   }
 
   if (delayDuration === void 0) {
@@ -2053,27 +2050,25 @@ delayDuration //seconds
 
   this.timeDuration = 1000 * this.timeDuration; //sec to ms
 
-  if (this.timeDuration == null) {
-    this.timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * _object.sentence.length;
+  if (this.timeDuration == 0) {
+    this.timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object.sentence.length;
   }
 
   var animationTimeline = animejs_1.default.timeline(); //initilising a timeline
 
   if (false) {//TeX animation
   } //Text animation
-  else if (_object instanceof Text_1.Text) {
-      if (!_object.writeTextElement) {
-        add_1.add(_object);
+  else if (object instanceof Text_1.Text) {
+      if (!object.writeTextElement) {
+        add_1.add(object);
       }
 
       console.log('Text');
-
-      _object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
-
+      object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
 
       if (this.animation_type == 'write') {
         animationTimeline.add({
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           scale: [CONFIG.PLAY.WRITE_SCALE, 1],
           opacity: [0, 1],
           translateZ: 0,
@@ -2087,7 +2082,7 @@ delayDuration //seconds
       } else if (this.animation_type == 'fadeIn') {
         console.log('fadeIn');
         animationTimeline.add({
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           //scale: [4, 1],
           opacity: [0, 1],
           //translateZ: 0,
@@ -2099,7 +2094,7 @@ delayDuration //seconds
       } else if (this.animation_type == 'fadeOut') {
         console.log('fadeOut');
         animationTimeline.add({
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           //scale: [4, 1],
           opacity: [1, 0],
           //translateZ: 0,
@@ -2111,7 +2106,7 @@ delayDuration //seconds
       } else if (this.animation_type == 'erase') {
         console.log('erase');
         animationTimeline.add({
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           scale: [CONFIG.PLAY.ERASE_SCALE, 1],
           opacity: [1, 0],
           //translateZ: 0,
@@ -2124,7 +2119,7 @@ delayDuration //seconds
       } else if (this.animation_type == 'dissolve') {
         console.log('dissolve');
         animationTimeline.add({
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           opacity: [1, random(0.5, 0.9), random(0.6, 0.8), random(0.5, 0.7), random(0.4, 0.6), random(0.6, 0.9), random(0, 0.4), random(0, 0.3), random(0, 0.2), 0],
           //translateZ: 0,
           easing: 'easeInExpo',
@@ -2137,13 +2132,12 @@ delayDuration //seconds
         console.log('waveIn');
         animationTimeline.add({
           begin: function begin(anim) {
-            _object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+            object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
               return el.style.display = 'inline-block';
             });
-
-            _object.writeTextElement.style('overflow', 'hidden');
+            object.writeTextElement.style('overflow', 'hidden');
           },
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           translateY: [CONFIG.PLAY.WAVEIN_TRANSLATEY, 0],
           translateZ: 0,
           duration: this.timeDuration,
@@ -2152,13 +2146,12 @@ delayDuration //seconds
         }, this.delayDuration);
       } else if (this.animation_type == 'waveOut') {
         //console.log('waveOut');
-        _object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+        object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
           return el.style.display = 'inline-block';
-        }); //_object.writeTextElement.style('overflow', 'hidden');
-
+        }); //object.writeTextElement.style('overflow', 'hidden');
 
         animationTimeline.add({
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           translateY: [0, CONFIG.PLAY.WAVEOUT_TRANSLATEY],
           translateZ: 0,
           opacity: [1, 0.5, 0.1, 0],
@@ -2169,16 +2162,14 @@ delayDuration //seconds
         }, this.delayDuration);
       } else if (this.animation_type == 'spinOut') {
         console.log('spinOut');
-
-        _object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+        object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
           return el.style.display = 'inline-block';
-        }); //_object.writeTextElement.style('overflow', 'hidden');
-
+        }); //object.writeTextElement.style('overflow', 'hidden');
 
         animejs_1.default.timeline({
           loop: false
         }).add({
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
+          targets: object.writeTextElement.elt.querySelectorAll('.letter'),
           //translateY: [0,'1em'],
           rotateX: 360,
           opacity: [0.5,, 0],
@@ -2207,7 +2198,7 @@ var play_1 = require("../Scene/play");
 var Text =
 /** @class */
 function () {
-  function Text(sentence, x, y, sizePx) {
+  function Text(sentence, x, y, _size) {
     if (x === void 0) {
       x = 10;
     }
@@ -2216,17 +2207,17 @@ function () {
       y = 10;
     }
 
-    if (sizePx === void 0) {
-      sizePx = 28;
+    if (_size === void 0) {
+      _size = 28;
     }
 
     this.x = x;
     this.y = y;
     this.sentence = sentence;
-    this.sizePx = sizePx;
-    this._stroke = 'black';
-    this._strokeWidth = 10;
-    this._fill = 'black';
+    this._size = _size; // this.strokeColor = 'black';
+    // this._strokeWidth = 10;
+
+    this.fillColor = color('black');
   }
 
   Text.prototype.position = function (x, y) {
@@ -2238,14 +2229,14 @@ function () {
     this.y = y; //this.writeTextElement.position(this.x, this.y);
   };
 
-  Text.prototype.size = function (sizePx) {
-    this.sizePx = sizePx;
+  Text.prototype.size = function (_size) {
+    this._size = _size; //font-size
   }; //TODO : fix stroke - currently only -webkit supported
   // stroke(strokeColor: string) {
   //   if (arguments.length === 0) {
-  //     return this._stroke;
+  //     return this.strokeColor;
   //   } else {
-  //     this._stroke = strokeColor;
+  //     this.strokeColor = strokeColor;
   //   }
   // }
   // strokeWidth(w: number) {
@@ -2259,9 +2250,9 @@ function () {
 
   Text.prototype.fill = function (fillColor) {
     if (arguments.length === 0) {
-      return this._fill;
+      return this.fillColor;
     } else {
-      this._fill = fillColor;
+      this.fillColor = fillColor;
     }
   };
 
@@ -2533,7 +2524,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61325" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54625" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

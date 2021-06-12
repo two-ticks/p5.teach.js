@@ -13,7 +13,7 @@ async function reel() {
   texty.position(25, 175);
   texty.fill('red');
   texty.size(35);
-  //texty.play('write', 2, 0);
+  texty.play('write', 2, 0);
   //play(texty); //can use this also
   let text2 = createText('Linear Transformation');
   text2.position(25, 325);
