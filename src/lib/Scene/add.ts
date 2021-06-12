@@ -4,7 +4,7 @@ export function add(object: any) {
   if (false) {
     //tex animations
   } else if (object instanceof Text) {
-    const sentence = object.sentence;
+    const sentence = object._text;
 
     object.writeTextElement = createElement(
       'div',

@@ -20,7 +20,7 @@ async function reel() {
   text2.fill('white');
   text2.size(35);
   //await scene.delay(2);
-  text2.play('fadeOut', 2, 0);
+  text2.play('dissolve', 2, 0);
   //await scene.delay(2);
   text2.play('fadeIn', 2, 3); // plays in place of waveIn
   text2.play('waveIn', 2, 6);

@@ -2,26 +2,26 @@ import p5 from 'p5';
 import { play } from '../Scene/play';
 
 export class Text {
+  writeTextElement: any; //to be used by play function
+  textWrapper: any; //to be used by play function
+  _text: string;
   x: number;
   y: number;
-  sentence: string;
+
   _size: number; //px
   // strokeColor: string;
   // strokeWidth: number;
   fillColor: p5.Color;
 
-  writeTextElement: any; //to be used by play function
-  textWrapper: any; //to be used by play function
-
   constructor(
-    sentence: string,
+    _text: string,
     x: number = 10,
     y: number = 10,
     _size: number = 28
   ) {
     this.x = x;
     this.y = y;
-    this.sentence = sentence;
+    this._text = _text;
     this._size = _size;
     // this.strokeColor = 'black';
     // this._strokeWidth = 10;
@@ -73,7 +73,7 @@ export class Text {
 }
 
 export function createText(
-  sentence: string,
+  _text: string,
   x: number = 10,
   y: number = 10,
   sizePx: number = 28 //px
@@ -81,5 +81,5 @@ export function createText(
   if (sizePx < 0) {
     throw new Error('Size should be a whole number');
   }
-  return new Text(sentence, x, y, sizePx);
+  return new Text(_text, x, y, sizePx);
 }
