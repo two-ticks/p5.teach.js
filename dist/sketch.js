@@ -9,7 +9,7 @@ function draw() {
 }
 
 async function reel() {
-  let texty = createText('Ampere Circulation Law');
+  let texty = createText('Ampere Circulation Law', 25, 175, 35);
   texty.position(25, 175);
   texty.fill('red');
   texty.size(35);

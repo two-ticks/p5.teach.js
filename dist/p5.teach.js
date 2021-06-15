@@ -2052,7 +2052,7 @@ delayDuration //seconds
   timeDuration = 1000 * timeDuration; //sec to ms
 
   if (timeDuration == 0) {
-    timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object.sentence.length;
+    timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
   }
 
   if (false) {//TeX animation
@@ -2235,23 +2235,20 @@ var play_1 = require("../Scene/play");
 var Text =
 /** @class */
 function () {
-  function Text(_text, x, y, _size) {
-    if (x === void 0) {
-      x = 10;
-    }
-
-    if (y === void 0) {
-      y = 10;
-    }
-
-    if (_size === void 0) {
-      _size = 28;
-    }
+  function Text(_a) {
+    var _text = _a._text,
+        _b = _a.x,
+        x = _b === void 0 ? 10 : _b,
+        _c = _a.y,
+        y = _c === void 0 ? 10 : _c,
+        _d = _a._size,
+        _size = _d === void 0 ? 28 : _d;
 
     this.x = x;
     this.y = y;
     this._text = _text;
-    this._size = _size; // this.strokeColor = 'black';
+    this._size = _size;
+    console.log('me', this._size); // this.strokeColor = 'black';
     // this._strokeWidth = 10;
 
     this.fillColor = color('black');
@@ -2314,25 +2311,25 @@ function () {
 
 exports.Text = Text;
 
-function createText(_text, x, y, sizePx //px
-) {
-  if (x === void 0) {
-    x = 10;
+function createText() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
   }
 
-  if (y === void 0) {
-    y = 10;
-  }
-
-  if (sizePx === void 0) {
-    sizePx = 28;
-  }
-
-  if (sizePx < 0) {
+  if (args[3] < 0) {
+    //size
     throw new Error('Size should be a whole number');
   }
 
-  return new Text(_text, x, y, sizePx);
+  var _textArg = {
+    _text: args[0],
+    x: args[1],
+    y: args[2],
+    _size: args[3]
+  };
+  return new Text(_textArg);
 }
 
 exports.createText = createText;
@@ -2561,7 +2558,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58059" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60697" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

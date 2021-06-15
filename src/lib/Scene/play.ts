@@ -53,7 +53,7 @@ export function play(
   timeDuration = 1000 * timeDuration; //sec to ms
 
   if (timeDuration == 0) {
-    timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object.sentence.length;
+    timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
   }
 
   if (false) {
