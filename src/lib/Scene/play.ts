@@ -3,7 +3,6 @@ import anime from 'animejs';
 import { add } from './add';
 import * as CONFIG from '../config.js';
 
-//TODO : start and end of animations as parameters
 //TODO : fix relative time
 //TODO : text animation for all-at-once
 
@@ -31,6 +30,12 @@ export function play(
   startTime: number = 0, //seconds // start time
   endTime: number = 0 //seconds // end time
 ) {
+  if (!(typeof startTime == 'number' || typeof endTime == 'number')) {
+    //size
+    throw new Error('startTime and endTime must be passed as number');
+  } else if (endTime - startTime < 0) {
+    throw new Error('startTime must be less than endTime');
+  }
   var timeDuration = (endTime - startTime) * 1000;
   var delayDuration = startTime * 1000;
   // object = object;
