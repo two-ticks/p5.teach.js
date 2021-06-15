@@ -13,16 +13,16 @@ async function reel() {
   texty.position(25, 175);
   texty.fill('red');
   texty.size(35);
-  texty.play('write', 2, 0);
-  //play(texty); //can use this also
+  texty.play('write', 0, 2); //Start = 0 sec and End = 2 sec
+
   let text2 = createText('Linear Transformation');
   text2.position(25, 325);
   text2.fill('white');
   text2.size(35);
-  //await scene.delay(2);
-  text2.play('dissolve', 2, 0);
-  //await scene.delay(2);
-  text2.play('fadeIn', 2, 3); // plays in place of waveIn
-  text2.play('waveIn', 2, 6);
+
+  text2.play('dissolve', 0, 4);
+
+  text2.play('fadeIn', 5, 6); // plays in place of waveIn
+  text2.play('waveIn', 6, 7);
   //play(texty); //can use this also
 }

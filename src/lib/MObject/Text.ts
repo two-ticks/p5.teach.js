@@ -75,8 +75,10 @@ export class Text {
   }
 }
 
-export function createText(...args: any[]) { //TODO : convert into interface
-  if (args[3] < 0) { //size
+export function createText(...args: any[]) {
+  //TODO : convert into interface
+  if (args[3] < 0) {
+    //size
     throw new Error('Size should be a whole number');
   }
   const _textArg: TextObject = {

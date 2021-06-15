@@ -3,6 +3,7 @@ import anime from 'animejs';
 import { add } from './add';
 import * as CONFIG from '../config.js';
 
+//TODO : start and end of animations as parameters
 //TODO : fix relative time
 //TODO : text animation for all-at-once
 
@@ -27,34 +28,38 @@ export function play(
   //any, //TODO: use '...args'
   object: any,
   animation_type: string = 'write',
-  timeDuration: number = 0, //seconds
-  delayDuration: number | string = 0 //seconds
+  startTime: number = 0, //seconds // start time
+  endTime: number = 0 //seconds // end time
 ) {
+  var timeDuration = (endTime - startTime) * 1000;
+  var delayDuration = startTime * 1000;
   // object = object;
   // animation_type = animation_type;
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
   //testing for relative and absolute parameters //TODO : fix relative time
-  if (typeof delayDuration === 'number') {
-    delayDuration = 1000 * delayDuration; //sec to ms
-    //console.log(delayDuration);
-  } else if (typeof delayDuration === 'string') {
-    if (delayDuration.charAt(0) === '+') {
-      delayDuration = 1000 * Number(delayDuration);
-      delayDuration = `+=${delayDuration}`;
-      console.log(delayDuration);
-    } else if (delayDuration.charAt(0) === '-') {
-      delayDuration = 1000 * Number(delayDuration);
-      delayDuration = `-=${-delayDuration}`;
-      console.log(delayDuration);
-    }
-  }
 
-  timeDuration = 1000 * timeDuration; //sec to ms
+  //TODO : fix this after testing end and start parameters
+  // if (typeof delayDuration === 'number') {
+  //   delayDuration = 1000 * delayDuration; //sec to ms
+  //   //console.log(delayDuration);
+  // } else if (typeof delayDuration === 'string') {
+  //   if (delayDuration.charAt(0) === '+') {
+  //     delayDuration = 1000 * Number(delayDuration);
+  //     delayDuration = `+=${delayDuration}`;
+  //     console.log(delayDuration);
+  //   } else if (delayDuration.charAt(0) === '-') {
+  //     delayDuration = 1000 * Number(delayDuration);
+  //     delayDuration = `-=${-delayDuration}`;
+  //     console.log(delayDuration);
+  //   }
+  // }
 
-  if (timeDuration == 0) {
-    timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
-  }
+  // timeDuration = 1000 * timeDuration; //sec to ms
+
+  // if (timeDuration == 0) {
+  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
+  // }
 
   if (false) {
     //TeX animation

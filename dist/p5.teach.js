@@ -1992,7 +1992,8 @@ var animejs_1 = __importDefault(require("animejs"));
 
 var add_1 = require("./add");
 
-var CONFIG = __importStar(require("../config.js")); //TODO : fix relative time
+var CONFIG = __importStar(require("../config.js")); //TODO : start and end of animations as parameters 
+//TODO : fix relative time
 //TODO : text animation for all-at-once
 
 /**
@@ -2014,46 +2015,46 @@ var CONFIG = __importStar(require("../config.js")); //TODO : fix relative time
 var animationTimeline = animejs_1.default.timeline(); //initilising a timeline
 
 function play( //any, //TODO: use '...args'
-object, animation_type, timeDuration, //seconds
-delayDuration //seconds
+object, animation_type, startTime, //seconds // start time 
+endTime //seconds // end time 
 ) {
   if (animation_type === void 0) {
     animation_type = 'write';
   }
 
-  if (timeDuration === void 0) {
-    timeDuration = 0;
+  if (startTime === void 0) {
+    startTime = 0;
   }
 
-  if (delayDuration === void 0) {
-    delayDuration = 0;
-  } // object = object;
+  if (endTime === void 0) {
+    endTime = 0;
+  }
+
+  var timeDuration = (endTime - startTime) * 1000;
+  var delayDuration = startTime * 1000; // object = object;
   // animation_type = animation_type;
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
   //testing for relative and absolute parameters //TODO : fix relative time
-
-
-  if (typeof delayDuration === 'number') {
-    delayDuration = 1000 * delayDuration; //sec to ms
-    //console.log(delayDuration);
-  } else if (typeof delayDuration === 'string') {
-    if (delayDuration.charAt(0) === '+') {
-      delayDuration = 1000 * Number(delayDuration);
-      delayDuration = "+=" + delayDuration;
-      console.log(delayDuration);
-    } else if (delayDuration.charAt(0) === '-') {
-      delayDuration = 1000 * Number(delayDuration);
-      delayDuration = "-=" + -delayDuration;
-      console.log(delayDuration);
-    }
-  }
-
-  timeDuration = 1000 * timeDuration; //sec to ms
-
-  if (timeDuration == 0) {
-    timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
-  }
+  //TODO : fix this after testing end and start parameters
+  // if (typeof delayDuration === 'number') {
+  //   delayDuration = 1000 * delayDuration; //sec to ms
+  //   //console.log(delayDuration);
+  // } else if (typeof delayDuration === 'string') {
+  //   if (delayDuration.charAt(0) === '+') {
+  //     delayDuration = 1000 * Number(delayDuration);
+  //     delayDuration = `+=${delayDuration}`;
+  //     console.log(delayDuration);
+  //   } else if (delayDuration.charAt(0) === '-') {
+  //     delayDuration = 1000 * Number(delayDuration);
+  //     delayDuration = `-=${-delayDuration}`;
+  //     console.log(delayDuration);
+  //   }
+  // }
+  // timeDuration = 1000 * timeDuration; //sec to ms
+  // if (timeDuration == 0) {
+  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
+  // }
 
   if (false) {//TeX animation
   } //Text animation
@@ -2558,7 +2559,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60697" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59541" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
