@@ -1992,8 +1992,7 @@ var animejs_1 = __importDefault(require("animejs"));
 
 var add_1 = require("./add");
 
-var CONFIG = __importStar(require("../config.js")); //TODO : start and end of animations as parameters 
-//TODO : fix relative time
+var CONFIG = __importStar(require("../config.js")); //TODO : fix relative time
 //TODO : text animation for all-at-once
 
 /**
@@ -2015,8 +2014,8 @@ var CONFIG = __importStar(require("../config.js")); //TODO : start and end of an
 var animationTimeline = animejs_1.default.timeline(); //initilising a timeline
 
 function play( //any, //TODO: use '...args'
-object, animation_type, startTime, //seconds // start time 
-endTime //seconds // end time 
+object, animation_type, startTime, //seconds // start time
+endTime //seconds // end time
 ) {
   if (animation_type === void 0) {
     animation_type = 'write';
@@ -2028,6 +2027,13 @@ endTime //seconds // end time
 
   if (endTime === void 0) {
     endTime = 0;
+  }
+
+  if (!(typeof startTime == 'number' || typeof endTime == 'number')) {
+    //size
+    throw new Error('startTime and endTime must be passed as number');
+  } else if (endTime - startTime < 0) {
+    throw new Error('startTime must be less than endTime');
   }
 
   var timeDuration = (endTime - startTime) * 1000;
@@ -2313,15 +2319,11 @@ function () {
 exports.Text = Text;
 
 function createText() {
+  //TODO : convert into interface
   var args = [];
 
   for (var _i = 0; _i < arguments.length; _i++) {
     args[_i] = arguments[_i];
-  }
-
-  if (args[3] < 0) {
-    //size
-    throw new Error('Size should be a whole number');
   }
 
   var _textArg = {
@@ -2330,6 +2332,16 @@ function createText() {
     y: args[2],
     _size: args[3]
   };
+  console.log(_textArg._size);
+
+  if (!(typeof _textArg._size == 'undefined' || typeof _textArg._size == 'number')) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (_textArg._size < 0) {
+    //size
+    throw new Error('size of text should be a whole number!');
+  }
+
   return new Text(_textArg);
 }
 
@@ -2559,7 +2571,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59541" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59588" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

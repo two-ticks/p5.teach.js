@@ -2,7 +2,6 @@
  * @jest-environment jsdom
  */
 
-import module = require('p5');
 import * as text from '../../lib/MObject/Text';
 import * as Play from '../../lib/Scene/play';
 import { createText, Text } from '../../lib/MObject/Text';

@@ -24,7 +24,7 @@ export class Text {
     this.y = y;
     this._text = _text;
     this._size = _size;
-    console.log('me', this._size);
+    //console.log('me', this._size);
 
     // this.strokeColor = 'black';
     // this._strokeWidth = 10;
@@ -84,14 +84,14 @@ export function createText(...args: any[]) {
     y: args[2],
     _size: args[3]
   };
-  console.log(_textArg._size);
+  //console.log(_textArg._size);
 
   if (
     !(typeof _textArg._size == 'undefined' || typeof _textArg._size == 'number')
   ) {
     //size
     throw new Error('size must be passed as number');
-  } else if (_textArg._size < 0) {
+  } else if (!(typeof _textArg._size == 'undefined') && _textArg._size < 0) {
     //size
     throw new Error('size of text should be a whole number!');
   }

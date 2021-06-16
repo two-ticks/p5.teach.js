@@ -36,8 +36,8 @@ export function play(
   } else if (endTime - startTime < 0) {
     throw new Error('startTime must be less than endTime');
   }
-  var timeDuration = (endTime - startTime) * 1000;
-  var delayDuration = startTime * 1000;
+  const timeDuration = (endTime - startTime) * 1000;
+  const delayDuration = startTime * 1000;
   // object = object;
   // animation_type = animation_type;
   // timeDuration = timeDuration; //seconds
