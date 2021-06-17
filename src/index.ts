@@ -39,3 +39,8 @@ import { Graph2D, create2DGraph } from './lib/Geometry/graph';
 global.Graph2D = Graph2D;
 global.create2DGraph = create2DGraph;
 
+import { GraphPolar2D, create2DPolarGraph } from './lib/Geometry/polar';
+
+global.GraphPolar2D = GraphPolar2D;
+global.create2DPolarGraph= create2DPolarGraph;
+
