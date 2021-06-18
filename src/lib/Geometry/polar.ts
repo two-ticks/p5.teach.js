@@ -31,7 +31,7 @@ export class GraphPolar2D {
     this.height_svg = height_svg;
     this.pathData = createPolarSVGPath(eqn, thetaRange);
     this.graphContainer = createElement('div');
-    this.linePath = this.linePath = document.createElementNS(
+    this.linePath = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'path'
     );
@@ -46,7 +46,9 @@ export class GraphPolar2D {
     this.graphContainer.position(this.x, this.y);
   }
   size(sizePx: number) {}
-
+  stroke(_stroke: any) {
+    this.linePath.setAttribute('stroke', `${_stroke}`);
+  }
   plot() {
     this.graphObject = document.createElementNS(
       'http://www.w3.org/2000/svg',
@@ -61,18 +63,89 @@ export class GraphPolar2D {
     this.graphContainer.elt.appendChild(this.graphObject);
   }
 
+  remove() {
+    this.graphContainer.elt.removeChild(this.graphObject);
+  }
+
   play() {
     const pathElement = this.graphContainer.elt.querySelectorAll('path');
-    var lineDrawing = anime({
+    const lineDrawing = anime({
       targets: this.graphContainer.elt.querySelectorAll('path'),
       strokeDashoffset: [anime.setDashoffset, 0],
       easing: 'easeOutSine',
-      duration: 20000,
+      duration: 50000,
       begin: function (anim) {
-        pathElement[0].setAttribute('stroke', 'black');
+        //pathElement[0].setAttribute('stroke', 'black');
         pathElement[0].setAttribute('fill', 'none');
       },
       complete: function (anim) {
+        //document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  }
+  //TODO : arrow follower
+  arrow(eqn: any) {
+    let arrowPath = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'line'
+    );
+    arrowPath.setAttribute('fill', 'none');
+    arrowPath.setAttribute('stroke', 'black');
+    arrowPath.setAttribute('stroke-width', '40');
+    let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML =
+      '<marker id="arrowhead" markerWidth="10" markerHeight="7" refX="7.5" refY="3.5" orient="auto">  <polygon points="0 0, 10 3.5, 0 7" /></marker>';
+    this.graphObject.appendChild(defs);
+    this.graphObject.appendChild(arrowPath);
+    let update = 0;
+    //this.graphObject.appendChild(arrowPath);
+    const arrowDrawing = anime({
+      targets: arrowPath,
+      //strokeDashoffset: [anime.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: 50000,
+      begin: function (anim) {
+        //pathElement[0].setAttribute('stroke', 'black');
+        //pathElement[0].setAttribute('fill', 'none');
+      },
+      complete: function (anim) {
+        //document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      update: function (anim) {
+        update += 0.01;
+        //console.log(update);
+
+        let scaleX = 100;
+        let scaleY = 100;
+
+        // let SVG_path = `M${scaleX * this.eqn(minX) * Math.cos(0)},${
+        //   scaleY * this.eqn(minX) * Math.sin(0)
+        // }`;
+        // for (
+        //   let theta = this.thetaRange[0];
+        //   theta < this.thetaRange[1];
+        //   theta += 0.01
+        // ) {
+        //   // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
+        //   SVG_path = SVG_path.concat(
+        //     ` L${scaleX * this.eqn(theta) * Math.cos(theta)},${
+        //       scaleY * this.eqn(theta) * Math.sin(theta)
+        //     }`
+        //   );
+        // }
+        arrowPath.setAttribute('x1', `${0}`);
+
+        arrowPath.setAttribute(
+          'x2',
+          `${scaleX * eqn(update) * Math.cos(update)}`
+        );
+        arrowPath.setAttribute('y1', `${0}`);
+        arrowPath.setAttribute(
+          'y2',
+          `${scaleY * eqn(update) * Math.sin(update)}`
+        );
+        arrowPath.setAttribute('marker-end', 'url(#arrowhead)');
         //document.querySelector('path').setAttribute("fill", "yellow");
       },
       autoplay: true
@@ -83,7 +156,7 @@ export class GraphPolar2D {
 function createPolarSVGPath(
   eqn: any,
   thetaRange: number[] = [0, 2 * Math.PI],
-  stepSize: number = 0.0001
+  stepSize: number = 0.001
 ) {
   let minX = 0;
   let scaleX = 100;
