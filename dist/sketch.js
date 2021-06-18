@@ -1,7 +1,5 @@
-
 function setup() {
   createCanvas(400, 400);
-  background(220);
   scene = new Scene();
   reel();
 }
@@ -11,33 +9,59 @@ function draw() {
 }
 
 async function reel() {
-
   // text1 = createText ("text");
   // text1.position(200,100);
   // play(text1);
-  
-  grp = create2DGraph((t) => 800 * Math.cos(2 * t) + 1000 * Math.sin(4 * t) + 800 * Math.sin(6*t));
 
-  grp.plot();
-  grp.position(10, 200);
-  grp.play();
+  // grp = create2DGraph((t) => 800 * Math.cos(2 * t) + 1000 * Math.sin(4 * t) + 800 * Math.sin(6*t));
 
-  grp1 = create2DGraph((t) => 800 * Math.cos(2 * t));
-  grp1.plot();
-  grp1.position(10, 0);
-  grp1.play();
+  // grp.plot();
+  // grp.position(10, 200);
+  // grp.play();
 
-  grp2 = create2DGraph((t) => 1000 * Math.sin(4 * t));
+  // grp1 = create2DPolarGraph(
+  //   (t) => 20 * (2 + Math.cos(10 * t ) + 2*Math.sin(5 * t)),
+  //   [0, 2 * Math.PI]
+  // );
+  grp1 = create2DPolarGraph(
+    (t) =>
+      15 *
+      (Math.pow(Math.E, Math.cos(t) + 0.25 * noise(25 * Math.cos(0.6 * t))) -
+        2 * Math.cos(4 * t) -
+        Math.pow(Math.sin(t / 12), 5)),
+    [0, 12 * Math.PI]
+  );
+  grp1.stroke('red');
+  //grp1.plot();
+  grp1.size(400, 400);
+  grp1.position(50, 110);
+  //grp1.arrow()
+  //grp1.play();
+
+  // grp2 = create2DPolarGraph(
+  //   (t) =>
+  //     15 *
+  //     (Math.pow(Math.E, Math.cos(t)) -
+  //       2 * Math.cos(4 * t) -
+  //       Math.pow(Math.sin(t / 12), 5)),
+  //   [0, 12 * Math.PI]
+  // );
+  signalAmp = 2;
+  let signalFreq = 2;
+  grp2 = create2DPolarGraph(
+    (t) => 15 * (signalAmp * Math.sin(signalFreq * t) + signalAmp),
+    [0, 2 * Math.PI]
+  );
+  grp2.stroke('blue');
   grp2.plot();
-  grp2.position(10, 50);
-  grp2.play();
-
-  grp3 = create2DGraph((t) => 800 * Math.sin(6 * t));
-  grp3.plot();
-  grp3.position(10, 100);
-  grp3.play();
-  
-
+  grp2.position(50, -10);
+  //grp2.play();
+  grp2.arrow((t) => 15 * (signalAmp * Math.sin(signalFreq * t) + signalAmp));
+  grp2.remove();
+  // grp3 = create2DGraph((t) => 800 * Math.sin(6 * t));
+  // grp3.plot();
+  // grp3.position(10, 100);
+  // grp3.play();
 
   // let tex = createTeX('\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}');
   // tex.position(100, 50);

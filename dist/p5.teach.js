@@ -41100,6 +41100,216 @@ function create2DGraph(eqn, x, y, width_svg, height_svg) {
 }
 
 exports.create2DGraph = create2DGraph;
+},{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
+"use strict"; // let xArr = [];
+// let yArr = [];
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.create2DPolarGraph = exports.GraphPolar2D = void 0;
+
+var animejs_1 = __importDefault(require("animejs"));
+
+var GraphPolar2D =
+/** @class */
+function () {
+  function GraphPolar2D(eqn, thetaRange, x, y, width_svg, height_svg) {
+    if (thetaRange === void 0) {
+      thetaRange = [0, 2 * Math.PI];
+    }
+
+    if (x === void 0) {
+      x = 10;
+    }
+
+    if (y === void 0) {
+      y = 10;
+    }
+
+    if (width_svg === void 0) {
+      width_svg = 300;
+    }
+
+    if (height_svg === void 0) {
+      height_svg = 300;
+    }
+
+    this.eqn = eqn;
+    this.thetaRange = thetaRange;
+    this.x = x;
+    this.y = y;
+    this.width_svg = width_svg;
+    this.height_svg = height_svg;
+    this.pathData = createPolarSVGPath(eqn, thetaRange);
+    this.graphContainer = createElement('div');
+    this.linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    this.linePath.setAttribute('fill', 'none');
+    this.linePath.setAttribute('stroke', 'black');
+    this.linePath.setAttribute('stroke-width', '40');
+    this.graphContainer.position(this.x, this.y);
+  }
+
+  GraphPolar2D.prototype.position = function (x, y) {
+    if (y === void 0) {
+      y = 10;
+    }
+
+    this.x = x;
+    this.y = y;
+    this.graphContainer.position(this.x, this.y);
+  };
+
+  GraphPolar2D.prototype.size = function (sizePx) {};
+
+  GraphPolar2D.prototype.stroke = function (_stroke) {
+    this.linePath.setAttribute('stroke', "" + _stroke);
+  };
+
+  GraphPolar2D.prototype.plot = function () {
+    this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); //this.graphObject.setAttribute('style', `translate(-50%, -50%)`);
+
+    this.graphObject.setAttribute('width', "" + this.width_svg);
+    this.graphObject.setAttribute('height', "" + this.height_svg);
+    this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
+    this.linePath.setAttribute('d', this.pathData);
+    this.graphObject.appendChild(this.linePath);
+    this.graphContainer.elt.appendChild(this.graphObject);
+  };
+
+  GraphPolar2D.prototype.remove = function () {
+    this.graphContainer.elt.removeChild(this.graphObject);
+  };
+
+  GraphPolar2D.prototype.play = function () {
+    var pathElement = this.graphContainer.elt.querySelectorAll('path');
+    var lineDrawing = animejs_1.default({
+      targets: this.graphContainer.elt.querySelectorAll('path'),
+      strokeDashoffset: [animejs_1.default.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: 50000,
+      begin: function begin(anim) {
+        //pathElement[0].setAttribute('stroke', 'black');
+        pathElement[0].setAttribute('fill', 'none');
+      },
+      complete: function complete(anim) {//document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  }; //TODO : arrow follower
+
+
+  GraphPolar2D.prototype.arrow = function (eqn) {
+    var arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    arrowPath.setAttribute('fill', 'none');
+    arrowPath.setAttribute('stroke', 'black');
+    arrowPath.setAttribute('stroke-width', '40');
+    var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = '<marker id="arrowhead" markerWidth="10" markerHeight="7" refX="7.5" refY="3.5" orient="auto">  <polygon points="0 0, 10 3.5, 0 7" /></marker>';
+    this.graphObject.appendChild(defs);
+    this.graphObject.appendChild(arrowPath);
+    var _update = 0; //this.graphObject.appendChild(arrowPath);
+
+    var arrowDrawing = animejs_1.default({
+      targets: arrowPath,
+      //strokeDashoffset: [anime.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: 50000,
+      begin: function begin(anim) {//pathElement[0].setAttribute('stroke', 'black');
+        //pathElement[0].setAttribute('fill', 'none');
+      },
+      complete: function complete(anim) {//document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      update: function update(anim) {
+        _update += 0.01; //console.log(update);
+
+        var scaleX = 100;
+        var scaleY = 100; // let SVG_path = `M${scaleX * this.eqn(minX) * Math.cos(0)},${
+        //   scaleY * this.eqn(minX) * Math.sin(0)
+        // }`;
+        // for (
+        //   let theta = this.thetaRange[0];
+        //   theta < this.thetaRange[1];
+        //   theta += 0.01
+        // ) {
+        //   // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
+        //   SVG_path = SVG_path.concat(
+        //     ` L${scaleX * this.eqn(theta) * Math.cos(theta)},${
+        //       scaleY * this.eqn(theta) * Math.sin(theta)
+        //     }`
+        //   );
+        // }
+
+        arrowPath.setAttribute('x1', "" + 0);
+        arrowPath.setAttribute('x2', "" + scaleX * eqn(_update) * Math.cos(_update));
+        arrowPath.setAttribute('y1', "" + 0);
+        arrowPath.setAttribute('y2', "" + scaleY * eqn(_update) * Math.sin(_update));
+        arrowPath.setAttribute('marker-end', 'url(#arrowhead)'); //document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  };
+
+  return GraphPolar2D;
+}();
+
+exports.GraphPolar2D = GraphPolar2D;
+
+function createPolarSVGPath(eqn, thetaRange, stepSize) {
+  if (thetaRange === void 0) {
+    thetaRange = [0, 2 * Math.PI];
+  }
+
+  if (stepSize === void 0) {
+    stepSize = 0.001;
+  }
+
+  var minX = 0;
+  var scaleX = 100;
+  var scaleY = 100;
+  var SVG_path = "M" + scaleX * eqn(minX) * Math.cos(0) + "," + scaleY * eqn(minX) * Math.sin(0);
+
+  for (var theta = thetaRange[0]; theta < thetaRange[1]; theta += stepSize) {
+    // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
+    SVG_path = SVG_path.concat(" L" + scaleX * eqn(theta) * Math.cos(theta) + "," + scaleY * eqn(theta) * Math.sin(theta));
+  }
+
+  return SVG_path;
+}
+
+function create2DPolarGraph(eqn, thetaRange, x, y, width_svg, height_svg) {
+  if (thetaRange === void 0) {
+    thetaRange = [0, 2 * Math.PI];
+  }
+
+  if (x === void 0) {
+    x = 10;
+  }
+
+  if (y === void 0) {
+    y = 10;
+  }
+
+  if (width_svg === void 0) {
+    width_svg = 300;
+  }
+
+  if (height_svg === void 0) {
+    height_svg = 300;
+  }
+
+  var _object = new GraphPolar2D(eqn, thetaRange, x, y, width_svg, height_svg);
+
+  return _object;
+}
+
+exports.create2DPolarGraph = create2DPolarGraph;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"index.ts":[function(require,module,exports) {
 
 "use strict";
@@ -41147,7 +41357,12 @@ var graph_1 = require("./lib/Geometry/graph");
 
 global.Graph2D = graph_1.Graph2D;
 global.create2DGraph = graph_1.create2DGraph;
-},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var polar_1 = require("./lib/Geometry/polar");
+
+global.GraphPolar2D = polar_1.GraphPolar2D;
+global.create2DPolarGraph = polar_1.create2DPolarGraph;
+},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts","./lib/Geometry/polar":"lib/Geometry/polar.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -41175,7 +41390,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62989" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57617" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
