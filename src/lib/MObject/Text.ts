@@ -1,9 +1,11 @@
+import p5 from 'p5';
 import { TextObject } from '../interfaces';
 import { play } from '../Scene/play';
 
 export class Text {
-  writeTextElement: any; //to be used by play function
-  textWrapper: any; //to be used by play function
+  writeTextElement!: p5.Element; //to be used by play function
+  //to be used by play function
+  //textWrapper: any; //to be used by play function
   _text: string;
   x: number;
   y: number;
