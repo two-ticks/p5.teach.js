@@ -1,4 +1,4 @@
-import p5 from 'p5';
+import { TextObject } from '../interfaces';
 import { play } from '../Scene/play';
 
 export class Text {
@@ -13,16 +13,13 @@ export class Text {
   // strokeWidth: number;
   fillColor: p5.Color;
 
-  constructor(
-    _text: string,
-    x: number = 10,
-    y: number = 10,
-    _size: number = 28
-  ) {
+  constructor({ _text, x = 10, y = 10, _size = 28 }: TextObject) {
     this.x = x;
     this.y = y;
     this._text = _text;
     this._size = _size;
+    //console.log('me', this._size);
+
     // this.strokeColor = 'black';
     // this._strokeWidth = 10;
     this.fillColor = color('black');
@@ -72,14 +69,25 @@ export class Text {
   }
 }
 
-export function createText(
-  _text: string,
-  x: number = 10,
-  y: number = 10,
-  sizePx: number = 28 //px
-) {
-  if (sizePx < 0) {
-    throw new Error('Size should be a whole number');
+export function createText(...args: any[]) {
+  //TODO : convert into interface
+
+  const _textArg: TextObject = {
+    _text: args[0],
+    x: args[1],
+    y: args[2],
+    _size: args[3]
+  };
+  //console.log(_textArg._size);
+
+  if (
+    !(typeof _textArg._size == 'undefined' || typeof _textArg._size == 'number')
+  ) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (!(typeof _textArg._size == 'undefined') && _textArg._size < 0) {
+    //size
+    throw new Error('size of text should be a whole number!');
   }
-  return new Text(_text, x, y, sizePx);
+  return new Text(_textArg);
 }

@@ -26,35 +26,45 @@ let animationTimeline = anime.timeline(); //initilising a timeline
 export function play(
   //any, //TODO: use '...args'
   object: any,
-  animation_type: string = 'write',
-  timeDuration: number = 0, //seconds
-  delayDuration: number | string = 0 //seconds
+  animationType: string = 'write',
+  startTime: number = 0, //seconds // start time
+  endTime: number = 0 //seconds // end time
 ) {
+  if (!(typeof startTime == 'number' || typeof endTime == 'number')) {
+    //size
+    throw new Error('startTime and endTime must be passed as number');
+  } else if (endTime - startTime < 0) {
+    throw new Error('startTime must be less than endTime');
+  }
+  const timeDuration = (endTime - startTime) * 1000;
+  const delayDuration = startTime * 1000;
   // object = object;
-  // animation_type = animation_type;
+  // animationType = animationType;
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
   //testing for relative and absolute parameters //TODO : fix relative time
-  if (typeof delayDuration === 'number') {
-    delayDuration = 1000 * delayDuration; //sec to ms
-    //console.log(delayDuration);
-  } else if (typeof delayDuration === 'string') {
-    if (delayDuration.charAt(0) === '+') {
-      delayDuration = 1000 * Number(delayDuration);
-      delayDuration = `+=${delayDuration}`;
-      console.log(delayDuration);
-    } else if (delayDuration.charAt(0) === '-') {
-      delayDuration = 1000 * Number(delayDuration);
-      delayDuration = `-=${-delayDuration}`;
-      console.log(delayDuration);
-    }
-  }
 
-  timeDuration = 1000 * timeDuration; //sec to ms
+  //TODO : fix this after testing end and start parameters
+  // if (typeof delayDuration === 'number') {
+  //   delayDuration = 1000 * delayDuration; //sec to ms
+  //   //console.log(delayDuration);
+  // } else if (typeof delayDuration === 'string') {
+  //   if (delayDuration.charAt(0) === '+') {
+  //     delayDuration = 1000 * Number(delayDuration);
+  //     delayDuration = `+=${delayDuration}`;
+  //     console.log(delayDuration);
+  //   } else if (delayDuration.charAt(0) === '-') {
+  //     delayDuration = 1000 * Number(delayDuration);
+  //     delayDuration = `-=${-delayDuration}`;
+  //     console.log(delayDuration);
+  //   }
+  // }
 
-  if (timeDuration == 0) {
-    timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object.sentence.length;
-  }
+  // timeDuration = 1000 * timeDuration; //sec to ms
+
+  // if (timeDuration == 0) {
+  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
+  // }
 
   if (false) {
     //TeX animation
@@ -68,30 +78,30 @@ export function play(
     console.log('Text');
     object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
 
-    if (animation_type == 'write') {
+    if (animationType == 'write') {
       console.log(object);
       writeAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'all-at-once') {
+    } else if (animationType == 'all-at-once') {
       console.log('all at once');
-    } else if (animation_type == 'fadeIn') {
+    } else if (animationType == 'fadeIn') {
       console.log('fadeIn');
       fadeInAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'fadeOut') {
+    } else if (animationType == 'fadeOut') {
       console.log('fadeOut');
       fadeOutAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'erase') {
+    } else if (animationType == 'erase') {
       console.log('erase');
       eraseAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'dissolve') {
+    } else if (animationType == 'dissolve') {
       console.log('dissolve');
       dissolveAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'waveIn') {
+    } else if (animationType == 'waveIn') {
       console.log('waveIn');
       waveInAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'waveOut') {
+    } else if (animationType == 'waveOut') {
       console.log('waveOut');
       waveOutAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'spinOut') {
+    } else if (animationType == 'spinOut') {
       console.log('spinOut');
       spinOutAnimator(object, timeDuration, delayDuration);
     }
