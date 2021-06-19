@@ -1,11 +1,5 @@
+import { TextObject } from '../interfaces';
 import { play } from '../Scene/play';
-
-interface TextObject {
-  _text: string;
-  x?: number;
-  y?: number;
-  _size?: number;
-}
 
 export class Text {
   writeTextElement: any; //to be used by play function

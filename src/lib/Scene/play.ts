@@ -26,7 +26,7 @@ let animationTimeline = anime.timeline(); //initilising a timeline
 export function play(
   //any, //TODO: use '...args'
   object: any,
-  animation_type: string = 'write',
+  animationType: string = 'write',
   startTime: number = 0, //seconds // start time
   endTime: number = 0 //seconds // end time
 ) {
@@ -39,7 +39,7 @@ export function play(
   const timeDuration = (endTime - startTime) * 1000;
   const delayDuration = startTime * 1000;
   // object = object;
-  // animation_type = animation_type;
+  // animationType = animationType;
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
   //testing for relative and absolute parameters //TODO : fix relative time
@@ -78,30 +78,30 @@ export function play(
     console.log('Text');
     object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
 
-    if (animation_type == 'write') {
+    if (animationType == 'write') {
       console.log(object);
       writeAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'all-at-once') {
+    } else if (animationType == 'all-at-once') {
       console.log('all at once');
-    } else if (animation_type == 'fadeIn') {
+    } else if (animationType == 'fadeIn') {
       console.log('fadeIn');
       fadeInAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'fadeOut') {
+    } else if (animationType == 'fadeOut') {
       console.log('fadeOut');
       fadeOutAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'erase') {
+    } else if (animationType == 'erase') {
       console.log('erase');
       eraseAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'dissolve') {
+    } else if (animationType == 'dissolve') {
       console.log('dissolve');
       dissolveAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'waveIn') {
+    } else if (animationType == 'waveIn') {
       console.log('waveIn');
       waveInAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'waveOut') {
+    } else if (animationType == 'waveOut') {
       console.log('waveOut');
       waveOutAnimator(object, timeDuration, delayDuration);
-    } else if (animation_type == 'spinOut') {
+    } else if (animationType == 'spinOut') {
       console.log('spinOut');
       spinOutAnimator(object, timeDuration, delayDuration);
     }

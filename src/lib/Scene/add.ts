@@ -1,6 +1,7 @@
+import { TeX } from '../MObject/TeX';
 import { Text } from '../MObject/Text';
 
-export function add(object: any) {
+export function add(object: Text | TeX) {
   if (false) {
     //tex animations
   } else if (object instanceof Text) {
