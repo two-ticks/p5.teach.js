@@ -1,4 +1,3 @@
-import p5 from 'p5';
 import { TextObject } from '../interfaces';
 import { play } from '../Scene/play';
 
