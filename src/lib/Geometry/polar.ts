@@ -1,6 +1,3 @@
-// let xArr = [];
-// let yArr = [];
-
 import anime from 'animejs';
 
 export class GraphPolar2D {
@@ -114,26 +111,9 @@ export class GraphPolar2D {
       },
       update: function (anim) {
         update += 0.01;
-        //console.log(update);
 
         let scaleX = 100;
         let scaleY = 100;
-
-        // let SVG_path = `M${scaleX * this.eqn(minX) * Math.cos(0)},${
-        //   scaleY * this.eqn(minX) * Math.sin(0)
-        // }`;
-        // for (
-        //   let theta = this.thetaRange[0];
-        //   theta < this.thetaRange[1];
-        //   theta += 0.01
-        // ) {
-        //   // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-        //   SVG_path = SVG_path.concat(
-        //     ` L${scaleX * this.eqn(theta) * Math.cos(theta)},${
-        //       scaleY * this.eqn(theta) * Math.sin(theta)
-        //     }`
-        //   );
-        // }
         arrowPath.setAttribute('x1', `${0}`);
 
         arrowPath.setAttribute(

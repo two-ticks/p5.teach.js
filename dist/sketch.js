@@ -47,7 +47,7 @@ async function reel() {
   //   [0, 12 * Math.PI]
   // );
   signalAmp = 2;
-  let signalFreq = 2;
+  let signalFreq = 12;
   grp2 = create2DPolarGraph(
     (t) => 15 * (signalAmp * Math.sin(signalFreq * t) + signalAmp),
     [0, 2 * Math.PI]
@@ -57,7 +57,7 @@ async function reel() {
   grp2.position(50, -10);
   //grp2.play();
   grp2.arrow((t) => 15 * (signalAmp * Math.sin(signalFreq * t) + signalAmp));
-  grp2.remove();
+  //grp2.remove();
   // grp3 = create2DGraph((t) => 800 * Math.sin(6 * t));
   // grp3.plot();
   // grp3.position(10, 100);

@@ -1,6 +1,3 @@
-// let xArr = [];
-// let yArr = [];
-
 import anime from 'animejs';
 
 export class Graph2D {
