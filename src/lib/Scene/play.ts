@@ -1,4 +1,5 @@
 import { Text } from '../MObject/Text';
+import { TeX } from '../MObject/TeX';
 import anime from 'animejs';
 import { add } from './add';
 import * as CONFIG from '../config.js';
@@ -66,8 +67,161 @@ export function play(
   //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
   // }
 
-  if (false) {
-    //TeX animation
+  if (object instanceof TeX) {
+    //adding element before animation
+    if (!object.writeTexElement) {
+      add(object);
+    }
+    //tex animations
+    console.log('TeX');
+    if (animationType === 'write') {
+      //write(object, timeDuration);
+      // object.writeTexElement = createDiv(object.SVGEquation);
+      // let svg = object.writeTexElement.elt.querySelectorAll('svg');
+      // svg[0].setAttribute('width', `${object.width_svg}px`);
+      // svg[0].setAttribute('height', `${object.height_svg}px`);
+      // const g = object.writeTexElement.elt.querySelectorAll('g');
+      // // g[0].setAttribute('fill', 'none');
+      // // g[0].setAttribute('stroke-width', '10px');
+      // object.writeTexElement.position(object.x, object.y);
+      //const pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+      const g = object.writeTexElement.elt.querySelectorAll('g');
+      anime.timeline({ loop: false }).add({
+        targets: object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        fill: [color(object.fillColor).toString(), object.fillColor], //TODO : fill is black by default can be customised through config files
+        //stroke : "black",     //customisable through config
+        //stroke-width: "10px", //customisable through config
+        strokeDashoffset: [anime.setDashoffset, 0],
+        opacity: [0, 1],
+        begin: function (anim) {
+          g[0].setAttribute('fill', 'none');
+          g[0].setAttribute('stroke-width', `${object.strokeWidth}px`);
+        },
+        complete: function (anim) {
+          g[0].setAttribute('fill', `${object.fillColor}`);
+        },
+        easing: 'easeInOutCubic',
+        duration: timeDuration,
+        delay: anime.stagger(400, { start: 0 })
+      });
+    } else if (animationType === 'all-at-once') {
+      //object.all_at_once(timeDuration);
+      // object.writeTexElement = createDiv(object.SVGEquation);
+      // let svg = object.writeTexElement.elt.querySelectorAll('svg');
+      // svg[0].setAttribute('width', `${object.width_svg}px`);
+      // svg[0].setAttribute('height', `${object.height_svg}px`);
+
+      // object.writeTexElement.position(object.x, object.y);
+      const g = object.writeTexElement.elt.querySelectorAll('g');
+      const pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+
+      for (var i = 0; i < pathEls.length; i++) {
+        var pathEl = pathEls[i];
+        var offset: any = anime.setDashoffset(pathEl);
+        pathEl.setAttribute('stroke-dashoffset', offset);
+        anime({
+          targets: pathEl,
+          strokeDashoffset: [anime.setDashoffset, 0],
+          easing: 'easeInOutCubic',
+          //easing: 'easeOutExpo', //customisable through config
+          duration: timeDuration,
+          delay: anime.stagger(1000, { direction: 'normal' }), //customisable through config
+          begin: function (anim) {
+            pathEl.setAttribute('stroke', `${object.strokeColor}`);
+            pathEl.setAttribute('fill', 'none');
+            g[0].setAttribute('fill', 'none');
+            g[0].setAttribute('stroke-width', `${object.strokeWidth}px`);
+          },
+          complete: function (anim) {
+            pathEl.setAttribute('fill', `${object.fillColor}`);
+            g[0].setAttribute('fill', `${object.fillColor}`);
+          },
+          autoplay: true
+        });
+      }
+    } else if (animationType === 'fade-in') {
+      console.log('fadeIn called');
+
+      anime({
+        targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+        //targets: object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [0, 1],
+        //translateZ: 0,
+        easing: 'easeOutExpo',
+        complete: function (anim) {
+          object.writeTexElement.style('opacity', '1'); //clear all stray elements
+        },
+        duration: timeDuration,
+        delay: anime.stagger(180, { start: 1000 })
+      });
+    } else if (animationType === 'appear') {
+      console.log('appear called');
+
+      anime({
+        //targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+        targets: object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [0, 1],
+        //translateZ: 0,
+        easing: 'easeOutExpo',
+        complete: function (anim) {
+          object.writeTexElement.style('opacity', '1'); //clear all stray elements
+        },
+        duration: timeDuration,
+        delay: anime.stagger(180, { start: 1000, direction: 'normal'})
+      });
+    } else if (animationType === 'dissolve') {
+      console.log('dissolve called');
+      //add(object);
+      anime({
+        //targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+        targets: object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [1, 0],
+        //translateZ: 0,
+        easing: 'easeOutExpo',
+        complete: function (anim) {
+          object.writeTexElement.style('opacity', '0'); //clear all stray elements
+        },
+        duration: timeDuration,
+        delay: anime.stagger(180, { start: 1000 })
+      });
+    } else if (animationType === 'fade-out') {
+      console.log('fadeout called');
+
+      anime({
+        targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+        //targets: object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [1, 0],
+        //translateZ: 0,
+        easing: 'easeOutExpo',
+        complete: function (anim) {
+          object.writeTexElement.style('opacity', '0'); //clear all stray elements
+        },
+        duration: timeDuration,
+        delay: anime.stagger(180, { start: 1000 })
+      });
+    } else if (animationType === 'blink') {
+      console.log('blink');
+
+      const animation: any = anime({
+        targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+        //targets: object.writeTexElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        opacity: [0, 1, 0],
+        //translateZ: 0,
+        easing: 'easeOutSine',
+        // complete: function (anim) {
+        //   animation.reverse();
+        // },
+        duration: timeDuration,
+        delay: anime.stagger(200),
+        loop: true
+      });
+    }
   }
   //Text animation
   else if (object instanceof Text) {

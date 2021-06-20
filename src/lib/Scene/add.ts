@@ -2,8 +2,19 @@ import { TeX } from '../MObject/TeX';
 import { Text } from '../MObject/Text';
 
 export function add(object: Text | TeX) {
-  if (false) {
+  if (object instanceof TeX) {
     //tex animations
+    object.writeTexElement = createDiv(object.SVGEquation);
+    let svg = object.writeTexElement.elt.querySelectorAll('svg');
+    svg[0].setAttribute('width', `${object.width_svg}px`);
+    svg[0].setAttribute('height', `${object.height_svg}px`);
+    svg[0].setAttribute('stroke', object.strokeColor);
+    svg[0].setAttribute('stroke-width', object.strokeWidth);
+    svg[0].setAttribute('fill', object.fillColor.toString());
+
+    // g[0].setAttribute('fill', 'none');
+    // g[0].setAttribute('stroke-width', '10px');
+    object.writeTexElement.position(object.x, object.y);
   } else if (object instanceof Text) {
     const sentence = object._text;
 
