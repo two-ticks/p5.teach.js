@@ -43,3 +43,8 @@ import { GraphPolar2D, create2DPolarGraph } from './lib/Geometry/polar';
 
 global.GraphPolar2D = GraphPolar2D;
 global.create2DPolarGraph = create2DPolarGraph;
+
+import { Vector2DField, create2DVectorField } from './lib/Geometry/vectorField';
+
+global.Vector2DField = Vector2DField;
+global.create2DVectorField = create2DVectorField;
