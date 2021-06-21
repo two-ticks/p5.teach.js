@@ -69,12 +69,15 @@ export function play(
 
   if (object instanceof TeX) {
     //adding element before animation
+    console.log('TeX');
     if (!object.writeTexElement) {
       add(object);
     }
     //tex animations
     console.log('TeX');
     if (animationType === 'write') {
+      console.log('writing');
+
       //write(object, timeDuration);
       // object.writeTexElement = createDiv(object.SVGEquation);
       // let svg = object.writeTexElement.elt.querySelectorAll('svg');
@@ -85,26 +88,30 @@ export function play(
       // // g[0].setAttribute('stroke-width', '10px');
       // object.writeTexElement.position(object.x, object.y);
       //const pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+
       const g = object.writeTexElement.elt.querySelectorAll('g');
-      anime.timeline({ loop: false }).add({
-        targets: object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
-        fill: [color(object.fillColor).toString(), object.fillColor], //TODO : fill is black by default can be customised through config files
-        //stroke : "black",     //customisable through config
-        //stroke-width: "10px", //customisable through config
-        strokeDashoffset: [anime.setDashoffset, 0],
-        opacity: [0, 1],
-        begin: function (anim) {
-          g[0].setAttribute('fill', 'none');
-          g[0].setAttribute('stroke-width', `${object.strokeWidth}px`);
+      animationTimeline.add(
+        {
+          targets: object.writeTexElement.elt.querySelectorAll('path'),
+          //scale: [4, 1],
+          fill: [color(object.fillColor).toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
+          //stroke : "black",     //TODO : customisable through config
+          //stroke-width: "10px", //customisable through config
+          strokeDashoffset: [anime.setDashoffset, 0],
+          opacity: [0, 1],
+          begin: function (anim) {
+            g[0].setAttribute('fill', 'none');
+            g[0].setAttribute('stroke-width', '10px');
+          },
+          complete: function (anim) {
+            g[0].setAttribute('fill', 'black');
+          },
+          easing: 'easeInOutCubic',
+          duration: timeDuration,
+          delay: anime.stagger(400)
         },
-        complete: function (anim) {
-          g[0].setAttribute('fill', `${object.fillColor}`);
-        },
-        easing: 'easeInOutCubic',
-        duration: timeDuration,
-        delay: anime.stagger(400, { start: 0 })
-      });
+        delayDuration
+      );
     } else if (animationType === 'all-at-once') {
       //object.all_at_once(timeDuration);
       // object.writeTexElement = createDiv(object.SVGEquation);
@@ -170,7 +177,7 @@ export function play(
           object.writeTexElement.style('opacity', '1'); //clear all stray elements
         },
         duration: timeDuration,
-        delay: anime.stagger(180, { start: 1000, direction: 'normal'})
+        delay: anime.stagger(180, { start: 1000, direction: 'normal' })
       });
     } else if (animationType === 'dissolve') {
       console.log('dissolve called');
