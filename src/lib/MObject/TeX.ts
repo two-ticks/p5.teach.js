@@ -28,12 +28,12 @@ import { play } from '../Scene/play';
  */
 export class TeX {
   writeTexElement: any;
-  SVGEquation: any;
-  //timeDuration: number; // left for later decision -> need not specify such details at initialisation
+  svgEquation: any;
+  //startTime: number; // left for later decision -> need not specify such details at initialisation
   x: number = 10;
   y: number = 10;
-  width_svg: number;
-  height_svg: number;
+  svgWidth: number;
+  svgHeight: number;
   sentence: string;
   fillColor: p5.Color;
   strokeWidth: number;
@@ -42,15 +42,15 @@ export class TeX {
     sentence: string,
     x: number = 10,
     y: number = 10,
-    width_svg: number = 300,
-    height_svg: number = 300
+    svgWidth: number = 300,
+    svgHeight: number = 300
   ) {
     this.x = x;
     this.y = y;
     this.sentence = sentence;
-    this.width_svg = width_svg;
-    this.height_svg = height_svg;
-    this.SVGEquation = TeXToSVG(sentence);
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
+    this.svgEquation = TeXToSVG(sentence);
     this.fillColor = color('black');
     this.strokeWidth = 0;
     this.strokeColor = color('black');
@@ -61,9 +61,9 @@ export class TeX {
     this.y = y;
   }
 
-  size(width_svg: number = 300, height_svg: number = 300) {
-    this.width_svg = width_svg;
-    this.height_svg = height_svg;
+  size(svgWidth: number = 300, svgHeight: number = 300) {
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
   }
 
   fill(fillColor: p5.Color) {
@@ -76,10 +76,10 @@ export class TeX {
 
   play(
     animationType: string = 'write',
-    timeDuration: number = 0,
-    delayDuration: number = 0
+    startTime: number = 0,
+    endTime: number = 0
   ) {
-    play(this, animationType, timeDuration, delayDuration);
+    play(this, animationType, startTime, endTime);
   }
 }
 
@@ -87,9 +87,9 @@ export function createTeX(
   sentence: string,
   x: number = 10,
   y: number = 10,
-  width_svg: number = 300,
-  height_svg: number = 300
+  svgWidth: number = 300,
+  svgHeight: number = 300
 ) {
-  const object = new TeX(sentence, x, y, width_svg, height_svg);
+  const object = new TeX(sentence, x, y, svgWidth, svgHeight);
   return object;
 }

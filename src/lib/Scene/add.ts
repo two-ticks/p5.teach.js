@@ -4,10 +4,10 @@ import { Text } from '../MObject/Text';
 export function add(object: Text | TeX) {
   if (object instanceof TeX) {
     //tex animations
-    object.writeTexElement = createDiv(object.SVGEquation);
+    object.writeTexElement = createDiv(object.svgEquation);
     let svg = object.writeTexElement.elt.querySelectorAll('svg');
-    svg[0].setAttribute('width', `${object.width_svg}px`);
-    svg[0].setAttribute('height', `${object.height_svg}px`);
+    svg[0].setAttribute('width', `${object.svgWidth}px`);
+    svg[0].setAttribute('height', `${object.svgHeight}px`);
     svg[0].setAttribute('stroke', object.strokeColor);
     svg[0].setAttribute('stroke-width', object.strokeWidth);
     svg[0].setAttribute('fill', object.fillColor.toString());
