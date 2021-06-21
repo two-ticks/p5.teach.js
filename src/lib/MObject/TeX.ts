@@ -1,4 +1,3 @@
-import p5 from 'p5';
 import TeXToSVG from 'tex-to-svg';
 import { play } from '../Scene/play';
 

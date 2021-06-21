@@ -12,8 +12,9 @@
   "keywords": [],
   "license": "ISC",
   "dependencies": {
+    "animejs": "^3.2.1",
     "p5": "^1.2.0",
-    "animejs": "^3.2.1"
+    "tex-to-svg": "^0.2.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
