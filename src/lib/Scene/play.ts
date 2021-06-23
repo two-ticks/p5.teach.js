@@ -2,6 +2,8 @@ import { Text } from '../MObject/Text';
 import anime from 'animejs';
 import { add } from './add';
 import * as CONFIG from '../config.js';
+import { animationTimeline } from './controls';
+// import { animationTimeline } from './controls';
 
 //TODO : fix relative time
 //TODO : text animation for all-at-once
@@ -21,7 +23,7 @@ import * as CONFIG from '../config.js';
  * @experimental
  */
 
-let animationTimeline = anime.timeline(); //initilising a timeline
+
 
 export function play(
   //any, //TODO: use '...args'
