@@ -13,3 +13,14 @@ global.play = play;
 
 import { Scene } from './lib/Scene/scene';
 global.Scene = Scene;
+
+import {
+  createControls,
+  pauseScene,
+  playScene,
+  restartScene
+} from './lib/Scene/controls';
+global.createControls = createControls;
+global.pauseScene = pauseScene;
+global.playScene = playScene;
+global.restartScene = restartScene;
