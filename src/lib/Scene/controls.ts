@@ -15,22 +15,16 @@ export function createControls() {
   );
   document.body.appendChild(progressBar);
 
-  progressBar.addEventListener('input', function () {
+  progressBar.oninput = function () {
+    pauseScene();
+    //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
     animationTimeline.seek(
       animationTimeline.duration * (progressBar.valueAsNumber / 100)
     );
-  });
-
-  //   progressBar.oninput = function () {
-  //     pauseScene();
-  //     //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
-  //     animationTimeline.seek(
-  //       animationTimeline.duration * (progressBar.valueAsNumber / 100)
-  //     );
-  //     //playScene();
-  //     //animationTimeline.seek(parseInt(progressBar.value, 10));
-  //     //animationTimeline.pause();
-  //   };
+    //playScene();
+    //animationTimeline.seek(parseInt(progressBar.value, 10));
+    //animationTimeline.pause();
+  };
 
   //buttons
   let playButton = document.createElement('button');
