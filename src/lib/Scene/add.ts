@@ -32,7 +32,8 @@ export function add(object: any) {
     object.writeTextElement.style('color', `${object.fillColor}`);
     //object.writeTextElement.style('text-stroke-width', `${object._strokeWidth}`); //TODO : not working without -webkit
     object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
-    object.writeTextElement.remove();
-    sceneContainer.appendChild(object.writeTextElement.elt);
+    object.writeTextElement.parent(sceneContainer);
+    //object.writeTextElement.remove();
+    //sceneContainer.appendChild(object.writeTextElement.elt);
   }
 }

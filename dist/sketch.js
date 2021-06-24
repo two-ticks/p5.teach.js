@@ -11,7 +11,7 @@ function draw() {
 
 async function reel() {
   let texty = createText("Ampere Circulation Law", 150, 175, 35);
-  texty.position(10, 175);
+  texty.position(150, 175);
   texty.fill("red");
   texty.play("write", 0, 4); 
   let pythag = createTeX('a^2 + b^2 = c^2');
@@ -19,7 +19,7 @@ async function reel() {
   pythag.size(120, 120);
   pythag.play('write', 0, 3);
 
-  
+
   // text1 = createText ("text");
   // text1.position(200,100);
   // play(text1);

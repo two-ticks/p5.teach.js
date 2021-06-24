@@ -40495,7 +40495,7 @@ function add(object) {
 
     object.writeTexElement.position(object.x, object.y);
   } else if (object instanceof Text_1.Text) {
-    console.log("Text add");
+    console.log('Text add');
     var sentence = object._text;
     object.writeTextElement = createElement('div', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
     object.writeTextElement.style('white-space', ' nowrap');
@@ -40505,8 +40505,8 @@ function add(object) {
 
     object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
 
-    object.writeTextElement.remove();
-    scene_1.sceneContainer.appendChild(object.writeTextElement.elt);
+    object.writeTextElement.parent(scene_1.sceneContainer); //object.writeTextElement.remove();
+    //sceneContainer.appendChild(object.writeTextElement.elt);
   }
 }
 
@@ -40568,19 +40568,15 @@ function createControls() {
   progressBar.setAttribute('step', "" + 0.001);
   progressBar.setAttribute('style', "appearance: none; width: 400px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;");
   document.body.appendChild(progressBar);
-  progressBar.addEventListener('input', function () {
-    exports.animationTimeline.seek(exports.animationTimeline.duration * (progressBar.valueAsNumber / 100));
-  }); //   progressBar.oninput = function () {
-  //     pauseScene();
-  //     //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
-  //     animationTimeline.seek(
-  //       animationTimeline.duration * (progressBar.valueAsNumber / 100)
-  //     );
-  //     //playScene();
-  //     //animationTimeline.seek(parseInt(progressBar.value, 10));
-  //     //animationTimeline.pause();
-  //   };
-  //buttons
+
+  progressBar.oninput = function () {
+    pauseScene(); //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
+
+    exports.animationTimeline.seek(exports.animationTimeline.duration * (progressBar.valueAsNumber / 100)); //playScene();
+    //animationTimeline.seek(parseInt(progressBar.value, 10));
+    //animationTimeline.pause();
+  }; //buttons
+
 
   var playButton = document.createElement('button');
   var pauseButton = document.createElement('button');
@@ -41742,7 +41738,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63745" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61754" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
