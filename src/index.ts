@@ -43,3 +43,14 @@ import { GraphPolar2D, create2DPolarGraph } from './lib/Geometry/polar';
 
 global.GraphPolar2D = GraphPolar2D;
 global.create2DPolarGraph = create2DPolarGraph;
+
+import {
+  createControls,
+  pauseScene,
+  playScene,
+  restartScene
+} from './lib/Scene/controls';
+global.createControls = createControls;
+global.pauseScene = pauseScene;
+global.playScene = playScene;
+global.restartScene = restartScene;

@@ -266,21 +266,34 @@ var __generator = this && this.__generator || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Scene = void 0;
+exports.Scene = exports.sceneContainer = void 0;
 
 var Scene =
 /** @class */
 function () {
-  function Scene() {}
+  function Scene() {
+    var p5Canvas = document.getElementsByClassName('p5Canvas')[0].getBoundingClientRect(); //console.log(p5Canvas);
 
-  Scene.prototype.delay = function (ms) {
+    exports.sceneContainer = document.createElement('div'); //sceneContainer.setAttribute('overflow', 'hidden');
+
+    exports.sceneContainer.setAttribute('class', 'sceneContainer');
+    exports.sceneContainer.setAttribute('style', "overflow: hidden; position: absolute; left: " + p5Canvas.x + "px; top: " + p5Canvas.y + "px; width: " + p5Canvas.width + "px; height : " + p5Canvas.height + "px"); // sceneContainer.setAttribute('height', `${p5Canvas.height}px`);
+    // sceneContainer.setAttribute('left', `${p5Canvas.x}px`);
+    // sceneContainer.setAttribute('top', `${p5Canvas.y}px`);
+
+    document.body.appendChild(exports.sceneContainer);
+  }
+
+  Scene.prototype.remove = function () {};
+
+  Scene.prototype.delay = function (sec) {
     return __awaiter(this, void 0, void 0, function () {
       return __generator(this, function (_a) {
         return [2
         /*return*/
         , new Promise(function (resolve) {
-          return setTimeout(resolve, ms);
-        })];
+          return setTimeout(resolve, 1000 * sec);
+        })]; //sec to ms
       });
     });
   };
@@ -289,94 +302,6 @@ function () {
 }();
 
 exports.Scene = Scene;
-},{}],"lib/MObject/Text.ts":[function(require,module,exports) {
-"use strict"; //TODO : insure Text is not reserved by any other dependecies
-//TODO : position and size
-//TODO : fix 'write' animation
-//TODO : fix duration and delay
-//TODO : clean stray after porting write and all-at-once animations
-//TODO : fix size function
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createText = exports.Text = void 0;
-
-var Text =
-/** @class */
-function () {
-  function Text(sentence, x, y, sizePx) {
-    if (x === void 0) {
-      x = 10;
-    }
-
-    if (y === void 0) {
-      y = 10;
-    }
-
-    if (sizePx === void 0) {
-      sizePx = 28;
-    }
-
-    this.x = x;
-    this.y = y;
-    this.sentence = sentence;
-    this.sizePx = sizePx; // this.writeTextElement = createElement(
-    //   'h1',
-    //   sentence.replace(/\S/g, "<span class='letter'>$&</span>")
-    // );
-    // this.writeTextElement.position(x, y);
-    // this.writeTextElement.style('font-size', `${this.size}px`);
-    // this.writeTextElement.style('opacity', '0'); //to hide text at initialisation
-  } // play(animation_type: string = 'write', timeDuration: number = 180) {
-  //   this.writeTextElement.style("opacity", '1');
-  //   if (animation_type == 'write') {
-  //     this.write(timeDuration);
-  //   } else if (animation_type == 'all-at-once') {
-  //     console.log('all at once');
-  //   }
-  // }
-  // write(timeDuration: number) {
-  // }
-
-
-  Text.prototype.position = function (x, y) {
-    if (y === void 0) {
-      y = 10;
-    }
-
-    this.x = x;
-    this.y = y; //this.writeTextElement.position(this.x, this.y);
-  };
-
-  Text.prototype.size = function (sizePx) {
-    this.sizePx = sizePx;
-  };
-
-  return Text;
-}();
-
-exports.Text = Text;
-
-function createText(sentence, x, y, sizePx) {
-  if (x === void 0) {
-    x = 10;
-  }
-
-  if (y === void 0) {
-    y = 10;
-  }
-
-  if (sizePx === void 0) {
-    sizePx = 28;
-  }
-
-  var _object = new Text(sentence, x, y, sizePx);
-
-  return _object;
-}
-
-exports.createText = createText;
 },{}],"../node_modules/mathjax-full/js/util/PrioritizedList.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -38635,7 +38560,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createTeX = exports.TeX = void 0;
 
-var tex_to_svg_1 = __importDefault(require("tex-to-svg")); //TODO : add test cases
+var tex_to_svg_1 = __importDefault(require("tex-to-svg"));
+
+var play_1 = require("../Scene/play"); //TODO : add test cases
 
 /**
  * TeX class
@@ -38665,7 +38592,7 @@ var tex_to_svg_1 = __importDefault(require("tex-to-svg")); //TODO : add test cas
 var TeX =
 /** @class */
 function () {
-  function TeX(sentence, x, y, width_svg, height_svg) {
+  function TeX(sentence, x, y, svgWidth, svgHeight) {
     if (x === void 0) {
       x = 10;
     }
@@ -38674,13 +38601,13 @@ function () {
       y = 10;
     }
 
-    if (width_svg === void 0) {
-      width_svg = 300;
+    if (svgWidth === void 0) {
+      svgWidth = 300;
     }
 
-    if (height_svg === void 0) {
-      height_svg = 300;
-    } //timeDuration: number; // left for later decision -> need not specify such details at initialisation
+    if (svgHeight === void 0) {
+      svgHeight = 300;
+    } //startTime: number; // left for later decision -> need not specify such details at initialisation
 
 
     this.x = 10;
@@ -38688,9 +38615,12 @@ function () {
     this.x = x;
     this.y = y;
     this.sentence = sentence;
-    this.width_svg = width_svg;
-    this.height_svg = height_svg;
-    this.SVGEquation = tex_to_svg_1.default(sentence);
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
+    this.svgEquation = tex_to_svg_1.default(sentence);
+    this.fillColor = color('black');
+    this.strokeWidth = 0;
+    this.strokeColor = color('black');
   }
 
   TeX.prototype.position = function (x, y) {
@@ -38706,17 +38636,41 @@ function () {
     this.y = y;
   };
 
-  TeX.prototype.size = function (width_svg, height_svg) {
-    if (width_svg === void 0) {
-      width_svg = 300;
+  TeX.prototype.size = function (svgWidth, svgHeight) {
+    if (svgWidth === void 0) {
+      svgWidth = 300;
     }
 
-    if (height_svg === void 0) {
-      height_svg = 300;
+    if (svgHeight === void 0) {
+      svgHeight = 300;
     }
 
-    this.width_svg = width_svg;
-    this.height_svg = height_svg;
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
+  };
+
+  TeX.prototype.fill = function (fillColor) {
+    if (arguments.length === 0) {
+      return this.fillColor;
+    } else {
+      this.fillColor = fillColor;
+    }
+  };
+
+  TeX.prototype.play = function (animationType, startTime, endTime) {
+    if (animationType === void 0) {
+      animationType = 'write';
+    }
+
+    if (startTime === void 0) {
+      startTime = 0;
+    }
+
+    if (endTime === void 0) {
+      endTime = 0;
+    }
+
+    play_1.play(this, animationType, startTime, endTime);
   };
 
   return TeX;
@@ -38724,7 +38678,7 @@ function () {
 
 exports.TeX = TeX;
 
-function createTeX(sentence, x, y, width_svg, height_svg) {
+function createTeX(sentence, x, y, svgWidth, svgHeight) {
   if (x === void 0) {
     x = 10;
   }
@@ -38733,70 +38687,20 @@ function createTeX(sentence, x, y, width_svg, height_svg) {
     y = 10;
   }
 
-  if (width_svg === void 0) {
-    width_svg = 300;
+  if (svgWidth === void 0) {
+    svgWidth = 300;
   }
 
-  if (height_svg === void 0) {
-    height_svg = 300;
+  if (svgHeight === void 0) {
+    svgHeight = 300;
   }
 
-  var _object = new TeX(sentence, x, y, width_svg, height_svg);
-
-  return _object;
+  var object = new TeX(sentence, x, y, svgWidth, svgHeight);
+  return object;
 }
 
 exports.createTeX = createTeX;
-},{"tex-to-svg":"../node_modules/tex-to-svg/TeXToSVG.js"}],"lib/Scene/shift.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.shift = void 0; //only works if object has been added to the scene
-
-function shift(_object, x, y) {
-  _object.x = x;
-  _object.y = y;
-
-  if (_object.writeTexElement) {
-    _object.writeTexElement.position(_object.x, _object.y);
-  } else if (_object.writeTextElement) {
-    _object.writeTextElement.position(_object.x, _object.y);
-  }
-}
-
-exports.shift = shift;
-},{}],"lib/Scene/scale.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.T_scale = void 0;
-
-var TeX_1 = require("../MObject/TeX");
-
-var Text_1 = require("../MObject/Text"); //TODO : add test cases
-//TODO : change name from T_scale to something else
-
-
-function T_scale(_object, scale_to) {
-  _object.width_svg = scale_to * _object.width_svg;
-  _object.height_svg = scale_to * _object.height_svg;
-
-  if (_object instanceof TeX_1.TeX && _object.writeTexElement.elt.querySelectorAll('svg')) {
-    var svg = _object.writeTexElement.elt.querySelectorAll('svg');
-
-    svg[0].setAttribute('width', _object.width_svg + "px");
-    svg[0].setAttribute('height', _object.height_svg + "px");
-  } else if (_object instanceof Text_1.Text && _object.writeTextElement.elt.querySelectorAll('svg')) {
-    _object.writeTextElement.style('font-size', _object.size * scale_to + "px");
-  }
-}
-
-exports.T_scale = T_scale;
-},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts"}],"../node_modules/animejs/lib/anime.es.js":[function(require,module,exports) {
+},{"tex-to-svg":"../node_modules/tex-to-svg/TeXToSVG.js","../Scene/play":"lib/Scene/play.ts"}],"../node_modules/animejs/lib/anime.es.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40563,51 +40467,8 @@ anime.random = function (min, max) {
 
 var _default = anime;
 exports.default = _default;
-},{}],"lib/config.js":[function(require,module,exports) {
-module.exports = {
-  PLAY: {
-    STROKE_WIDTH: '15px',
-    STROKE_COLOR: 'black',
-    STAGGERING_DELAY: 1000 //ms
-
-  }
-};
 },{}],"lib/Scene/add.ts":[function(require,module,exports) {
 "use strict";
-
-var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  Object.defineProperty(o, k2, {
-    enumerable: true,
-    get: function get() {
-      return m[k];
-    }
-  });
-} : function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  o[k2] = m[k];
-});
-
-var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
-  Object.defineProperty(o, "default", {
-    enumerable: true,
-    value: v
-  });
-} : function (o, v) {
-  o["default"] = v;
-});
-
-var __importStar = this && this.__importStar || function (mod) {
-  if (mod && mod.__esModule) return mod;
-  var result = {};
-  if (mod != null) for (var k in mod) {
-    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-  }
-
-  __setModuleDefault(result, mod);
-
-  return result;
-};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -40618,50 +40479,153 @@ var TeX_1 = require("../MObject/TeX");
 
 var Text_1 = require("../MObject/Text");
 
-var CONFIG = __importStar(require("../config.js"));
+var scene_1 = require("./scene");
 
-function add(_object) {
-  if (_object instanceof TeX_1.TeX) {
+function add(object) {
+  if (object instanceof TeX_1.TeX) {
     //tex animations
-    console.log('TeX');
-    _object.writeTexElement = createDiv(_object.SVGEquation);
+    object.writeTexElement = createDiv(object.svgEquation);
+    var svg = object.writeTexElement.elt.querySelectorAll('svg');
+    svg[0].setAttribute('width', object.svgWidth + "px");
+    svg[0].setAttribute('height', object.svgHeight + "px");
+    svg[0].setAttribute('stroke', object.strokeColor);
+    svg[0].setAttribute('stroke-width', object.strokeWidth);
+    svg[0].setAttribute('fill', object.fillColor.toString()); // g[0].setAttribute('fill', 'none');
+    // g[0].setAttribute('stroke-width', '10px');
 
-    var svg = _object.writeTexElement.elt.querySelectorAll('svg');
+    object.writeTexElement.position(object.x, object.y);
+  } else if (object instanceof Text_1.Text) {
+    console.log("Text add");
+    var sentence = object._text;
+    object.writeTextElement = createElement('div', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
+    object.writeTextElement.style('white-space', ' nowrap');
+    object.writeTextElement.position(object.x, object.y);
+    object.writeTextElement.style('font-size', object._size + "px");
+    object.writeTextElement.style('color', "" + object.fillColor); //object.writeTextElement.style('text-stroke-width', `${object._strokeWidth}`); //TODO : not working without -webkit
 
-    svg[0].setAttribute('width', _object.width_svg + "px");
-    svg[0].setAttribute('height', _object.height_svg + "px");
+    object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
 
-    _object.writeTexElement.position(_object.x, _object.y);
-
-    var g = _object.writeTexElement.elt.querySelectorAll('g');
-
-    g[0].setAttribute('stroke-width', "" + CONFIG.PLAY.STROKE_WIDTH); //console.log(CONFIG.PLAY.STROKE_WIDTH);
-    //TODO : clean
-    //g[0].setAttribute('fill', 'none');
-    // const pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
-    //   for (var i = 0; i < pathEls.length; i++) {
-    //     var pathEl = pathEls[i];
-    //   }
-  } else if (_object instanceof Text_1.Text) {
-    var sentence = _object.sentence; //const x = _object.x;
-    //const y = _object.y;
-
-    _object.writeTextElement = createElement('div', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
-
-    _object.writeTextElement.position(_object.x, _object.y); //_object.writeTextElement.position(_object.x, _object.x);
-
-
-    _object.writeTextElement.style('font-size', _object.sizePx + "px");
-
-    console.log(_object.sizePx);
-
-    _object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
-
+    object.writeTextElement.remove();
+    scene_1.sceneContainer.appendChild(object.writeTextElement.elt);
   }
 }
 
 exports.add = add;
-},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts","../config.js":"lib/config.js"}],"lib/Scene/play.ts":[function(require,module,exports) {
+},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts","./scene":"lib/Scene/scene.ts"}],"lib/config.js":[function(require,module,exports) {
+module.exports = {
+  PLAY: {
+    STROKE_WIDTH: '15px',
+    STROKE_COLOR: 'black',
+    TIME_LENGHT_CHARACTER: 250,
+    WRITE_SCALE: 4,
+    WRITE_STAGGERING_DELAY: 150,
+    //ms
+    DISSOLVE_STAGGERING_DELAY: 10,
+    //ms
+    ERASE_STAGGERING_DELAY: 100,
+    //ms
+    ERASE_SCALE: 4,
+    WAVEIN_DURATION: 750,
+    //ms
+    WAVEIN_TRANSLATEY: '1.1em',
+    WAVEIN_STAGGERING_DELAY: 50,
+    // WAVEIN_DURATION_DIV: 1000,
+    // WAVEIN_DELAY_DIV: 1000,
+    WAVEOUT_DURATION: 2000,
+    WAVEOUT_TRANSLATEY: '1em',
+    WAVEOUT_STAGGERING_DELAY: 100,
+    // WAVEOUT_DELAY_DIV: 1000,
+    SPINOUT_DURATION: 2500,
+    SPINOUT_STAGGERING_DELAY: 150 // SPINOUT_DURATION_DIV: 1000,
+    // SPINOUT_DELAY_DIV: 1000
+
+  }
+};
+},{}],"lib/Scene/controls.ts":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.restartScene = exports.pauseScene = exports.playScene = exports.createControls = exports.animationTimeline = void 0;
+
+var animejs_1 = __importDefault(require("animejs"));
+
+exports.animationTimeline = animejs_1.default.timeline({}); //initilising a timeline
+
+function createControls() {
+  var progressBar = document.createElement('input');
+  progressBar.setAttribute('type', 'range');
+  progressBar.setAttribute('min', "" + 0);
+  progressBar.setAttribute('max', "" + 100);
+  progressBar.setAttribute('value', "" + 0);
+  progressBar.setAttribute('step', "" + 0.001);
+  progressBar.setAttribute('style', "appearance: none; width: 400px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;");
+  document.body.appendChild(progressBar);
+  progressBar.addEventListener('input', function () {
+    exports.animationTimeline.seek(exports.animationTimeline.duration * (progressBar.valueAsNumber / 100));
+  }); //   progressBar.oninput = function () {
+  //     pauseScene();
+  //     //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
+  //     animationTimeline.seek(
+  //       animationTimeline.duration * (progressBar.valueAsNumber / 100)
+  //     );
+  //     //playScene();
+  //     //animationTimeline.seek(parseInt(progressBar.value, 10));
+  //     //animationTimeline.pause();
+  //   };
+  //buttons
+
+  var playButton = document.createElement('button');
+  var pauseButton = document.createElement('button');
+  var restartButton = document.createElement('button');
+  playButton.onclick = exports.animationTimeline.play;
+  pauseButton.onclick = exports.animationTimeline.pause;
+  restartButton.onclick = exports.animationTimeline.restart;
+  playButton.innerText = 'play';
+  pauseButton.innerText = 'pause';
+  restartButton.innerText = 'restart';
+  playButton.setAttribute('style', 'background-color: transparent; border: 1px solid #61C3FF; display: inline-block; align-items: flex-start; padding: 5px 10px;text-transform: uppercase; color : #61C3FF;');
+  pauseButton.setAttribute('style', 'background-color: transparent; border: 1px solid #61C3FF; margin: 0 0 0 -1px; display: inline-block; align-items: flex-start;padding: 5px 10px;text-transform: uppercase; color : #61C3FF;');
+  restartButton.setAttribute('style', 'background-color: transparent; border: 1px solid #61C3FF; margin: 0 0 0 -1px; display: inline-block; align-items: flex-start;padding: 5px 10px;text-transform: uppercase; color : #61C3FF;');
+  document.body.append(playButton, pauseButton, restartButton); //IE and Edge previous versions may not support
+
+  exports.animationTimeline.add({
+    update: function update(anim) {
+      progressBar.value = exports.animationTimeline.progress.toString(); // console.log(
+      //   animationTimeline.duration * (progressBar.valueAsNumber / 100)
+      // );
+    }
+  });
+}
+
+exports.createControls = createControls;
+
+function playScene() {
+  exports.animationTimeline.play();
+}
+
+exports.playScene = playScene;
+
+function pauseScene() {
+  exports.animationTimeline.pause();
+}
+
+exports.pauseScene = pauseScene;
+
+function restartScene() {
+  exports.animationTimeline.restart();
+}
+
+exports.restartScene = restartScene; //<input class="progress" step=".001" type="range" min="0" max="100" value="0">
+// button.onclick = animationTimeline.pause;
+},{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"lib/Scene/play.ts":[function(require,module,exports) {
 "use strict";
 
 var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
@@ -40709,15 +40673,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.play = void 0;
 
-var TeX_1 = require("../MObject/TeX");
-
 var Text_1 = require("../MObject/Text");
+
+var TeX_1 = require("../MObject/TeX");
 
 var animejs_1 = __importDefault(require("animejs"));
 
 var add_1 = require("./add");
 
-var CONFIG = __importStar(require("../config.js")); //TODO : use add function to initiate, then play animation
+var CONFIG = __importStar(require("../config.js"));
+
+var controls_1 = require("./controls"); //TODO : fix relative time
+//TODO : text animation for all-at-once
 
 /**
  * Animation functions
@@ -40733,188 +40700,584 @@ var CONFIG = __importStar(require("../config.js")); //TODO : use add function to
  * ```
  * @experimental
  */
+//let animationTimeline = anime.timeline(); //initilising a timeline
 
 
-function play( //TODO: use '...args'
-_object, animation_type, timeDuration) {
-  if (animation_type === void 0) {
-    animation_type = 'write';
+function play( //any, //TODO: use '...args'
+object, animationType, startTime, //seconds // start time
+endTime //seconds // end time
+) {
+  if (animationType === void 0) {
+    animationType = 'write';
   }
 
-  if (timeDuration == null) {
-    timeDuration = 50 * _object.sentence.length;
+  if (startTime === void 0) {
+    startTime = 0;
   }
 
-  if (_object instanceof TeX_1.TeX) {
+  if (endTime === void 0) {
+    endTime = 0;
+  }
+
+  if (!(typeof startTime == 'number' || typeof endTime == 'number')) {
+    //size
+    throw new Error('startTime and endTime must be passed as number');
+  } else if (endTime - startTime < 0) {
+    throw new Error('startTime must be less than endTime');
+  }
+
+  var timeDuration = (endTime - startTime) * 1000;
+  var delayDuration = startTime * 1000; // object = object;
+  // animationType = animationType;
+  // timeDuration = timeDuration; //seconds
+  // delayDuration = delayDuration; //seconds
+  //testing for relative and absolute parameters //TODO : fix relative time
+  //TODO : fix this after testing end and start parameters
+  // if (typeof delayDuration === 'number') {
+  //   delayDuration = 1000 * delayDuration; //sec to ms
+  //   //console.log(delayDuration);
+  // } else if (typeof delayDuration === 'string') {
+  //   if (delayDuration.charAt(0) === '+') {
+  //     delayDuration = 1000 * Number(delayDuration);
+  //     delayDuration = `+=${delayDuration}`;
+  //     console.log(delayDuration);
+  //   } else if (delayDuration.charAt(0) === '-') {
+  //     delayDuration = 1000 * Number(delayDuration);
+  //     delayDuration = `-=${-delayDuration}`;
+  //     console.log(delayDuration);
+  //   }
+  // }
+  // timeDuration = 1000 * timeDuration; //sec to ms
+  // if (timeDuration == 0) {
+  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
+  // }
+
+  if (object instanceof TeX_1.TeX) {
     //adding element before animation
-    if (!_object.writeTexElement) {
-      add_1.add(_object);
+    console.log('TeX');
+
+    if (!object.writeTexElement) {
+      add_1.add(object);
     } //tex animations
 
 
-    if (animation_type == 'write') {
-      var g_1 = _object.writeTexElement.elt.querySelectorAll('g');
+    console.log('TeX');
 
-      animejs_1.default.timeline({
-        loop: false
-      }).add({
-        targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        //scale: [4, 1],
-        fill: ['rgba(0,0,0,0)', '#000000'],
-        //stroke : "black",     //TODO : customisable through config
-        //stroke-width: "10px", //customisable through config
-        strokeDashoffset: [animejs_1.default.setDashoffset, 0],
-        opacity: [0, 1],
-        begin: function begin(anim) {
-          g_1[0].setAttribute('fill', 'none');
-          g_1[0].setAttribute('stroke-width', '10px');
-        },
-        complete: function complete(anim) {
-          g_1[0].setAttribute('fill', 'black');
-        },
-        easing: 'easeInOutCubic',
-        duration: timeDuration,
-        delay: animejs_1.default.stagger(CONFIG.PLAY.STAGGERING_DELAY, {
-          start: 0
-        })
-      });
-    } else if (animation_type == 'all-at-once') {
-      var g_2 = _object.writeTexElement.elt.querySelectorAll('g');
+    if (animationType === 'write') {
+      console.log('writing'); //write(object, timeDuration);
+      // object.writeTexElement = createDiv(object.SVGEquation);
+      // let svg = object.writeTexElement.elt.querySelectorAll('svg');
+      // svg[0].setAttribute('width', `${object.width_svg}px`);
+      // svg[0].setAttribute('height', `${object.height_svg}px`);
+      // const g = object.writeTexElement.elt.querySelectorAll('g');
+      // // g[0].setAttribute('fill', 'none');
+      // // g[0].setAttribute('stroke-width', '10px');
+      // object.writeTexElement.position(object.x, object.y);
+      //const pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
 
-      var pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
-
-
-      for (var i = 0; i < pathEls.length; i++) {
-        var pathEl = pathEls[i];
-        var offset = animejs_1.default.setDashoffset(pathEl);
-        pathEl.setAttribute('stroke-dashoffset', offset);
-        animejs_1.default({
-          targets: pathEl,
-          strokeDashoffset: [animejs_1.default.setDashoffset, 0],
-          easing: 'easeInOutCubic',
-          //easing: 'easeOutExpo', //TODO : customisable through config
-          duration: timeDuration,
-          delay: animejs_1.default.stagger(1000, {
-            direction: 'normal'
-          }),
-          begin: function begin(anim) {
-            pathEl.setAttribute('stroke', 'black');
-            pathEl.setAttribute('fill', 'none');
-            g_2[0].setAttribute('fill', 'none');
-            g_2[0].setAttribute('stroke-width', '10px');
-          },
-          complete: function complete(anim) {
-            pathEl.setAttribute('fill', 'black');
-            g_2[0].setAttribute('fill', 'black');
-          },
-          autoplay: true
-        });
-      }
-    } else if (animation_type == 'fade-in') {
+      writeAnimatorTeX(object, timeDuration, delayDuration);
+    } else if (animationType === 'allAtOnce') {
+      //object.all_at_once(timeDuration);
+      // object.writeTexElement = createDiv(object.SVGEquation);
+      // let svg = object.writeTexElement.elt.querySelectorAll('svg');
+      // svg[0].setAttribute('width', `${object.width_svg}px`);
+      // svg[0].setAttribute('height', `${object.height_svg}px`);
+      // object.writeTexElement.position(object.x, object.y);
+      allAtOnceAnimatorTeX(object, timeDuration, delayDuration);
+    } else if (animationType === 'fadeIn') {
       console.log('fadeIn called');
-      animejs_1.default({
-        targets: _object.writeTexElement.elt.querySelectorAll('svg'),
-        opacity: [0, 1],
-        easing: 'easeOutExpo',
-        complete: function complete(anim) {
-          _object.writeTexElement.style('opacity', '1'); //clears all stray elements
-
-        },
-        duration: timeDuration,
-        delay: animejs_1.default.stagger(180, {
-          start: 1000
-        })
-      });
-    } else if (animation_type == 'appear') {
+      fadeInAnimatorTeX(object, timeDuration, delayDuration);
+    } else if (animationType === 'appear') {
       console.log('appear called');
-      animejs_1.default({
-        targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        opacity: [0, 1],
-        easing: 'easeOutExpo',
-        complete: function complete(anim) {
-          _object.writeTexElement.style('opacity', '1'); //clear all stray elements
+      appearAnimatorTeX(object, timeDuration, delayDuration);
+    } else if (animationType === 'dissolve') {
+      console.log('dissolve called'); //add(object);
 
-        },
-        duration: timeDuration,
-        delay: animejs_1.default.stagger(180, {
-          start: 1000,
-          direction: 'normal'
-        })
-      });
-    } else if (animation_type == 'dissolve') {
-      console.log('dissolve called');
-      animejs_1.default({
-        targets: _object.writeTexElement.elt.querySelectorAll('path'),
-        opacity: [1, 0],
-        easing: 'easeOutExpo',
-        complete: function complete(anim) {
-          _object.writeTexElement.style('opacity', '0'); //clear all stray elements
-
-        },
-        duration: timeDuration,
-        delay: animejs_1.default.stagger(180, {
-          start: 1000
-        })
-      });
-    } else if (animation_type == 'fade-out') {
+      dissolveAnimatorTeX(object, timeDuration, delayDuration);
+    } else if (animationType === 'fadeOut') {
       console.log('fadeout called');
-      animejs_1.default({
-        targets: _object.writeTexElement.elt.querySelectorAll('svg'),
-        opacity: [1, 0],
-        easing: 'easeOutExpo',
-        complete: function complete(anim) {
-          _object.writeTexElement.style('opacity', '0'); //clear all stray elements
-
-        },
-        duration: timeDuration,
-        delay: animejs_1.default.stagger(180, {
-          start: 1000
-        })
-      });
-    } else if (animation_type == 'blink') {
+      fadeOutAnimatorTeX(object, timeDuration, delayDuration);
+    } else if (animationType === 'blink') {
       console.log('blink');
-      var animation = animejs_1.default({
-        targets: _object.writeTexElement.elt.querySelectorAll('svg'),
-        opacity: [0, 1, 0],
-        easing: 'easeOutSine',
-        duration: timeDuration,
-        delay: animejs_1.default.stagger(200),
-        loop: true
-      });
+      blinkAnimatorTeX(object, timeDuration, delayDuration);
     }
   } //Text animation
-  else if (_object instanceof Text_1.Text) {
-      if (!_object.writeTextElement) {
-        add_1.add(_object);
+  else if (object instanceof Text_1.Text) {
+      if (!object.writeTextElement) {
+        add_1.add(object);
       }
 
       console.log('Text');
+      object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
 
-      _object.writeTextElement.style('opacity', '1');
-
-      if (animation_type == 'write') {
-        animejs_1.default.timeline({
-          loop: false
-        }).add({
-          targets: _object.writeTextElement.elt.querySelectorAll('.letter'),
-          scale: [4, 1],
-          opacity: [0, 1],
-          translateZ: 0,
-          easing: 'easeOutExpo',
-          duration: 950,
-          delay: animejs_1.default.stagger(180, {
-            start: timeDuration
-          }) //time duration must be replaced with delay
-
-        });
-      } else if (animation_type == 'all-at-once') {
+      if (animationType == 'write') {
+        console.log(object);
+        writeAnimatorText(object, timeDuration, delayDuration);
+      } else if (animationType == 'allAtOnce') {
         console.log('all at once');
+      } else if (animationType == 'fadeIn') {
+        console.log('fadeIn');
+        fadeInAnimatorText(object, timeDuration, delayDuration);
+      } else if (animationType == 'fadeOut') {
+        console.log('fadeOut');
+        fadeOutAnimatorText(object, timeDuration, delayDuration);
+      } else if (animationType == 'erase') {
+        console.log('erase');
+        eraseAnimatorText(object, timeDuration, delayDuration);
+      } else if (animationType == 'dissolve') {
+        console.log('dissolve');
+        dissolveAnimatorText(object, timeDuration, delayDuration);
+      } else if (animationType == 'waveIn') {
+        console.log('waveIn');
+        waveInAnimatorText(object, timeDuration, delayDuration);
+      } else if (animationType == 'waveOut') {
+        console.log('waveOut');
+        waveOutAnimatorText(object, timeDuration, delayDuration);
+      } else if (animationType == 'spinOut') {
+        console.log('spinOut');
+        spinOutAnimatorText(object, timeDuration, delayDuration);
       }
     }
 }
 
 exports.play = play;
-},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts","animejs":"../node_modules/animejs/lib/anime.es.js","./add":"lib/Scene/add.ts","../config.js":"lib/config.js"}],"lib/Scene/transform.ts":[function(require,module,exports) {
+
+function writeAnimatorText(object, timeDuration, delayDuration) {
+  // console.log(object);
+  //object = object;
+  // timeDuration = timeDuration; //seconds
+  // delayDuration = delayDuration; //seconds
+  object.writeTextElement.style('opacity', '1');
+  controls_1.animationTimeline.add({
+    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    scale: [CONFIG.PLAY.WRITE_SCALE, 1],
+    opacity: [0, 1],
+    translateZ: 0,
+    easing: 'easeOutExpo',
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(CONFIG.PLAY.WRITE_STAGGERING_DELAY) //time duration must be replaced with delay
+
+  }, delayDuration);
+}
+
+function eraseAnimatorText(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    scale: [CONFIG.PLAY.ERASE_SCALE, 1],
+    opacity: [1, 0],
+    //translateZ: 0,
+    easing: 'easeInOutCubic',
+    duration: timeDuration,
+    //delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY),
+    delay: animejs_1.default.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY) //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+  }, delayDuration);
+}
+
+function dissolveAnimatorText(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    opacity: [1, random(0.5, 0.9), random(0.6, 0.8), random(0.5, 0.7), random(0.4, 0.6), random(0.6, 0.9), random(0, 0.4), random(0, 0.3), random(0, 0.2), 0],
+    //translateZ: 0,
+    easing: 'easeInExpo',
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY) //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+    //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+  }, delayDuration);
+}
+
+function spinOutAnimatorText(object, timeDuration, delayDuration) {
+  object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+    return el.style.display = 'inline-block';
+  }); //object.writeTextElement.style('overflow', 'hidden');
+
+  animejs_1.default.timeline({
+    loop: false
+  }).add({
+    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    //translateY: [0,'1em'],
+    rotateX: 360,
+    opacity: [0.5,, 0],
+    //scale :[1,0],
+    duration: timeDuration,
+    //delay: (el, i) => CONFIG.PLAY.SPINOUT_STAGGERING_DELAY * i,
+    delay: animejs_1.default.stagger(CONFIG.PLAY.SPINOUT_STAGGERING_DELAY, {
+      start: delayDuration
+    })
+  });
+}
+
+function waveOutAnimatorText(object, timeDuration, delayDuration) {
+  object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+    return el.style.display = 'inline-block';
+  }); //object.writeTextElement.style('overflow', 'hidden');
+
+  controls_1.animationTimeline.add({
+    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    translateY: [0, CONFIG.PLAY.WAVEOUT_TRANSLATEY],
+    translateZ: 0,
+    opacity: [1, 0.5, 0.1, 0],
+    scale: [1, 0.2, 0],
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY) //delay: (el, i) => CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY * i
+
+  }, delayDuration);
+}
+
+function waveInAnimatorText(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    begin: function begin(anim) {
+      object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+        return el.style.display = 'inline-block';
+      });
+      object.writeTextElement.style('overflow', 'hidden');
+    },
+    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    translateY: [CONFIG.PLAY.WAVEIN_TRANSLATEY, 0],
+    translateZ: 0,
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY) //delay: (el, i) => CONFIG.PLAY.WAVEIN_STAGGERING_DELAY * i
+
+  }, delayDuration);
+}
+
+function fadeOutAnimatorText(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    //scale: [4, 1],
+    opacity: [1, 0],
+    //translateZ: 0,
+    easing: 'easeInOutCubic',
+    duration: timeDuration //delay: delayDuration
+    //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+  }, delayDuration);
+}
+
+function fadeInAnimatorText(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    //scale: [4, 1],
+    opacity: [0, 1],
+    //translateZ: 0,
+    easing: 'easeInOutCubic',
+    duration: timeDuration //delay:
+    //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+  }, delayDuration);
+}
+
+function writeAnimatorTeX(object, timeDuration, delayDuration) {
+  var g = object.writeTexElement.elt.querySelectorAll('g');
+  controls_1.animationTimeline.add({
+    targets: object.writeTexElement.elt.querySelectorAll('path'),
+    //scale: [4, 1],
+    fill: [color(object.fillColor).toString(), object.fillColor],
+    //stroke : "black",     //TODO : customisable through config
+    //stroke-width: "10px", //customisable through config
+    strokeDashoffset: [animejs_1.default.setDashoffset, 0],
+    opacity: [0, 1],
+    begin: function begin(anim) {
+      g[0].setAttribute('fill', 'none');
+      g[0].setAttribute('stroke-width', '10px');
+    },
+    complete: function complete(anim) {
+      g[0].setAttribute('fill', 'black');
+    },
+    easing: 'easeInOutCubic',
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(400)
+  }, delayDuration);
+} //TODO : fix timeline
+
+
+function allAtOnceAnimatorTeX(object, timeDuration, delayDuration) {
+  var g = object.writeTexElement.elt.querySelectorAll('g');
+  var pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+
+  for (var i = 0; i < pathEls.length; i++) {
+    var pathEl = pathEls[i];
+    var offset = animejs_1.default.setDashoffset(pathEl);
+    pathEl.setAttribute('stroke-dashoffset', offset);
+    animejs_1.default({
+      targets: pathEl,
+      strokeDashoffset: [animejs_1.default.setDashoffset, 0],
+      easing: 'easeInOutCubic',
+      //easing: 'easeOutExpo', //customisable through config
+      duration: timeDuration,
+      delay: animejs_1.default.stagger(1000, {
+        direction: 'normal'
+      }),
+      begin: function begin(anim) {
+        pathEl.setAttribute('stroke', "" + object.strokeColor);
+        pathEl.setAttribute('fill', 'none');
+        g[0].setAttribute('fill', 'none');
+        g[0].setAttribute('stroke-width', object.strokeWidth + "px");
+      },
+      complete: function complete(anim) {
+        pathEl.setAttribute('fill', "" + object.fillColor);
+        g[0].setAttribute('fill', "" + object.fillColor);
+      },
+      autoplay: true
+    });
+  }
+}
+
+function fadeInAnimatorTeX(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    targets: object.writeTexElement.elt.querySelectorAll('svg'),
+    //targets: object.writeTexElement.elt.querySelectorAll('path'),
+    //scale: [4, 1],
+    opacity: [0, 1],
+    //translateZ: 0,
+    easing: 'easeOutExpo',
+    complete: function complete(anim) {
+      object.writeTexElement.style('opacity', '1'); //clear all stray elements
+    },
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(180)
+  }, delayDuration);
+} //TODO : how appear is different from fadeIn
+
+
+function appearAnimatorTeX(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    //targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+    targets: object.writeTexElement.elt.querySelectorAll('path'),
+    //scale: [4, 1],
+    opacity: [0, 1],
+    //translateZ: 0,
+    easing: 'easeOutExpo',
+    complete: function complete(anim) {
+      object.writeTexElement.style('opacity', '1'); //clear all stray elements
+    },
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(180, {
+      start: 1000,
+      direction: 'normal'
+    })
+  }, delayDuration);
+}
+
+function dissolveAnimatorTeX(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    //targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
+    targets: object.writeTexElement.elt.querySelectorAll('path'),
+    //scale: [4, 1],
+    opacity: [1, 0],
+    //translateZ: 0,
+    easing: 'easeOutExpo',
+    complete: function complete(anim) {
+      object.writeTexElement.style('opacity', '0'); //clear all stray elements
+    },
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(180, {
+      start: 1000
+    })
+  }, delayDuration);
+}
+
+function fadeOutAnimatorTeX(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    targets: object.writeTexElement.elt.querySelectorAll('svg'),
+    //targets: object.writeTexElement.elt.querySelectorAll('path'),
+    //scale: [4, 1],
+    opacity: [1, 0],
+    //translateZ: 0,
+    easing: 'easeOutExpo',
+    complete: function complete(anim) {
+      object.writeTexElement.style('opacity', '0'); //clear all stray elements
+    },
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(180, {
+      start: 1000
+    })
+  }, delayDuration);
+}
+
+function blinkAnimatorTeX(object, timeDuration, delayDuration) {
+  controls_1.animationTimeline.add({
+    targets: object.writeTexElement.elt.querySelectorAll('svg'),
+    //targets: object.writeTexElement.elt.querySelectorAll('path'),
+    //scale: [4, 1],
+    opacity: [0, 1, 0],
+    //translateZ: 0,
+    easing: 'easeOutSine',
+    // complete: function (anim) {
+    //   animation.reverse();
+    // },
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(200),
+    loop: true
+  }, delayDuration);
+}
+},{"../MObject/Text":"lib/MObject/Text.ts","../MObject/TeX":"lib/MObject/TeX.ts","animejs":"../node_modules/animejs/lib/anime.es.js","./add":"lib/Scene/add.ts","../config.js":"lib/config.js","./controls":"lib/Scene/controls.ts"}],"lib/MObject/Text.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createText = exports.Text = void 0;
+
+var play_1 = require("../Scene/play");
+
+var Text =
+/** @class */
+function () {
+  function Text(_a) {
+    var _text = _a._text,
+        _b = _a.x,
+        x = _b === void 0 ? 10 : _b,
+        _c = _a.y,
+        y = _c === void 0 ? 10 : _c,
+        _d = _a._size,
+        _size = _d === void 0 ? 28 : _d;
+
+    this.x = x;
+    this.y = y;
+    this._text = _text;
+    this._size = _size; //console.log('me', this._size);
+    // this.strokeColor = 'black';
+    // this._strokeWidth = 10;
+
+    this.fillColor = color('black');
+  }
+
+  Text.prototype.position = function (x, y) {
+    if (y === void 0) {
+      y = 10;
+    }
+
+    this.x = x;
+    this.y = y; //this.writeTextElement.position(this.x, this.y);
+  };
+
+  Text.prototype.size = function (_size) {
+    this._size = _size; //font-size
+  }; //TODO : fix stroke - currently only -webkit supported
+  // stroke(strokeColor: string) {
+  //   if (arguments.length === 0) {
+  //     return this.strokeColor;
+  //   } else {
+  //     this.strokeColor = strokeColor;
+  //   }
+  // }
+  // strokeWidth(w: number) {
+  //   if (arguments.length === 0) {
+  //     return this._strokeWidth;
+  //   } else {
+  //     this._strokeWidth = w;
+  //   }
+  // }
+
+
+  Text.prototype.fill = function (fillColor) {
+    if (arguments.length === 0) {
+      return this.fillColor;
+    } else {
+      this.fillColor = fillColor;
+    }
+  };
+
+  Text.prototype.play = function (animationType, timeDuration, delayDuration) {
+    if (animationType === void 0) {
+      animationType = 'write';
+    }
+
+    if (timeDuration === void 0) {
+      timeDuration = 0;
+    }
+
+    if (delayDuration === void 0) {
+      delayDuration = 0;
+    }
+
+    play_1.play(this, animationType, timeDuration, delayDuration);
+  };
+
+  return Text;
+}();
+
+exports.Text = Text;
+
+function createText() {
+  //TODO : convert into interface
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  var _textArg = {
+    _text: args[0],
+    x: args[1],
+    y: args[2],
+    _size: args[3]
+  }; //console.log(_textArg._size);
+
+  if (!(typeof _textArg._size == 'undefined' || typeof _textArg._size == 'number')) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (!(typeof _textArg._size == 'undefined') && _textArg._size < 0) {
+    //size
+    throw new Error('size of text should be a whole number!');
+  }
+
+  return new Text(_textArg);
+}
+
+exports.createText = createText;
+},{"../Scene/play":"lib/Scene/play.ts"}],"lib/Scene/shift.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.shift = void 0; //only works if object has been added to the scene
+
+function shift(_object, x, y) {
+  _object.x = x;
+  _object.y = y;
+
+  if (_object.writeTexElement) {
+    _object.writeTexElement.position(_object.x, _object.y);
+  } else if (_object.writeTextElement) {
+    _object.writeTextElement.position(_object.x, _object.y);
+  }
+}
+
+exports.shift = shift;
+},{}],"lib/Scene/scale.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.T_scale = void 0;
+
+var TeX_1 = require("../MObject/TeX");
+
+var Text_1 = require("../MObject/Text"); //TODO : add test cases
+//TODO : change name from T_scale to something else
+
+
+function T_scale(_object, scale_to) {
+  _object.width_svg = scale_to * _object.width_svg;
+  _object.height_svg = scale_to * _object.height_svg;
+
+  if (_object instanceof TeX_1.TeX && _object.writeTexElement.elt.querySelectorAll('svg')) {
+    var svg = _object.writeTexElement.elt.querySelectorAll('svg');
+
+    svg[0].setAttribute('width', _object.width_svg + "px");
+    svg[0].setAttribute('height', _object.height_svg + "px");
+  } else if (_object instanceof Text_1.Text && _object.writeTextElement.elt.querySelectorAll('svg')) {
+    _object.writeTextElement.style('font-size', _object.size * scale_to + "px");
+  }
+}
+
+exports.T_scale = T_scale;
+},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts"}],"lib/Scene/transform.ts":[function(require,module,exports) {
 "use strict"; //TODO : transform function : use morphing
 
 var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
@@ -40967,8 +41330,7 @@ function transform(_object_init, _object_finl) {
 
 exports.transform = transform;
 },{"../config.js":"lib/config.js"}],"lib/Geometry/graph.ts":[function(require,module,exports) {
-"use strict"; // let xArr = [];
-// let yArr = [];
+"use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -41101,8 +41463,7 @@ function create2DGraph(eqn, x, y, width_svg, height_svg) {
 
 exports.create2DGraph = create2DGraph;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
-"use strict"; // let xArr = [];
-// let yArr = [];
+"use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -41227,25 +41588,9 @@ function () {
       complete: function complete(anim) {//document.querySelector('path').setAttribute("fill", "yellow");
       },
       update: function update(anim) {
-        _update += 0.01; //console.log(update);
-
+        _update += 0.01;
         var scaleX = 100;
-        var scaleY = 100; // let SVG_path = `M${scaleX * this.eqn(minX) * Math.cos(0)},${
-        //   scaleY * this.eqn(minX) * Math.sin(0)
-        // }`;
-        // for (
-        //   let theta = this.thetaRange[0];
-        //   theta < this.thetaRange[1];
-        //   theta += 0.01
-        // ) {
-        //   // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-        //   SVG_path = SVG_path.concat(
-        //     ` L${scaleX * this.eqn(theta) * Math.cos(theta)},${
-        //       scaleY * this.eqn(theta) * Math.sin(theta)
-        //     }`
-        //   );
-        // }
-
+        var scaleY = 100;
         arrowPath.setAttribute('x1', "" + 0);
         arrowPath.setAttribute('x2', "" + scaleX * eqn(_update) * Math.cos(_update));
         arrowPath.setAttribute('y1', "" + 0);
@@ -41362,7 +41707,14 @@ var polar_1 = require("./lib/Geometry/polar");
 
 global.GraphPolar2D = polar_1.GraphPolar2D;
 global.create2DPolarGraph = polar_1.create2DPolarGraph;
-},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts","./lib/Geometry/polar":"lib/Geometry/polar.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var controls_1 = require("./lib/Scene/controls");
+
+global.createControls = controls_1.createControls;
+global.pauseScene = controls_1.pauseScene;
+global.playScene = controls_1.playScene;
+global.restartScene = controls_1.restartScene;
+},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts","./lib/Geometry/polar":"lib/Geometry/polar.ts","./lib/Scene/controls":"lib/Scene/controls.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -41390,7 +41742,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57617" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63745" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
