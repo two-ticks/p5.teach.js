@@ -1,4 +1,5 @@
 import TeXToSVG from 'tex-to-svg';
+import { add } from '../Scene/add';
 import { play } from '../Scene/play';
 
 //TODO : add test cases
@@ -72,6 +73,16 @@ export class TeX {
     } else {
       this.fillColor = fillColor;
     }
+  }
+
+  remove() {
+    //TODO : should throw error if called on object which has not been added
+    this.writeTexElement.remove();
+  }
+
+  add() {
+    add(this);
+    //this.writeTexElement.style('opacity', '1');
   }
 
   play(

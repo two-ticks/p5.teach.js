@@ -1,4 +1,5 @@
 import { TextObject } from '../interfaces';
+import { add } from '../Scene/add';
 import { play } from '../Scene/play';
 
 export class Text {
@@ -61,6 +62,14 @@ export class Text {
     }
   }
 
+  remove() {
+    //TODO : should throw error if called on object which has not been added
+    this.writeTextElement.remove();
+  }
+  add() {
+    add(this);
+    this.writeTextElement.style('opacity', '1');
+  }
   play(
     animationType: string = 'write',
     timeDuration: number = 0,
