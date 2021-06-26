@@ -1,4 +1,6 @@
 import anime from 'animejs';
+import { animationTimeline } from '../Scene/controls';
+import { sceneContainer } from '../Scene/scene';
 
 export class Graph2D {
   eqn: any;
@@ -24,7 +26,8 @@ export class Graph2D {
     this.width_svg = width_svg;
     this.height_svg = height_svg;
     this.pathData = createSVGPath(eqn);
-    this.graphContainer = createElement('div');
+    this.graphContainer = createElement('div'); //attaching it to sceneContainer
+    this.graphContainer.parent(sceneContainer);
     this.linePath = this.linePath = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'path'
@@ -52,24 +55,28 @@ export class Graph2D {
     this.linePath.setAttribute('d', this.pathData);
     this.graphObject.appendChild(this.linePath);
     this.graphContainer.elt.appendChild(this.graphObject);
+    
   }
 
-  play() {
+  play(timeDuration: number = 5000, delayTime: number = 0) {
     const pathElement = this.graphContainer.elt.querySelectorAll('path');
-    var lineDrawing = anime({
-      targets: this.graphContainer.elt.querySelectorAll('path'),
-      strokeDashoffset: [anime.setDashoffset, 0],
-      easing: 'easeOutSine',
-      duration: 20000,
-      begin: function (anim) {
-        pathElement[0].setAttribute('stroke', 'black');
-        pathElement[0].setAttribute('fill', 'none');
+    animationTimeline.add(
+      {
+        targets: this.graphContainer.elt.querySelectorAll('path'),
+        strokeDashoffset: [anime.setDashoffset, 0],
+        easing: 'easeOutSine',
+        duration: timeDuration,
+        begin: function (anim) {
+          pathElement[0].setAttribute('stroke', 'black');
+          pathElement[0].setAttribute('fill', 'none');
+        },
+        complete: function (anim) {
+          //document.querySelector('path').setAttribute("fill", "yellow");
+        }
+        //autoplay: true
       },
-      complete: function (anim) {
-        //document.querySelector('path').setAttribute("fill", "yellow");
-      },
-      autoplay: true
-    });
+      delayTime
+    );
   }
 }
 

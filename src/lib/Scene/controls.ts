@@ -3,6 +3,10 @@ import anime from 'animejs';
 export let animationTimeline = anime.timeline({}); //initilising a timeline
 
 export function createControls() {
+  let controlsDiv = document.createElement('div');
+  controlsDiv.setAttribute('class','controls');
+  document.body.appendChild(controlsDiv);
+  
   let progressBar = document.createElement('input');
   progressBar.setAttribute('type', 'range');
   progressBar.setAttribute('min', `${0}`);
@@ -13,7 +17,7 @@ export function createControls() {
     'style',
     `appearance: none; width: 400px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;`
   );
-  document.body.appendChild(progressBar);
+  controlsDiv.appendChild(progressBar);
 
   progressBar.oninput = function () {
     pauseScene();
@@ -50,7 +54,7 @@ export function createControls() {
     'style',
     'background-color: transparent; border: 1px solid #61C3FF; margin: 0 0 0 -1px; display: inline-block; align-items: flex-start;padding: 5px 10px;text-transform: uppercase; color : #61C3FF;'
   );
-  document.body.append(playButton, pauseButton, restartButton); //IE and Edge previous versions may not support
+  controlsDiv.append(playButton, pauseButton, restartButton); //IE and Edge previous versions may not support
   animationTimeline.add({
     update: function (anim) {
       progressBar.value = animationTimeline.progress.toString();

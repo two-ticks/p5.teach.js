@@ -7,6 +7,7 @@ export function add(object: any) {
   if (object instanceof TeX) {
     //tex animations
     object.writeTexElement = createDiv(object.svgEquation);
+    object.writeTexElement.parent(sceneContainer);
     let svg = object.writeTexElement.elt.querySelectorAll('svg');
     svg[0].setAttribute('width', `${object.svgWidth}px`);
     svg[0].setAttribute('height', `${object.svgHeight}px`);
