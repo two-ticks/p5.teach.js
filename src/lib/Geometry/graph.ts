@@ -1,6 +1,7 @@
 import anime from 'animejs';
-import { animationTimeline } from '../Scene/controls';
+import { animationTimeline, sceneTime } from '../Scene/controls';
 import { sceneContainer } from '../Scene/scene';
+import { transform } from '../Scene/transform';
 
 export class Graph2D {
   eqn: any;
@@ -44,6 +45,34 @@ export class Graph2D {
   }
   size(sizePx: number) {}
 
+  transform(object_finl: any, startTime: number = 0, endTime: number = 2) {
+    transform(this, object_finl, startTime, endTime);
+  }
+  loop(finlEqn, timeDuration: number = 2, startTime: number = 0) {
+    timeDuration = timeDuration * 1000;
+    startTime = startTime * 1000; //s to ms
+    anime({
+      loop: true,
+      targets: this.graphContainer.elt.querySelectorAll('path')[0],
+      d: [
+        //{value: shapes[0].d},
+        { value: `${createSVGPath(finlEqn)}` }
+      ],
+      duration: timeDuration,
+      direction: 'alternate',
+      autoplay: true,
+      easing: 'easeInOutCubic',
+
+      delay: startTime
+      // complete: function(anim) {
+      //   looper.restart;
+      // }
+      //elasticity: 1
+    });
+  }
+  stroke(_stroke: any) {
+    this.linePath.setAttribute('stroke', `${_stroke}`);
+  }
   plot() {
     this.graphObject = document.createElementNS(
       'http://www.w3.org/2000/svg',
@@ -55,7 +84,10 @@ export class Graph2D {
     this.linePath.setAttribute('d', this.pathData);
     this.graphObject.appendChild(this.linePath);
     this.graphContainer.elt.appendChild(this.graphObject);
-    
+  }
+  update(eqn: any) {
+    this.pathData = createSVGPath(eqn);
+    this.linePath.setAttribute('d', this.pathData);
   }
 
   play(timeDuration: number = 5000, delayTime: number = 0) {
@@ -80,7 +112,7 @@ export class Graph2D {
   }
 }
 
-function createSVGPath(eqn: any, stepSize: number = 0.001) {
+export function createSVGPath(eqn: any, stepSize: number = 0.001) {
   let minX = 0;
   let SVG_path = `M${1000 * minX},${eqn(minX)}`;
   for (let x = 0.001; x < 20; x += stepSize) {

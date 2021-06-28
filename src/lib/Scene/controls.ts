@@ -1,12 +1,18 @@
 import anime from 'animejs';
+export let sceneTime: string;
 
-export let animationTimeline = anime.timeline({}); //initilising a timeline
+export let animationTimeline = anime.timeline({
+  update: function (anim) {
+    sceneTime = animationTimeline.progress.toString();
+  }
+}); //initilising a timeline
+// animationTimeline.add({});
 
 export function createControls() {
   let controlsDiv = document.createElement('div');
-  controlsDiv.setAttribute('class','controls');
+  controlsDiv.setAttribute('class', 'controls');
   document.body.appendChild(controlsDiv);
-  
+
   let progressBar = document.createElement('input');
   progressBar.setAttribute('type', 'range');
   progressBar.setAttribute('min', `${0}`);
