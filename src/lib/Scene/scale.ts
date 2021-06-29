@@ -18,6 +18,6 @@ export function T_scale(_object: any, scale_to: number) {
     _object instanceof Text &&
     _object.writeTextElement.elt.querySelectorAll('svg')
   ) {
-    _object.writeTextElement.style('font-size', `${_object.size * scale_to}px`);
+    _object.writeTextElement.style('font-size', `${_object.sizePx * scale_to}px`);
   }
 }
