@@ -21,6 +21,7 @@ export class Scene {
   remove() {
     document.body.removeChild(sceneContainer);
   } //TODO : remove scene
+
   async delay(sec: number) {
     return new Promise((resolve) => setTimeout(resolve, 1000 * sec)); //sec to ms
   }

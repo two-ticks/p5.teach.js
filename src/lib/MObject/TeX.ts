@@ -66,6 +66,10 @@ export class TeX {
     this.svgHeight = svgHeight;
   }
 
+  scale(scaleFactor) {
+    this.writeTexElement.style('transform', `scale(${scaleFactor})`);
+  }
+
   fill(fillColor: p5.Color) {
     if (arguments.length === 0) {
       return this.fillColor;

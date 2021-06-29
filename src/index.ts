@@ -56,3 +56,7 @@ global.createControls = createControls;
 global.pauseScene = pauseScene;
 global.playScene = playScene;
 global.restartScene = restartScene;
+
+import { Group, createGroup } from './lib/Scene/group';
+global.Group = Group;
+global.createGroup = createGroup;

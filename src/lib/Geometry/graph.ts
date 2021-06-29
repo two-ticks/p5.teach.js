@@ -45,6 +45,10 @@ export class Graph2D {
   }
   size(sizePx: number) {}
 
+  scale(scaleFactor) {
+    this.graphContainer.style('transform', `scale(${scaleFactor})`);
+  }
+
   transform(object_finl: any, startTime: number = 0, endTime: number = 2) {
     transform(this, object_finl, startTime, endTime);
   }

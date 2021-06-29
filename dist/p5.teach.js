@@ -38652,6 +38652,10 @@ function () {
     this.svgHeight = svgHeight;
   };
 
+  TeX.prototype.scale = function (scaleFactor) {
+    this.writeTexElement.style("transform", "scale(" + scaleFactor + ")");
+  };
+
   TeX.prototype.fill = function (fillColor) {
     if (arguments.length === 0) {
       return this.fillColor;
@@ -41163,6 +41167,10 @@ function () {
 
   Text.prototype.size = function (_size) {
     this._size = _size; //font-size
+  };
+
+  Text.prototype.scale = function (scaleFactor) {
+    this.writeTextElement.style("transform", "scale(" + scaleFactor + ")");
   }; //TODO : fix stroke - currently only -webkit supported
   // stroke(strokeColor: string) {
   //   if (arguments.length === 0) {
@@ -41354,6 +41362,10 @@ function () {
   };
 
   Graph2D.prototype.size = function (sizePx) {};
+
+  Graph2D.prototype.scale = function (scaleFactor) {
+    this.graphContainer.style("transform", "scale(" + scaleFactor + ")");
+  };
 
   Graph2D.prototype.transform = function (object_finl, startTime, endTime) {
     if (startTime === void 0) {
@@ -41730,7 +41742,92 @@ function create2DPolarGraph(eqn, thetaRange, x, y, width_svg, height_svg) {
 }
 
 exports.create2DPolarGraph = create2DPolarGraph;
-},{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"index.ts":[function(require,module,exports) {
+},{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"lib/Scene/group.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createGroup = exports.Group = void 0;
+
+var scene_1 = require("./scene");
+
+var Text_1 = require("../MObject/Text");
+
+var TeX_1 = require("../MObject/TeX");
+
+var graph_1 = require("../Geometry/graph");
+
+var Group =
+/** @class */
+function () {
+  function Group() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    } //console.log(args[0]);
+
+
+    var p5Canvas = document.getElementsByClassName('p5Canvas')[0].getBoundingClientRect(); //console.log(p5Canvas);
+    //sceneContainer.setAttribute('overflow', 'hidden');
+
+    var groupDiv = this.group = createElement('div');
+    this.group.parent(scene_1.sceneContainer);
+    groupDiv.elt.setAttribute('style', "overflow: hidden; position: absolute; left: " + p5Canvas.x + "px; top: " + p5Canvas.y + "px; width: " + p5Canvas.width + "px; height : " + p5Canvas.height + "px");
+
+    function parentDiv(element) {
+      console.log('element', element + 1);
+      console.log('gap');
+
+      if (element instanceof Text_1.Text) {
+        console.log('text foreach');
+        element.writeTextElement.parent(groupDiv);
+      } else if (element instanceof TeX_1.TeX) {
+        element.writeTexElement.parent(groupDiv);
+      } else if (element instanceof graph_1.Graph2D) {
+        element.graphContainer.parent(groupDiv);
+      } else {
+        console.log('foreach');
+      }
+    }
+
+    var i = 0;
+
+    while (document.getElementById("group" + i)) {
+      i++;
+    }
+
+    this.group.id("group" + i);
+    args[0].forEach(parentDiv);
+  }
+
+  Group.prototype.scale = function (scaleFactor) {
+    this.group.style('transform', "scale(" + scaleFactor + ")");
+  };
+
+  Group.prototype.remove = function () {
+    this.group.remove(); //document.body.removeChild(this.group.elt);
+  };
+
+  return Group;
+}();
+
+exports.Group = Group;
+
+function createGroup() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  } //TODO : convert into interface
+
+
+  return new Group(args);
+}
+
+exports.createGroup = createGroup;
+},{"./scene":"lib/Scene/scene.ts","../MObject/Text":"lib/MObject/Text.ts","../MObject/TeX":"lib/MObject/TeX.ts","../Geometry/graph":"lib/Geometry/graph.ts"}],"index.ts":[function(require,module,exports) {
 
 "use strict";
 
@@ -41790,7 +41887,12 @@ global.createControls = controls_1.createControls;
 global.pauseScene = controls_1.pauseScene;
 global.playScene = controls_1.playScene;
 global.restartScene = controls_1.restartScene;
-},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts","./lib/Geometry/polar":"lib/Geometry/polar.ts","./lib/Scene/controls":"lib/Scene/controls.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var group_1 = require("./lib/Scene/group");
+
+global.Group = group_1.Group;
+global.createGroup = group_1.createGroup;
+},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts","./lib/Geometry/polar":"lib/Geometry/polar.ts","./lib/Scene/controls":"lib/Scene/controls.ts","./lib/Scene/group":"lib/Scene/group.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -41818,7 +41920,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53294" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59784" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

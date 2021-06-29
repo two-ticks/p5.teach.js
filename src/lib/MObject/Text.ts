@@ -35,6 +35,10 @@ export class Text {
     this._size = _size; //font-size
   }
 
+  scale(scaleFactor) {
+    this.writeTextElement.style('transform', `scale(${scaleFactor})`);
+  }
+
   //TODO : fix stroke - currently only -webkit supported
 
   // stroke(strokeColor: string) {
