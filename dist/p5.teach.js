@@ -284,7 +284,10 @@ function () {
     document.body.appendChild(exports.sceneContainer);
   }
 
-  Scene.prototype.remove = function () {};
+  Scene.prototype.remove = function () {
+    document.body.removeChild(exports.sceneContainer);
+  }; //TODO : remove scene
+
 
   Scene.prototype.delay = function (sec) {
     return __awaiter(this, void 0, void 0, function () {
@@ -40485,6 +40488,7 @@ function add(object) {
   if (object instanceof TeX_1.TeX) {
     //tex animations
     object.writeTexElement = createDiv(object.svgEquation);
+    object.writeTexElement.parent(scene_1.sceneContainer);
     var svg = object.writeTexElement.elt.querySelectorAll('svg');
     svg[0].setAttribute('width', object.svgWidth + "px");
     svg[0].setAttribute('height', object.svgHeight + "px");
@@ -40553,13 +40557,21 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.restartScene = exports.pauseScene = exports.playScene = exports.createControls = exports.animationTimeline = void 0;
+exports.restartScene = exports.pauseScene = exports.playScene = exports.createControls = exports.animationTimeline = exports.sceneTime = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
-exports.animationTimeline = animejs_1.default.timeline({}); //initilising a timeline
+exports.animationTimeline = animejs_1.default.timeline({
+  update: function update(anim) {
+    exports.sceneTime = exports.animationTimeline.progress.toString();
+  }
+}); //initilising a timeline
+// animationTimeline.add({});
 
 function createControls() {
+  var controlsDiv = document.createElement('div');
+  controlsDiv.setAttribute('class', 'controls');
+  document.body.appendChild(controlsDiv);
   var progressBar = document.createElement('input');
   progressBar.setAttribute('type', 'range');
   progressBar.setAttribute('min', "" + 0);
@@ -40567,7 +40579,7 @@ function createControls() {
   progressBar.setAttribute('value', "" + 0);
   progressBar.setAttribute('step', "" + 0.001);
   progressBar.setAttribute('style', "appearance: none; width: 400px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;");
-  document.body.appendChild(progressBar);
+  controlsDiv.appendChild(progressBar);
 
   progressBar.oninput = function () {
     pauseScene(); //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
@@ -40590,7 +40602,7 @@ function createControls() {
   playButton.setAttribute('style', 'background-color: transparent; border: 1px solid #61C3FF; display: inline-block; align-items: flex-start; padding: 5px 10px;text-transform: uppercase; color : #61C3FF;');
   pauseButton.setAttribute('style', 'background-color: transparent; border: 1px solid #61C3FF; margin: 0 0 0 -1px; display: inline-block; align-items: flex-start;padding: 5px 10px;text-transform: uppercase; color : #61C3FF;');
   restartButton.setAttribute('style', 'background-color: transparent; border: 1px solid #61C3FF; margin: 0 0 0 -1px; display: inline-block; align-items: flex-start;padding: 5px 10px;text-transform: uppercase; color : #61C3FF;');
-  document.body.append(playButton, pauseButton, restartButton); //IE and Edge previous versions may not support
+  controlsDiv.append(playButton, pauseButton, restartButton); //IE and Edge previous versions may not support
 
   exports.animationTimeline.add({
     update: function update(anim) {
@@ -41273,59 +41285,7 @@ function T_scale(_object, scale_to) {
 }
 
 exports.T_scale = T_scale;
-},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts"}],"lib/Scene/transform.ts":[function(require,module,exports) {
-"use strict"; //TODO : transform function : use morphing
-
-var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  Object.defineProperty(o, k2, {
-    enumerable: true,
-    get: function get() {
-      return m[k];
-    }
-  });
-} : function (o, m, k, k2) {
-  if (k2 === undefined) k2 = k;
-  o[k2] = m[k];
-});
-
-var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
-  Object.defineProperty(o, "default", {
-    enumerable: true,
-    value: v
-  });
-} : function (o, v) {
-  o["default"] = v;
-});
-
-var __importStar = this && this.__importStar || function (mod) {
-  if (mod && mod.__esModule) return mod;
-  var result = {};
-  if (mod != null) for (var k in mod) {
-    if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-  }
-
-  __setModuleDefault(result, mod);
-
-  return result;
-};
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.transform = void 0;
-
-var config = __importStar(require("../config.js"));
-
-function transform(_object_init, _object_finl) {
-  console.log(config.hello[0]);
-
-  if (_object_init.writeTexElement && _object_finl.writeTexElement) {//TeX transformation
-  } else if (_object_init.writeTextElement && _object_finl.writeTextElement) {}
-}
-
-exports.transform = transform;
-},{"../config.js":"lib/config.js"}],"lib/Geometry/graph.ts":[function(require,module,exports) {
+},{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts"}],"lib/Geometry/graph.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -41337,9 +41297,15 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create2DGraph = exports.Graph2D = void 0;
+exports.create2DGraph = exports.createSVGPath = exports.Graph2D = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
+
+var controls_1 = require("../Scene/controls");
+
+var scene_1 = require("../Scene/scene");
+
+var transform_1 = require("../Scene/transform");
 
 var Graph2D =
 /** @class */
@@ -41367,7 +41333,9 @@ function () {
     this.width_svg = width_svg;
     this.height_svg = height_svg;
     this.pathData = createSVGPath(eqn);
-    this.graphContainer = createElement('div');
+    this.graphContainer = createElement('div'); //attaching it to sceneContainer
+
+    this.graphContainer.parent(scene_1.sceneContainer);
     this.linePath = this.linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     this.linePath.setAttribute('fill', 'none');
     this.linePath.setAttribute('stroke', 'black');
@@ -41387,6 +41355,53 @@ function () {
 
   Graph2D.prototype.size = function (sizePx) {};
 
+  Graph2D.prototype.transform = function (object_finl, startTime, endTime) {
+    if (startTime === void 0) {
+      startTime = 0;
+    }
+
+    if (endTime === void 0) {
+      endTime = 2;
+    }
+
+    transform_1.transform(this, object_finl, startTime, endTime);
+  };
+
+  Graph2D.prototype.loop = function (finlEqn, timeDuration, startTime) {
+    if (timeDuration === void 0) {
+      timeDuration = 2;
+    }
+
+    if (startTime === void 0) {
+      startTime = 0;
+    }
+
+    timeDuration = timeDuration * 1000;
+    startTime = startTime * 1000; //s to ms
+
+    animejs_1.default({
+      loop: true,
+      targets: this.graphContainer.elt.querySelectorAll('path')[0],
+      d: [//{value: shapes[0].d},
+      {
+        value: "" + createSVGPath(finlEqn)
+      }],
+      duration: timeDuration,
+      direction: 'alternate',
+      autoplay: true,
+      easing: 'easeInOutCubic',
+      delay: startTime // complete: function(anim) {
+      //   looper.restart;
+      // }
+      //elasticity: 1
+
+    });
+  };
+
+  Graph2D.prototype.stroke = function (_stroke) {
+    this.linePath.setAttribute('stroke', "" + _stroke);
+  };
+
   Graph2D.prototype.plot = function () {
     this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     this.graphObject.setAttribute('width', "" + this.width_svg);
@@ -41397,21 +41412,37 @@ function () {
     this.graphContainer.elt.appendChild(this.graphObject);
   };
 
-  Graph2D.prototype.play = function () {
+  Graph2D.prototype.update = function (eqn) {
+    this.pathData = createSVGPath(eqn);
+    this.linePath.setAttribute('d', this.pathData);
+  };
+
+  Graph2D.prototype.play = function (timeDuration, startTime) {
+    if (timeDuration === void 0) {
+      timeDuration = 5;
+    }
+
+    if (startTime === void 0) {
+      startTime = 0;
+    }
+
+    timeDuration = timeDuration * 1000;
+    startTime = startTime * 1000; //s to ms
+
     var pathElement = this.graphContainer.elt.querySelectorAll('path');
-    var lineDrawing = animejs_1.default({
+    controls_1.animationTimeline.add({
       targets: this.graphContainer.elt.querySelectorAll('path'),
       strokeDashoffset: [animejs_1.default.setDashoffset, 0],
       easing: 'easeOutSine',
-      duration: 20000,
+      duration: timeDuration,
       begin: function begin(anim) {
-        pathElement[0].setAttribute('stroke', 'black');
+        //pathElement[0].setAttribute('stroke', 'black');
         pathElement[0].setAttribute('fill', 'none');
       },
       complete: function complete(anim) {//document.querySelector('path').setAttribute("fill", "yellow");
-      },
-      autoplay: true
-    });
+      } //autoplay: true
+
+    }, startTime);
   };
 
   return Graph2D;
@@ -41434,6 +41465,8 @@ function createSVGPath(eqn, stepSize) {
 
   return SVG_path;
 }
+
+exports.createSVGPath = createSVGPath;
 
 function create2DGraph(eqn, x, y, width_svg, height_svg) {
   if (x === void 0) {
@@ -41458,7 +41491,53 @@ function create2DGraph(eqn, x, y, width_svg, height_svg) {
 }
 
 exports.create2DGraph = create2DGraph;
-},{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
+},{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts"}],"lib/Scene/transform.ts":[function(require,module,exports) {
+"use strict"; //TODO : transform function : use morphing
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.transform = void 0;
+
+var graph_1 = require("../Geometry/graph");
+
+var controls_1 = require("./controls");
+
+function transform(object_init, object_finl, startTime, endTime) {
+  if (startTime === void 0) {
+    startTime = 0;
+  }
+
+  if (endTime === void 0) {
+    endTime = 2;
+  } //console.log(config.hello[0]);
+
+
+  var timeDuration = (endTime - startTime) * 1000;
+  var delayDuration = startTime * 1000;
+
+  if (object_init.writeTexElement && object_finl.writeTexElement) {//TeX transformation
+  } else if (object_init.writeTextElement && object_finl.writeTextElement) {} else if (object_init.graphObject && object_finl.graphContainer) {
+    console.log('inside transform');
+    console.log("" + object_finl.eqn);
+    controls_1.animationTimeline.add({
+      targets: object_init.graphContainer.elt.querySelectorAll('path')[0],
+      d: [//{value: shapes[0].d},
+      {
+        value: "" + graph_1.createSVGPath(object_finl.eqn)
+      }],
+      duration: timeDuration,
+      //direction: 'alternate',
+      autoplay: true,
+      easing: 'easeInOutCubic' //elasticity: 1
+      //loop: true
+
+    }, delayDuration);
+  }
+}
+
+exports.transform = transform;
+},{"../Geometry/graph":"lib/Geometry/graph.ts","./controls":"lib/Scene/controls.ts"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -41706,6 +41785,7 @@ global.create2DPolarGraph = polar_1.create2DPolarGraph;
 
 var controls_1 = require("./lib/Scene/controls");
 
+global.sceneTime = controls_1.sceneTime;
 global.createControls = controls_1.createControls;
 global.pauseScene = controls_1.pauseScene;
 global.playScene = controls_1.playScene;
@@ -41738,7 +41818,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61754" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53294" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

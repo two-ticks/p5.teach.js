@@ -1,6 +1,6 @@
 //TODO : transform function : use morphing
 
-import anime from 'animejs';
+//import anime from 'animejs';
 import * as config from '../config.js';
 import { createSVGPath } from '../Geometry/graph';
 import { animationTimeline } from './controls';
@@ -32,7 +32,7 @@ export function transform(
         duration: timeDuration,
         //direction: 'alternate',
         autoplay: true,
-        easing: 'easeInOutCubic',
+        easing: 'easeInOutCubic'
         //elasticity: 1
         //loop: true
       },

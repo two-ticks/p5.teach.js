@@ -90,7 +90,9 @@ export class Graph2D {
     this.linePath.setAttribute('d', this.pathData);
   }
 
-  play(timeDuration: number = 5000, delayTime: number = 0) {
+  play(timeDuration: number = 5, startTime: number = 0) {
+    timeDuration = timeDuration * 1000;
+    startTime = startTime * 1000; //s to ms
     const pathElement = this.graphContainer.elt.querySelectorAll('path');
     animationTimeline.add(
       {
@@ -99,7 +101,7 @@ export class Graph2D {
         easing: 'easeOutSine',
         duration: timeDuration,
         begin: function (anim) {
-          pathElement[0].setAttribute('stroke', 'black');
+          //pathElement[0].setAttribute('stroke', 'black');
           pathElement[0].setAttribute('fill', 'none');
         },
         complete: function (anim) {
@@ -107,7 +109,7 @@ export class Graph2D {
         }
         //autoplay: true
       },
-      delayTime
+      startTime
     );
   }
 }
