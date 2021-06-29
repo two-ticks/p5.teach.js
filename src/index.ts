@@ -48,3 +48,14 @@ import { Vector2DField, create2DVectorField } from './lib/Geometry/vectorField';
 
 global.Vector2DField = Vector2DField;
 global.create2DVectorField = create2DVectorField;
+
+import {
+  createControls,
+  pauseScene,
+  playScene,
+  restartScene
+} from './lib/Scene/controls';
+global.createControls = createControls;
+global.pauseScene = pauseScene;
+global.playScene = playScene;
+global.restartScene = restartScene;

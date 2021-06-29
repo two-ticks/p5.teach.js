@@ -1,42 +1,40 @@
 import { TeX } from '../MObject/TeX';
 import { Text } from '../MObject/Text';
 import * as CONFIG from '../config.js';
+import { sceneContainer } from './scene';
 
-export function add(_object: any) {
-  if (_object instanceof TeX) {
+export function add(object: any) {
+  if (object instanceof TeX) {
     //tex animations
-    console.log('TeX');
-    _object.writeTexElement = createDiv(_object.SVGEquation);
-    const svg = _object.writeTexElement.elt.querySelectorAll('svg');
-    svg[0].setAttribute('width', `${_object.width_svg}px`);
-    svg[0].setAttribute('height', `${_object.height_svg}px`);
-    _object.writeTexElement.position(_object.x, _object.y);
-    const g = _object.writeTexElement.elt.querySelectorAll('g');
-    g[0].setAttribute('stroke-width', `${CONFIG.PLAY.STROKE_WIDTH}`);
-    //console.log(CONFIG.PLAY.STROKE_WIDTH);
+    object.writeTexElement = createDiv(object.svgEquation);
+    object.writeTexElement.parent(sceneContainer);
+    let svg = object.writeTexElement.elt.querySelectorAll('svg');
+    svg[0].setAttribute('width', `${object.svgWidth}px`);
+    svg[0].setAttribute('height', `${object.svgHeight}px`);
+    svg[0].setAttribute('stroke', object.strokeColor);
+    svg[0].setAttribute('stroke-width', object.strokeWidth);
+    svg[0].setAttribute('fill', object.fillColor.toString());
 
-    //TODO : clean
-    //g[0].setAttribute('fill', 'none');
-    // const pathEls = _object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+    // g[0].setAttribute('fill', 'none');
+    // g[0].setAttribute('stroke-width', '10px');
+    object.writeTexElement.position(object.x, object.y);
+  } else if (object instanceof Text) {
+    console.log('Text add');
 
-    //   for (var i = 0; i < pathEls.length; i++) {
-    //     var pathEl = pathEls[i];
-    //   }
-  } else if (_object instanceof Text) {
-    const sentence = _object.sentence;
-    //const x = _object.x;
-    //const y = _object.y;
-    _object.writeTextElement = createElement(
+    const sentence = object._text;
+
+    object.writeTextElement = createElement(
       'div',
       sentence.replace(/\S/g, "<span class='letter'>$&</span>")
     );
-
-    _object.writeTextElement.position(_object.x, _object.y);
-    //_object.writeTextElement.position(_object.x, _object.x);
-
-    _object.writeTextElement.style('font-size', `${_object.sizePx}px`);
-    console.log(_object.sizePx);
-
-    _object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
+    object.writeTextElement.style('white-space', ' nowrap');
+    object.writeTextElement.position(object.x, object.y);
+    object.writeTextElement.style('font-size', `${object._size}px`);
+    object.writeTextElement.style('color', `${object.fillColor}`);
+    //object.writeTextElement.style('text-stroke-width', `${object._strokeWidth}`); //TODO : not working without -webkit
+    object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
+    object.writeTextElement.parent(sceneContainer);
+    //object.writeTextElement.remove();
+    //sceneContainer.appendChild(object.writeTextElement.elt);
   }
 }

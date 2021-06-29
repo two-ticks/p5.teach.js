@@ -1,66 +1,94 @@
-//TODO : insure Text is not reserved by any other dependecies
-//TODO : position and size
-//TODO : fix 'write' animation
-//TODO : fix duration and delay
-//TODO : clean stray after porting write and all-at-once animations
-//TODO : fix size function
+import { TextObject } from '../interfaces';
+import { play } from '../Scene/play';
 
 export class Text {
-  writeTextElement: any;
-  textWrapper: any;
+  writeTextElement!: p5.Element; //to be used by play function
+  //to be used by play function
+  //textWrapper: any; //to be used by play function
+  _text: string;
   x: number;
   y: number;
-  sentence: string;
-  sizePx: number; //px
 
-  constructor(
-    sentence: string,
-    x: number = 10,
-    y: number = 10,
-    sizePx: number = 28
-  ) {
+  _size: number; //px
+  // strokeColor: string;
+  // strokeWidth: number;
+  fillColor: p5.Color;
+
+  constructor({ _text, x = 10, y = 10, _size = 28 }: TextObject) {
     this.x = x;
     this.y = y;
-    this.sentence = sentence;
-    this.sizePx = sizePx;
+    this._text = _text;
+    this._size = _size;
+    //console.log('me', this._size);
 
-    // this.writeTextElement = createElement(
-    //   'h1',
-    //   sentence.replace(/\S/g, "<span class='letter'>$&</span>")
-    // );
-    // this.writeTextElement.position(x, y);
-    // this.writeTextElement.style('font-size', `${this.size}px`);
-    // this.writeTextElement.style('opacity', '0'); //to hide text at initialisation
+    // this.strokeColor = 'black';
+    // this._strokeWidth = 10;
+    this.fillColor = color('black');
   }
 
-  // play(animation_type: string = 'write', timeDuration: number = 180) {
-  //   this.writeTextElement.style("opacity", '1');
-  //   if (animation_type == 'write') {
-  //     this.write(timeDuration);
-  //   } else if (animation_type == 'all-at-once') {
-  //     console.log('all at once');
-  //   }
-  // }
-
-  // write(timeDuration: number) {
-
-  // }
   position(x: number, y: number = 10) {
     this.x = x;
     this.y = y;
     //this.writeTextElement.position(this.x, this.y);
   }
-  size(sizePx: number) {
-    this.sizePx = sizePx;
+  size(_size: number) {
+    this._size = _size; //font-size
+  }
+
+  //TODO : fix stroke - currently only -webkit supported
+
+  // stroke(strokeColor: string) {
+  //   if (arguments.length === 0) {
+  //     return this.strokeColor;
+  //   } else {
+  //     this.strokeColor = strokeColor;
+  //   }
+  // }
+
+  // strokeWidth(w: number) {
+  //   if (arguments.length === 0) {
+  //     return this._strokeWidth;
+  //   } else {
+  //     this._strokeWidth = w;
+  //   }
+  // }
+
+  fill(fillColor: p5.Color) {
+    if (arguments.length === 0) {
+      return this.fillColor;
+    } else {
+      this.fillColor = fillColor;
+    }
+  }
+
+  play(
+    animationType: string = 'write',
+    timeDuration: number = 0,
+    delayDuration: number = 0
+  ) {
+    play(this, animationType, timeDuration, delayDuration);
   }
 }
 
-export function createText(
-  sentence: string,
-  x: number = 10,
-  y: number = 10,
-  sizePx: number = 28
-) {
-  const _object = new Text(sentence, x, y, sizePx);
-  return _object;
+export function createText(...args: any[]) {
+  //TODO : convert into interface
+
+  const _textArg: TextObject = {
+    _text: args[0],
+    x: args[1],
+    y: args[2],
+    _size: args[3]
+  };
+  //console.log(_textArg._size);
+
+  if (
+    !(typeof _textArg._size == 'undefined' || typeof _textArg._size == 'number')
+  ) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (!(typeof _textArg._size == 'undefined') && _textArg._size < 0) {
+    //size
+    throw new Error('size of text should be a whole number!');
+  }
+  return new Text(_textArg);
 }
