@@ -17,6 +17,11 @@ export class Group {
 
     const groupDiv = (this.group = createElement('div'));
     this.group.parent(sceneContainer);
+    let i = 0;
+    while (document.getElementById(`group${i}`)) {
+      i++;
+    }
+    this.group.id(`group${i}`);
     groupDiv.elt.setAttribute(
       'style',
       `overflow: hidden; position: absolute; left: ${p5Canvas.x}px; top: ${p5Canvas.y}px; width: ${p5Canvas.width}px; height : ${p5Canvas.height}px`
@@ -38,11 +43,7 @@ export class Group {
       }
     }
 
-    let i = 0;
-    while (document.getElementById(`group${i}`)) {
-      i++;
-    }
-    this.group.id(`group${i}`);
+
 
     args[0].forEach(parentDiv);
   }

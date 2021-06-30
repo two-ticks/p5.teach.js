@@ -84,7 +84,10 @@ export class Graph2D {
     );
     this.graphObject.setAttribute('width', `${this.width_svg}`);
     this.graphObject.setAttribute('height', `${this.height_svg}`);
-    this.graphObject.setAttribute('viewBox', '-100 -100 18000 4000');
+    this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
+    this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+
     this.linePath.setAttribute('d', this.pathData);
     this.graphObject.appendChild(this.linePath);
     this.graphContainer.elt.appendChild(this.graphObject);
@@ -118,12 +121,19 @@ export class Graph2D {
   }
 }
 
-export function createSVGPath(eqn: any, stepSize: number = 0.001) {
-  let minX = 0;
+export function createSVGPath(
+  eqn: any,
+  minX: number = -10,
+  maxX: number = 10,
+  stepSize: number = 0.001
+) {
+  const pathElements = 1000;
+  stepSize = (maxX-minX)/pathElements; 
+  //minX = 0;
   let SVG_path = `M${1000 * minX},${eqn(minX)}`;
-  for (let x = 0.001; x < 20; x += stepSize) {
+  for (let x = minX; x < maxX; x += stepSize) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-    SVG_path = SVG_path.concat(` L${1000 * x},${eqn(x)}`);
+    SVG_path = SVG_path.concat(` L${1000 * x}, ${eqn(x)}`);
   }
   return SVG_path;
 }

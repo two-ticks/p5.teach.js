@@ -3,6 +3,7 @@
 //import anime from 'animejs';
 import * as config from '../config.js';
 import { createSVGPath } from '../Geometry/graph';
+import { createPolarSVGPath } from '../Geometry/polar';
 import { animationTimeline } from './controls';
 
 export function transform(
@@ -19,24 +20,65 @@ export function transform(
     //TeX transformation
   } else if (object_init.writeTextElement && object_finl.writeTextElement) {
   } else if (object_init.graphObject && object_finl.graphContainer) {
-    console.log('inside transform');
-    console.log(`${object_finl.eqn}`);
+    if (object_finl.thetaRange) {
+      //console.log('polar');
 
-    animationTimeline.add(
-      {
-        targets: object_init.graphContainer.elt.querySelectorAll('path')[0],
-        d: [
-          //{value: shapes[0].d},
-          { value: `${createSVGPath(object_finl.eqn)}` }
-        ],
-        duration: timeDuration,
-        //direction: 'alternate',
-        autoplay: true,
-        easing: 'easeInOutCubic'
-        //elasticity: 1
-        //loop: true
-      },
-      delayDuration
-    );
+      let svgPath = createPolarSVGPath(object_finl.eqn);
+      // let viewBoxValue = {
+      //   A: 0,
+      //   B: '0%',
+      //   C: 0,
+      //   D: 0
+      // };
+      animationTimeline.add(
+        {
+          targets: object_init.graphContainer.elt.querySelectorAll('path'),
+          d: [
+            //{value: shapes[0].d},
+            { value: `${svgPath}` }
+          ],
+          // update: function() {
+          //   object_init.graphObject.setAttribute(
+          //     'viewBox',
+          //     JSON.stringify(viewBoxValue)
+          //   );
+          // },
+          // complete: function (anim) {
+          //   object_init.graphObject.setAttribute(
+          //     'viewBox',
+          //     '-8500 -2000 18000 4000'
+          //   );
+          // },
+          duration: timeDuration,
+          //direction: 'alternate',
+          autoplay: true,
+          easing: 'easeInOutCubic'
+          //elasticity: 1
+          //loop: true
+        },
+        delayDuration
+      );
+    } else if (!object_finl.thetaRange) {
+      //console.log('non-polar');
+
+      animationTimeline.add(
+        {
+          targets: object_init.graphContainer.elt.querySelectorAll('path'),
+          d: [
+            //{value: shapes[0].d},
+            { value: `${createSVGPath(object_finl.eqn)}` }
+          ],
+          duration: timeDuration,
+          //direction: 'alternate',
+          autoplay: true,
+          easing: 'easeInOutCubic'
+          //elasticity: 1
+          //loop: true
+        },
+        delayDuration
+      );
+    }
+    //console.log('inside transform');
+    //console.log(`${object_finl.eqn}`);
   }
 }

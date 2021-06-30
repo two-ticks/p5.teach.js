@@ -1,4 +1,5 @@
 import anime from 'animejs';
+import { transform } from '../Scene/transform';
 
 export class GraphPolar2D {
   eqn: any;
@@ -55,6 +56,7 @@ export class GraphPolar2D {
     this.graphObject.setAttribute('width', `${this.width_svg}`);
     this.graphObject.setAttribute('height', `${this.height_svg}`);
     this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
+    this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.linePath.setAttribute('d', this.pathData);
     this.graphObject.appendChild(this.linePath);
     this.graphContainer.elt.appendChild(this.graphObject);
@@ -63,7 +65,10 @@ export class GraphPolar2D {
   remove() {
     this.graphContainer.elt.removeChild(this.graphObject);
   }
-
+  
+  transform(object_finl: any, startTime: number = 0, endTime: number = 2) {
+    transform(this, object_finl, startTime, endTime);
+  }
   play() {
     const pathElement = this.graphContainer.elt.querySelectorAll('path');
     const lineDrawing = anime({
@@ -133,11 +138,14 @@ export class GraphPolar2D {
   }
 }
 
-function createPolarSVGPath(
+export function createPolarSVGPath(
   eqn: any,
   thetaRange: number[] = [0, 2 * Math.PI],
   stepSize: number = 0.001
 ) {
+  const pathElements = 1000;
+  stepSize = (thetaRange[1]-thetaRange[0])/pathElements; 
+
   let minX = 0;
   let scaleX = 100;
   let scaleY = 100;
