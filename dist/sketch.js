@@ -16,7 +16,7 @@ function draw() {
   //amp = amp + 10*Math.sin(amp+0.01);
   background(220);
   //console.log(sceneTime);
-  grp.update((t) => 1500 * Math.sin(i) * sin(2 * t - i));
+  //grp.update((t) => 1500 * Math.sin(i) * sin(2 * t - i));
 }
 
 async function reel() {
@@ -39,15 +39,29 @@ async function reel() {
 
   grp = create2DGraph((t) => 1500 * Math.sin(t) * sin(2 * t));
 
-  grp.plot();
+  //grp.plot();
   grp.stroke('blue');
-  grp.position(30, 200);
+  grp.position(50, 50);
   //grp.loop((t) => 1500 * Math.sin(t-50) * sin(2 * (t-50)), 1 , 0); //timeDuration and startTime
   //await scene.delay(2);
+  grp1 = create2DPolarGraph(
+    (t) =>
+      15 *
+      (Math.pow(Math.E, Math.cos(t)) -
+        2 * Math.cos(4 * t) -
+        Math.pow(Math.sin(t / 12), 5)),
+    [0, 18 * Math.PI]
+  );
+  grp1.stroke('blue');
+  grp1.plot();
+  grp1.size(400, 400);
+  grp1.position(50, 150);
 
-  let group = createGroup(texty, grp, pythag);
+  grp1.transform(grp, 0, 10);
+
+  //let group = createGroup(texty, grp, pythag);
   
-  group.scale(0.5);
+  //group.scale(0.5);
   
 
   // //grp.play();

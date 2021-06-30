@@ -38653,7 +38653,7 @@ function () {
   };
 
   TeX.prototype.scale = function (scaleFactor) {
-    this.writeTexElement.style("transform", "scale(" + scaleFactor + ")");
+    this.writeTexElement.style('transform', "scale(" + scaleFactor + ")");
   };
 
   TeX.prototype.fill = function (fillColor) {
@@ -40503,7 +40503,7 @@ function add(object) {
 
     object.writeTexElement.position(object.x, object.y);
   } else if (object instanceof Text_1.Text) {
-    console.log('Text add');
+    //console.log('Text add');
     var sentence = object._text;
     object.writeTextElement = createElement('div', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
     object.writeTextElement.style('white-space', ' nowrap');
@@ -40747,16 +40747,16 @@ endTime //seconds // end time
   //TODO : fix this after testing end and start parameters
   // if (typeof delayDuration === 'number') {
   //   delayDuration = 1000 * delayDuration; //sec to ms
-  //   //console.log(delayDuration);
+  //   ////console.log(delayDuration);
   // } else if (typeof delayDuration === 'string') {
   //   if (delayDuration.charAt(0) === '+') {
   //     delayDuration = 1000 * Number(delayDuration);
   //     delayDuration = `+=${delayDuration}`;
-  //     console.log(delayDuration);
+  //     //console.log(delayDuration);
   //   } else if (delayDuration.charAt(0) === '-') {
   //     delayDuration = 1000 * Number(delayDuration);
   //     delayDuration = `-=${-delayDuration}`;
-  //     console.log(delayDuration);
+  //     //console.log(delayDuration);
   //   }
   // }
   // timeDuration = 1000 * timeDuration; //sec to ms
@@ -40766,17 +40766,16 @@ endTime //seconds // end time
 
   if (object instanceof TeX_1.TeX) {
     //adding element before animation
-    console.log('TeX');
-
+    ////console.log('TeX');
     if (!object.writeTexElement) {
       add_1.add(object);
     } //tex animations
+    ////console.log('TeX');
 
-
-    console.log('TeX');
 
     if (animationType === 'write') {
-      console.log('writing'); //write(object, timeDuration);
+      //console.log('writing');
+      //write(object, timeDuration);
       // object.writeTexElement = createDiv(object.SVGEquation);
       // let svg = object.writeTexElement.elt.querySelectorAll('svg');
       // svg[0].setAttribute('width', `${object.width_svg}px`);
@@ -40786,7 +40785,6 @@ endTime //seconds // end time
       // // g[0].setAttribute('stroke-width', '10px');
       // object.writeTexElement.position(object.x, object.y);
       //const pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
-
       writeAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'allAtOnce') {
       //object.all_at_once(timeDuration);
@@ -40797,56 +40795,55 @@ endTime //seconds // end time
       // object.writeTexElement.position(object.x, object.y);
       allAtOnceAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'fadeIn') {
-      console.log('fadeIn called');
+      //console.log('fadeIn called');
       fadeInAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'appear') {
-      console.log('appear called');
+      //console.log('appear called');
       appearAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'dissolve') {
-      console.log('dissolve called'); //add(object);
-
+      //console.log('dissolve called');
+      //add(object);
       dissolveAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'fadeOut') {
-      console.log('fadeout called');
+      //console.log('fadeout called');
       fadeOutAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'blink') {
-      console.log('blink');
+      //console.log('blink');
       blinkAnimatorTeX(object, timeDuration, delayDuration);
     }
   } //Text animation
   else if (object instanceof Text_1.Text) {
       if (!object.writeTextElement) {
         add_1.add(object);
-      }
+      } //console.log('Text');
 
-      console.log('Text');
+
       object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
 
       if (animationType == 'write') {
-        console.log(object);
+        //console.log(object);
         writeAnimatorText(object, timeDuration, delayDuration);
-      } else if (animationType == 'allAtOnce') {
-        console.log('all at once');
+      } else if (animationType == 'allAtOnce') {//console.log('all at once');
       } else if (animationType == 'fadeIn') {
-        console.log('fadeIn');
+        //console.log('fadeIn');
         fadeInAnimatorText(object, timeDuration, delayDuration);
       } else if (animationType == 'fadeOut') {
-        console.log('fadeOut');
+        //console.log('fadeOut');
         fadeOutAnimatorText(object, timeDuration, delayDuration);
       } else if (animationType == 'erase') {
-        console.log('erase');
+        //console.log('erase');
         eraseAnimatorText(object, timeDuration, delayDuration);
       } else if (animationType == 'dissolve') {
-        console.log('dissolve');
+        //console.log('dissolve');
         dissolveAnimatorText(object, timeDuration, delayDuration);
       } else if (animationType == 'waveIn') {
-        console.log('waveIn');
+        //console.log('waveIn');
         waveInAnimatorText(object, timeDuration, delayDuration);
       } else if (animationType == 'waveOut') {
-        console.log('waveOut');
+        //console.log('waveOut');
         waveOutAnimatorText(object, timeDuration, delayDuration);
       } else if (animationType == 'spinOut') {
-        console.log('spinOut');
+        //console.log('spinOut');
         spinOutAnimatorText(object, timeDuration, delayDuration);
       }
     }
@@ -40855,7 +40852,7 @@ endTime //seconds // end time
 exports.play = play;
 
 function writeAnimatorText(object, timeDuration, delayDuration) {
-  // console.log(object);
+  // //console.log(object);
   //object = object;
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
@@ -41170,7 +41167,7 @@ function () {
   };
 
   Text.prototype.scale = function (scaleFactor) {
-    this.writeTextElement.style("transform", "scale(" + scaleFactor + ")");
+    this.writeTextElement.style('transform', "scale(" + scaleFactor + ")");
   }; //TODO : fix stroke - currently only -webkit supported
   // stroke(strokeColor: string) {
   //   if (arguments.length === 0) {
@@ -41364,7 +41361,7 @@ function () {
   Graph2D.prototype.size = function (sizePx) {};
 
   Graph2D.prototype.scale = function (scaleFactor) {
-    this.graphContainer.style("transform", "scale(" + scaleFactor + ")");
+    this.graphContainer.style('transform', "scale(" + scaleFactor + ")");
   };
 
   Graph2D.prototype.transform = function (object_finl, startTime, endTime) {
@@ -41418,7 +41415,8 @@ function () {
     this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     this.graphObject.setAttribute('width', "" + this.width_svg);
     this.graphObject.setAttribute('height', "" + this.height_svg);
-    this.graphObject.setAttribute('viewBox', '-100 -100 18000 4000');
+    this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
+    this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.linePath.setAttribute('d', this.pathData);
     this.graphObject.appendChild(this.linePath);
     this.graphContainer.elt.appendChild(this.graphObject);
@@ -41462,17 +41460,27 @@ function () {
 
 exports.Graph2D = Graph2D;
 
-function createSVGPath(eqn, stepSize) {
+function createSVGPath(eqn, minX, maxX, stepSize) {
+  if (minX === void 0) {
+    minX = -10;
+  }
+
+  if (maxX === void 0) {
+    maxX = 10;
+  }
+
   if (stepSize === void 0) {
     stepSize = 0.001;
   }
 
-  var minX = 0;
+  var pathElements = 1000;
+  stepSize = (maxX - minX) / pathElements; //minX = 0;
+
   var SVG_path = "M" + 1000 * minX + "," + eqn(minX);
 
-  for (var x = 0.001; x < 20; x += stepSize) {
+  for (var x = minX; x < maxX; x += stepSize) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-    SVG_path = SVG_path.concat(" L" + 1000 * x + "," + eqn(x));
+    SVG_path = SVG_path.concat(" L" + 1000 * x + ", " + eqn(x));
   }
 
   return SVG_path;
@@ -41503,53 +41511,7 @@ function create2DGraph(eqn, x, y, width_svg, height_svg) {
 }
 
 exports.create2DGraph = create2DGraph;
-},{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts"}],"lib/Scene/transform.ts":[function(require,module,exports) {
-"use strict"; //TODO : transform function : use morphing
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.transform = void 0;
-
-var graph_1 = require("../Geometry/graph");
-
-var controls_1 = require("./controls");
-
-function transform(object_init, object_finl, startTime, endTime) {
-  if (startTime === void 0) {
-    startTime = 0;
-  }
-
-  if (endTime === void 0) {
-    endTime = 2;
-  } //console.log(config.hello[0]);
-
-
-  var timeDuration = (endTime - startTime) * 1000;
-  var delayDuration = startTime * 1000;
-
-  if (object_init.writeTexElement && object_finl.writeTexElement) {//TeX transformation
-  } else if (object_init.writeTextElement && object_finl.writeTextElement) {} else if (object_init.graphObject && object_finl.graphContainer) {
-    console.log('inside transform');
-    console.log("" + object_finl.eqn);
-    controls_1.animationTimeline.add({
-      targets: object_init.graphContainer.elt.querySelectorAll('path')[0],
-      d: [//{value: shapes[0].d},
-      {
-        value: "" + graph_1.createSVGPath(object_finl.eqn)
-      }],
-      duration: timeDuration,
-      //direction: 'alternate',
-      autoplay: true,
-      easing: 'easeInOutCubic' //elasticity: 1
-      //loop: true
-
-    }, delayDuration);
-  }
-}
-
-exports.transform = transform;
-},{"../Geometry/graph":"lib/Geometry/graph.ts","./controls":"lib/Scene/controls.ts"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
+},{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -41561,9 +41523,11 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create2DPolarGraph = exports.GraphPolar2D = void 0;
+exports.create2DPolarGraph = exports.createPolarSVGPath = exports.GraphPolar2D = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
+
+var transform_1 = require("../Scene/transform");
 
 var GraphPolar2D =
 /** @class */
@@ -41626,6 +41590,7 @@ function () {
     this.graphObject.setAttribute('width', "" + this.width_svg);
     this.graphObject.setAttribute('height', "" + this.height_svg);
     this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
+    this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.linePath.setAttribute('d', this.pathData);
     this.graphObject.appendChild(this.linePath);
     this.graphContainer.elt.appendChild(this.graphObject);
@@ -41633,6 +41598,18 @@ function () {
 
   GraphPolar2D.prototype.remove = function () {
     this.graphContainer.elt.removeChild(this.graphObject);
+  };
+
+  GraphPolar2D.prototype.transform = function (object_finl, startTime, endTime) {
+    if (startTime === void 0) {
+      startTime = 0;
+    }
+
+    if (endTime === void 0) {
+      endTime = 2;
+    }
+
+    transform_1.transform(this, object_finl, startTime, endTime);
   };
 
   GraphPolar2D.prototype.play = function () {
@@ -41702,6 +41679,8 @@ function createPolarSVGPath(eqn, thetaRange, stepSize) {
     stepSize = 0.001;
   }
 
+  var pathElements = 1000;
+  stepSize = (thetaRange[1] - thetaRange[0]) / pathElements;
   var minX = 0;
   var scaleX = 100;
   var scaleY = 100;
@@ -41714,6 +41693,8 @@ function createPolarSVGPath(eqn, thetaRange, stepSize) {
 
   return SVG_path;
 }
+
+exports.createPolarSVGPath = createPolarSVGPath;
 
 function create2DPolarGraph(eqn, thetaRange, x, y, width_svg, height_svg) {
   if (thetaRange === void 0) {
@@ -41742,7 +41723,92 @@ function create2DPolarGraph(eqn, thetaRange, x, y, width_svg, height_svg) {
 }
 
 exports.create2DPolarGraph = create2DPolarGraph;
-},{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"lib/Scene/group.ts":[function(require,module,exports) {
+},{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/transform":"lib/Scene/transform.ts"}],"lib/Scene/transform.ts":[function(require,module,exports) {
+"use strict"; //TODO : transform function : use morphing
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.transform = void 0;
+
+var graph_1 = require("../Geometry/graph");
+
+var polar_1 = require("../Geometry/polar");
+
+var controls_1 = require("./controls");
+
+function transform(object_init, object_finl, startTime, endTime) {
+  if (startTime === void 0) {
+    startTime = 0;
+  }
+
+  if (endTime === void 0) {
+    endTime = 2;
+  } //console.log(config.hello[0]);
+
+
+  var timeDuration = (endTime - startTime) * 1000;
+  var delayDuration = startTime * 1000;
+
+  if (object_init.writeTexElement && object_finl.writeTexElement) {//TeX transformation
+  } else if (object_init.writeTextElement && object_finl.writeTextElement) {} else if (object_init.graphObject && object_finl.graphContainer) {
+    if (object_finl.thetaRange) {
+      //console.log('polar');
+      var svgPath = polar_1.createPolarSVGPath(object_finl.eqn); // let viewBoxValue = {
+      //   A: 0,
+      //   B: '0%',
+      //   C: 0,
+      //   D: 0
+      // };
+
+      controls_1.animationTimeline.add({
+        targets: object_init.graphContainer.elt.querySelectorAll('path'),
+        d: [//{value: shapes[0].d},
+        {
+          value: "" + svgPath
+        }],
+        // update: function() {
+        //   object_init.graphObject.setAttribute(
+        //     'viewBox',
+        //     JSON.stringify(viewBoxValue)
+        //   );
+        // },
+        // complete: function (anim) {
+        //   object_init.graphObject.setAttribute(
+        //     'viewBox',
+        //     '-8500 -2000 18000 4000'
+        //   );
+        // },
+        duration: timeDuration,
+        //direction: 'alternate',
+        autoplay: true,
+        easing: 'easeInOutCubic' //elasticity: 1
+        //loop: true
+
+      }, delayDuration);
+    } else if (!object_finl.thetaRange) {
+      //console.log('non-polar');
+      controls_1.animationTimeline.add({
+        targets: object_init.graphContainer.elt.querySelectorAll('path'),
+        d: [//{value: shapes[0].d},
+        {
+          value: "" + graph_1.createSVGPath(object_finl.eqn)
+        }],
+        duration: timeDuration,
+        //direction: 'alternate',
+        autoplay: true,
+        easing: 'easeInOutCubic' //elasticity: 1
+        //loop: true
+
+      }, delayDuration);
+    } //console.log('inside transform');
+    //console.log(`${object_finl.eqn}`);
+
+  }
+}
+
+exports.transform = transform;
+},{"../Geometry/graph":"lib/Geometry/graph.ts","../Geometry/polar":"lib/Geometry/polar.ts","./controls":"lib/Scene/controls.ts"}],"lib/Scene/group.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41774,6 +41840,13 @@ function () {
 
     var groupDiv = this.group = createElement('div');
     this.group.parent(scene_1.sceneContainer);
+    var i = 0;
+
+    while (document.getElementById("group" + i)) {
+      i++;
+    }
+
+    this.group.id("group" + i);
     groupDiv.elt.setAttribute('style', "overflow: hidden; position: absolute; left: " + p5Canvas.x + "px; top: " + p5Canvas.y + "px; width: " + p5Canvas.width + "px; height : " + p5Canvas.height + "px");
 
     function parentDiv(element) {
@@ -41792,13 +41865,6 @@ function () {
       }
     }
 
-    var i = 0;
-
-    while (document.getElementById("group" + i)) {
-      i++;
-    }
-
-    this.group.id("group" + i);
     args[0].forEach(parentDiv);
   }
 
@@ -41920,7 +41986,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59784" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49292" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

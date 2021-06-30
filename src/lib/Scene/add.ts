@@ -19,7 +19,7 @@ export function add(object: any) {
     // g[0].setAttribute('stroke-width', '10px');
     object.writeTexElement.position(object.x, object.y);
   } else if (object instanceof Text) {
-    console.log('Text add');
+    //console.log('Text add');
 
     const sentence = object._text;
 
