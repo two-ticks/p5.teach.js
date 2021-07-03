@@ -9,6 +9,9 @@ export let animationTimeline = anime.timeline({
 // animationTimeline.add({});
 
 export function createControls() {
+  let p5Canvas = document
+      .getElementsByClassName('p5Canvas')[0]
+      .getBoundingClientRect();
   let controlsDiv = document.createElement('div');
   controlsDiv.setAttribute('class', 'controls');
   document.body.appendChild(controlsDiv);
@@ -21,7 +24,7 @@ export function createControls() {
   progressBar.setAttribute('step', `${0.001}`);
   progressBar.setAttribute(
     'style',
-    `appearance: none; width: 400px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;`
+    `appearance: none; width: ${p5Canvas.width}px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;`
   );
   controlsDiv.appendChild(progressBar);
 

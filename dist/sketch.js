@@ -1,4 +1,9 @@
 let button;
+let A = 40;
+let B = 40;
+let a = 3;
+let b = 2;
+let d = Math.PI/4;
 function setup() {
   createCanvas(400, 400);
   button = createButton('click me');
@@ -10,13 +15,19 @@ function setup() {
   reel();
 }
 
-let i = 0;
+//let i = 0;
 function draw() {
-  i += 0.05;
+  //i += 0.005;
   //amp = amp + 10*Math.sin(amp+0.01);
   background(220);
   //console.log(sceneTime);
-  //grp.update((t) => 1500 * Math.sin(i) * sin(2 * t - i));
+  //a+=0.01;
+
+ // d += 0.005;
+  // grp.update(
+  //   (t) => A * sin(a * t + d),
+  //   (t) => B * cos(b * t)
+  // );
 }
 
 async function reel() {
@@ -37,32 +48,32 @@ async function reel() {
   // text1.position(200,100);
   // play(text1);
 
-  grp = create2DGraph((t) => 1500 * Math.sin(t) * sin(2 * t));
+  grp = create2DParametricGraph(
+    (t) => A * Math.sin(a * t + d),
+    (t) => B * Math.cos(b * t)
+  );
 
-  //grp.plot();
+  grp.plot();
   grp.stroke('blue');
   grp.position(50, 50);
   //grp.loop((t) => 1500 * Math.sin(t-50) * sin(2 * (t-50)), 1 , 0); //timeDuration and startTime
   //await scene.delay(2);
-  grp1 = create2DPolarGraph(
-    (t) =>
-      15 *
-      (Math.pow(Math.E, Math.cos(t)) -
-        2 * Math.cos(4 * t) -
-        Math.pow(Math.sin(t / 12), 5)),
-    [0, 18 * Math.PI]
+  a = 5; b = 4; d = Math.PI/8;
+
+  grp1 = create2DParametricGraph(
+    (t) => A * Math.sin(a * t + d),
+    (t) => B * Math.cos(b * t)
   );
   grp1.stroke('blue');
-  grp1.plot();
+  //grp1.plot();
   grp1.size(400, 400);
   grp1.position(50, 150);
 
-  grp1.transform(grp, 0, 10);
+  grp.transform(grp1, 0, 10);
 
   //let group = createGroup(texty, grp, pythag);
-  
+
   //group.scale(0.5);
-  
 
   // //grp.play();
   // group.forEach(element => element.scale(0.5));
@@ -80,6 +91,6 @@ async function reel() {
   //grp1.play();
 }
 function changeBG() {
-  console.log("heyBG");
+  console.log('heyBG');
   group.remove();
 }

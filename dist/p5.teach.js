@@ -40573,6 +40573,7 @@ exports.animationTimeline = animejs_1.default.timeline({
 // animationTimeline.add({});
 
 function createControls() {
+  var p5Canvas = document.getElementsByClassName('p5Canvas')[0].getBoundingClientRect();
   var controlsDiv = document.createElement('div');
   controlsDiv.setAttribute('class', 'controls');
   document.body.appendChild(controlsDiv);
@@ -40582,7 +40583,7 @@ function createControls() {
   progressBar.setAttribute('max', "" + 100);
   progressBar.setAttribute('value', "" + 0);
   progressBar.setAttribute('step', "" + 0.001);
-  progressBar.setAttribute('style', "appearance: none; width: 400px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;");
+  progressBar.setAttribute('style', "appearance: none; width: " + p5Canvas.width + "px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;");
   controlsDiv.appendChild(progressBar);
 
   progressBar.oninput = function () {
@@ -41511,7 +41512,226 @@ function create2DGraph(eqn, x, y, width_svg, height_svg) {
 }
 
 exports.create2DGraph = create2DGraph;
-},{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
+},{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts"}],"lib/Geometry/parametric.ts":[function(require,module,exports) {
+"use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.create2DParametricGraph = exports.createParametericSVGPath = exports.GraphParametric2D = void 0;
+
+var animejs_1 = __importDefault(require("animejs"));
+
+var transform_1 = require("../Scene/transform");
+
+var GraphParametric2D =
+/** @class */
+function () {
+  function GraphParametric2D(xeqn, yeqn, parameterRange, x, y, width_svg, height_svg) {
+    if (parameterRange === void 0) {
+      parameterRange = [0, 2 * Math.PI];
+    }
+
+    if (x === void 0) {
+      x = 10;
+    }
+
+    if (y === void 0) {
+      y = 10;
+    }
+
+    if (width_svg === void 0) {
+      width_svg = 300;
+    }
+
+    if (height_svg === void 0) {
+      height_svg = 300;
+    }
+
+    this.xeqn = xeqn;
+    this.yeqn = yeqn;
+    this.parameterRange = parameterRange;
+    this.x = x;
+    this.y = y;
+    this.width_svg = width_svg;
+    this.height_svg = height_svg;
+    this.pathData = createParametericSVGPath(xeqn, yeqn, parameterRange);
+    this.graphContainer = createElement('div');
+    this.linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    this.linePath.setAttribute('fill', 'none');
+    this.linePath.setAttribute('stroke', 'black');
+    this.linePath.setAttribute('stroke-width', '40');
+    this.graphContainer.position(this.x, this.y);
+  }
+
+  GraphParametric2D.prototype.position = function (x, y) {
+    if (y === void 0) {
+      y = 10;
+    }
+
+    this.x = x;
+    this.y = y;
+    this.graphContainer.position(this.x, this.y);
+  };
+
+  GraphParametric2D.prototype.size = function (sizePx) {};
+
+  GraphParametric2D.prototype.stroke = function (_stroke) {
+    this.linePath.setAttribute('stroke', "" + _stroke);
+  };
+
+  GraphParametric2D.prototype.plot = function () {
+    this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); //this.graphObject.setAttribute('style', `translate(-50%, -50%)`);
+
+    this.graphObject.setAttribute('width', "" + this.width_svg);
+    this.graphObject.setAttribute('height', "" + this.height_svg);
+    this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
+    this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    this.linePath.setAttribute('d', this.pathData);
+    this.graphObject.appendChild(this.linePath);
+    this.graphContainer.elt.appendChild(this.graphObject);
+  };
+
+  GraphParametric2D.prototype.remove = function () {
+    this.graphContainer.elt.removeChild(this.graphObject);
+  };
+
+  GraphParametric2D.prototype.update = function (xeqn, yeqn) {
+    this.pathData = createParametericSVGPath(xeqn, yeqn);
+    ;
+    this.linePath.setAttribute('d', this.pathData);
+  };
+
+  GraphParametric2D.prototype.transform = function (object_finl, startTime, endTime) {
+    if (startTime === void 0) {
+      startTime = 0;
+    }
+
+    if (endTime === void 0) {
+      endTime = 2;
+    }
+
+    transform_1.transform(this, object_finl, startTime, endTime);
+  };
+
+  GraphParametric2D.prototype.play = function () {
+    var pathElement = this.graphContainer.elt.querySelectorAll('path');
+    var lineDrawing = animejs_1.default({
+      targets: this.graphContainer.elt.querySelectorAll('path'),
+      strokeDashoffset: [animejs_1.default.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: 50000,
+      begin: function begin(anim) {
+        //pathElement[0].setAttribute('stroke', 'black');
+        pathElement[0].setAttribute('fill', 'none');
+      },
+      complete: function complete(anim) {//document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  }; //TODO : arrow follower
+
+
+  GraphParametric2D.prototype.arrow = function (eqn) {
+    var arrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    arrowPath.setAttribute('fill', 'none');
+    arrowPath.setAttribute('stroke', 'black');
+    arrowPath.setAttribute('stroke-width', '40');
+    var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = '<marker id="arrowhead" markerWidth="10" markerHeight="7" refX="7.5" refY="3.5" orient="auto">  <polygon points="0 0, 10 3.5, 0 7" /></marker>';
+    this.graphObject.appendChild(defs);
+    this.graphObject.appendChild(arrowPath);
+    var _update = 0; //this.graphObject.appendChild(arrowPath);
+
+    var arrowDrawing = animejs_1.default({
+      targets: arrowPath,
+      //strokeDashoffset: [anime.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: 50000,
+      begin: function begin(anim) {//pathElement[0].setAttribute('stroke', 'black');
+        //pathElement[0].setAttribute('fill', 'none');
+      },
+      complete: function complete(anim) {//document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      update: function update(anim) {
+        _update += 0.01;
+        var scaleX = 100;
+        var scaleY = 100;
+        arrowPath.setAttribute('x1', "" + 0);
+        arrowPath.setAttribute('x2', "" + scaleX * eqn(_update) * Math.cos(_update));
+        arrowPath.setAttribute('y1', "" + 0);
+        arrowPath.setAttribute('y2', "" + scaleY * eqn(_update) * Math.sin(_update));
+        arrowPath.setAttribute('marker-end', 'url(#arrowhead)'); //document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  };
+
+  return GraphParametric2D;
+}();
+
+exports.GraphParametric2D = GraphParametric2D;
+
+function createParametericSVGPath(xeqn, yeqn, parameterRange, stepSize) {
+  if (parameterRange === void 0) {
+    parameterRange = [0, 2 * Math.PI];
+  }
+
+  if (stepSize === void 0) {
+    stepSize = 0.001;
+  }
+
+  var pathElements = 1000;
+  stepSize = (parameterRange[1] - parameterRange[0]) / pathElements;
+  var minX = parameterRange[0];
+  var scaleX = 100;
+  var scaleY = 100;
+  var SVG_path = "M" + scaleX * xeqn(minX) + "," + scaleY * yeqn(minX);
+
+  for (var parameter = parameterRange[0]; parameter < parameterRange[1]; parameter += stepSize) {
+    // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
+    SVG_path = SVG_path.concat(" L" + scaleX * xeqn(parameter) + "," + scaleY * yeqn(parameter));
+  }
+
+  return SVG_path;
+}
+
+exports.createParametericSVGPath = createParametericSVGPath;
+
+function create2DParametricGraph(xeqn, yeqn, parameterRange, x, y, width_svg, height_svg) {
+  if (parameterRange === void 0) {
+    parameterRange = [0, 2 * Math.PI];
+  }
+
+  if (x === void 0) {
+    x = 10;
+  }
+
+  if (y === void 0) {
+    y = 10;
+  }
+
+  if (width_svg === void 0) {
+    width_svg = 300;
+  }
+
+  if (height_svg === void 0) {
+    height_svg = 300;
+  }
+
+  var _object = new GraphParametric2D(xeqn, yeqn, parameterRange, x, y, width_svg, height_svg);
+
+  return _object;
+}
+
+exports.create2DParametricGraph = create2DParametricGraph;
+},{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/transform":"lib/Scene/transform.ts"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
 "use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
@@ -41733,11 +41953,13 @@ exports.transform = void 0;
 
 var graph_1 = require("../Geometry/graph");
 
+var parametric_1 = require("../Geometry/parametric");
+
 var polar_1 = require("../Geometry/polar");
 
 var controls_1 = require("./controls");
 
-function transform(object_init, object_finl, startTime, endTime) {
+function transform(objectInit, objectFinl, startTime, endTime) {
   if (startTime === void 0) {
     startTime = 0;
   }
@@ -41750,35 +41972,17 @@ function transform(object_init, object_finl, startTime, endTime) {
   var timeDuration = (endTime - startTime) * 1000;
   var delayDuration = startTime * 1000;
 
-  if (object_init.writeTexElement && object_finl.writeTexElement) {//TeX transformation
-  } else if (object_init.writeTextElement && object_finl.writeTextElement) {} else if (object_init.graphObject && object_finl.graphContainer) {
-    if (object_finl.thetaRange) {
+  if (objectInit.writeTexElement && objectFinl.writeTexElement) {//TeX transformation
+  } else if (objectInit.writeTextElement && objectFinl.writeTextElement) {} else if (objectInit.graphObject && objectFinl.graphContainer) {
+    if (objectFinl.thetaRange) {
       //console.log('polar');
-      var svgPath = polar_1.createPolarSVGPath(object_finl.eqn); // let viewBoxValue = {
-      //   A: 0,
-      //   B: '0%',
-      //   C: 0,
-      //   D: 0
-      // };
-
+      var svgPath = polar_1.createPolarSVGPath(objectFinl.eqn, objectFinl.thetaRange);
       controls_1.animationTimeline.add({
-        targets: object_init.graphContainer.elt.querySelectorAll('path'),
+        targets: objectInit.graphContainer.elt.querySelectorAll('path'),
         d: [//{value: shapes[0].d},
         {
           value: "" + svgPath
         }],
-        // update: function() {
-        //   object_init.graphObject.setAttribute(
-        //     'viewBox',
-        //     JSON.stringify(viewBoxValue)
-        //   );
-        // },
-        // complete: function (anim) {
-        //   object_init.graphObject.setAttribute(
-        //     'viewBox',
-        //     '-8500 -2000 18000 4000'
-        //   );
-        // },
         duration: timeDuration,
         //direction: 'alternate',
         autoplay: true,
@@ -41786,13 +41990,29 @@ function transform(object_init, object_finl, startTime, endTime) {
         //loop: true
 
       }, delayDuration);
-    } else if (!object_finl.thetaRange) {
-      //console.log('non-polar');
+    } else if (objectFinl.parameterRange) {
+      console.log('parametric');
+      var svgPath = parametric_1.createParametericSVGPath(objectFinl.xeqn, objectFinl.yeqn, objectFinl.parameterRange);
       controls_1.animationTimeline.add({
-        targets: object_init.graphContainer.elt.querySelectorAll('path'),
+        targets: objectInit.graphContainer.elt.querySelectorAll('path'),
         d: [//{value: shapes[0].d},
         {
-          value: "" + graph_1.createSVGPath(object_finl.eqn)
+          value: "" + svgPath
+        }],
+        duration: timeDuration,
+        //direction: 'alternate',
+        autoplay: true,
+        easing: 'easeInOutCubic' //elasticity: 1
+        //loop: true
+
+      }, delayDuration);
+    } else if (!objectFinl.thetaRange && !objectFinl.parameterRange) {
+      //console.log('non-polar');
+      controls_1.animationTimeline.add({
+        targets: objectInit.graphContainer.elt.querySelectorAll('path'),
+        d: [//{value: shapes[0].d},
+        {
+          value: "" + graph_1.createSVGPath(objectFinl.eqn)
         }],
         duration: timeDuration,
         //direction: 'alternate',
@@ -41802,13 +42022,13 @@ function transform(object_init, object_finl, startTime, endTime) {
 
       }, delayDuration);
     } //console.log('inside transform');
-    //console.log(`${object_finl.eqn}`);
+    //console.log(`${objectFinl.eqn}`);
 
   }
 }
 
 exports.transform = transform;
-},{"../Geometry/graph":"lib/Geometry/graph.ts","../Geometry/polar":"lib/Geometry/polar.ts","./controls":"lib/Scene/controls.ts"}],"lib/Scene/group.ts":[function(require,module,exports) {
+},{"../Geometry/graph":"lib/Geometry/graph.ts","../Geometry/parametric":"lib/Geometry/parametric.ts","../Geometry/polar":"lib/Geometry/polar.ts","./controls":"lib/Scene/controls.ts"}],"lib/Scene/group.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41946,6 +42166,11 @@ var polar_1 = require("./lib/Geometry/polar");
 global.GraphPolar2D = polar_1.GraphPolar2D;
 global.create2DPolarGraph = polar_1.create2DPolarGraph;
 
+var parametric_1 = require("./lib/Geometry/parametric");
+
+global.GraphParametric2D = parametric_1.GraphParametric2D;
+global.create2DParametricGraph = parametric_1.create2DParametricGraph;
+
 var controls_1 = require("./lib/Scene/controls");
 
 global.sceneTime = controls_1.sceneTime;
@@ -41958,7 +42183,7 @@ var group_1 = require("./lib/Scene/group");
 
 global.Group = group_1.Group;
 global.createGroup = group_1.createGroup;
-},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts","./lib/Geometry/polar":"lib/Geometry/polar.ts","./lib/Scene/controls":"lib/Scene/controls.ts","./lib/Scene/group":"lib/Scene/group.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./lib/Scene/scene":"lib/Scene/scene.ts","./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/shift":"lib/Scene/shift.ts","./lib/Scene/scale":"lib/Scene/scale.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts","./lib/Geometry/polar":"lib/Geometry/polar.ts","./lib/Geometry/parametric":"lib/Geometry/parametric.ts","./lib/Scene/controls":"lib/Scene/controls.ts","./lib/Scene/group":"lib/Scene/group.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -41986,7 +42211,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49292" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52201" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
