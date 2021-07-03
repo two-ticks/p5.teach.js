@@ -103,14 +103,24 @@ export function createTeX(...args: any[]) {
     svgWidth: args[3],
     svgHeight: args[4]
   };
+  if (
+    !(typeof _texArg.svgWidth == 'undefined' || typeof _texArg.svgWidth == 'number')
+  ) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (!(typeof _texArg.svgWidth == 'undefined') && _texArg.svgWidth < 0) {
+    //size
+    throw new Error('width of tex should be greater than zero!');
+  }
 
-  // _tex: string,
-  // x: number = 10,
-  // y: number = 10,
-  // svgWidth: number = 300,
-  // svgHeight: number = 300
-
-  // const object = new TeX(_tex, x, y, svgWidth, svgHeight);
-  // return object;
+  if (
+    !(typeof _texArg.svgHeight == 'undefined' || typeof _texArg.svgHeight == 'number')
+  ) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (!(typeof _texArg.svgHeight == 'undefined') && _texArg.svgHeight < 0) {
+    //size
+    throw new Error('height of tex should be greater than zero!');
+  }
   return new TeX(_texArg);
 }
