@@ -45,6 +45,14 @@ global.GraphPolar2D = GraphPolar2D;
 global.create2DPolarGraph = create2DPolarGraph;
 
 import {
+  GraphParametric2D,
+  create2DParametricGraph
+} from './lib/Geometry/parametric';
+
+global.GraphParametric2D = GraphParametric2D;
+global.create2DParametricGraph = create2DParametricGraph;
+
+import {
   sceneTime,
   createControls,
   pauseScene,

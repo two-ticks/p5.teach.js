@@ -3,12 +3,13 @@
 //import anime from 'animejs';
 import * as config from '../config.js';
 import { createSVGPath } from '../Geometry/graph';
+import { createParametericSVGPath } from '../Geometry/parametric';
 import { createPolarSVGPath } from '../Geometry/polar';
 import { animationTimeline } from './controls';
 
 export function transform(
-  object_init: any,
-  object_finl: any,
+  objectInit: any,
+  objectFinl: any,
   startTime: number = 0,
   endTime = 2
 ) {
@@ -16,39 +17,23 @@ export function transform(
   const timeDuration = (endTime - startTime) * 1000;
   const delayDuration = startTime * 1000;
 
-  if (object_init.writeTexElement && object_finl.writeTexElement) {
+  if (objectInit.writeTexElement && objectFinl.writeTexElement) {
     //TeX transformation
-  } else if (object_init.writeTextElement && object_finl.writeTextElement) {
-  } else if (object_init.graphObject && object_finl.graphContainer) {
-    if (object_finl.thetaRange) {
+  } else if (objectInit.writeTextElement && objectFinl.writeTextElement) {
+  } else if (objectInit.graphObject && objectFinl.graphContainer) {
+    if (objectFinl.thetaRange) {
       //console.log('polar');
 
-      let svgPath = createPolarSVGPath(object_finl.eqn);
-      // let viewBoxValue = {
-      //   A: 0,
-      //   B: '0%',
-      //   C: 0,
-      //   D: 0
-      // };
+      let svgPath = createPolarSVGPath(objectFinl.eqn, objectFinl.thetaRange);
+
       animationTimeline.add(
         {
-          targets: object_init.graphContainer.elt.querySelectorAll('path'),
+          targets: objectInit.graphContainer.elt.querySelectorAll('path'),
           d: [
             //{value: shapes[0].d},
             { value: `${svgPath}` }
           ],
-          // update: function() {
-          //   object_init.graphObject.setAttribute(
-          //     'viewBox',
-          //     JSON.stringify(viewBoxValue)
-          //   );
-          // },
-          // complete: function (anim) {
-          //   object_init.graphObject.setAttribute(
-          //     'viewBox',
-          //     '-8500 -2000 18000 4000'
-          //   );
-          // },
+
           duration: timeDuration,
           //direction: 'alternate',
           autoplay: true,
@@ -58,15 +43,37 @@ export function transform(
         },
         delayDuration
       );
-    } else if (!object_finl.thetaRange) {
+    }else if (objectFinl.parameterRange) {
+      console.log('parametric');
+
+      let svgPath = createParametericSVGPath(objectFinl.xeqn, objectFinl.yeqn, objectFinl.parameterRange);
+
+      animationTimeline.add(
+        {
+          targets: objectInit.graphContainer.elt.querySelectorAll('path'),
+          d: [
+            //{value: shapes[0].d},
+            { value: `${svgPath}` }
+          ],
+
+          duration: timeDuration,
+          //direction: 'alternate',
+          autoplay: true,
+          easing: 'easeInOutCubic'
+          //elasticity: 1
+          //loop: true
+        },
+        delayDuration
+      );
+    } else if (!objectFinl.thetaRange && !objectFinl.parameterRange) {
       //console.log('non-polar');
 
       animationTimeline.add(
         {
-          targets: object_init.graphContainer.elt.querySelectorAll('path'),
+          targets: objectInit.graphContainer.elt.querySelectorAll('path'),
           d: [
             //{value: shapes[0].d},
-            { value: `${createSVGPath(object_finl.eqn)}` }
+            { value: `${createSVGPath(objectFinl.eqn)}` }
           ],
           duration: timeDuration,
           //direction: 'alternate',
@@ -79,6 +86,6 @@ export function transform(
       );
     }
     //console.log('inside transform');
-    //console.log(`${object_finl.eqn}`);
+    //console.log(`${objectFinl.eqn}`);
   }
 }
