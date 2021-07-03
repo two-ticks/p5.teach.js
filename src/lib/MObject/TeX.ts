@@ -99,5 +99,26 @@ export function createTeX(
     svgWidth: args[3],
     svgHeight: args[4]
   };
+  
+  if (
+    !(typeof _texArg.svgWidth == 'undefined' || typeof _texArg.svgWidth == 'number')
+  ) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (!(typeof _texArg.svgWidth == 'undefined') && _texArg.svgWidth < 0) {
+    //size
+    throw new Error('width of tex should be greater than zero!');
+  }
+
+  if (
+    !(typeof _texArg.svgHeight == 'undefined' || typeof _texArg.svgHeight == 'number')
+  ) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (!(typeof _texArg.svgHeight == 'undefined') && _texArg.svgHeight < 0) {
+    //size
+    throw new Error('height of tex should be greater than zero!');
+  }
+
   return new TeX(_texArg);
 }
