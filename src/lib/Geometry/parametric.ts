@@ -10,8 +10,8 @@ export class GraphParametric2D {
   graphContainer: any;
   x: number;
   y: number;
-  width_svg: number;
-  height_svg: number;
+  svgWidth: number;
+  svgHeight: number;
   linePath: SVGPathElement;
 
   constructor(
@@ -20,16 +20,16 @@ export class GraphParametric2D {
     parameterRange: number[] = [0, 2 * Math.PI],
     x: number = 10,
     y: number = 10,
-    width_svg: number = 300,
-    height_svg: number = 300
+    svgWidth: number = 300,
+    svgHeight: number = 300
   ) {
     this.xeqn = xeqn;
     this.yeqn = yeqn;
     this.parameterRange = parameterRange;
     this.x = x;
     this.y = y;
-    this.width_svg = width_svg;
-    this.height_svg = height_svg;
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
     this.pathData = createParametricSVGPath(xeqn, yeqn, parameterRange);
     this.graphContainer = createElement('div');
     this.linePath = document.createElementNS(
@@ -46,7 +46,10 @@ export class GraphParametric2D {
     this.y = y;
     this.graphContainer.position(this.x, this.y);
   }
-  size(sizePx: number) {}
+  size(svgWidth: number = 300, svgHeight: number = 300) {
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
+  }
   stroke(_stroke: any) {
     this.linePath.setAttribute('stroke', `${_stroke}`);
   }
@@ -56,8 +59,8 @@ export class GraphParametric2D {
       'svg'
     );
     //this.graphObject.setAttribute('style', `translate(-50%, -50%)`);
-    this.graphObject.setAttribute('width', `${this.width_svg}`);
-    this.graphObject.setAttribute('height', `${this.height_svg}`);
+    this.graphObject.setAttribute('width', `${this.svgWidth}`);
+    this.graphObject.setAttribute('height', `${this.svgHeight}`);
     this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
     this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.linePath.setAttribute('d', this.pathData);
@@ -176,8 +179,8 @@ export function create2DParametricGraph(
   parameterRange: number[] = [0, 2 * Math.PI],
   x: number = 10,
   y: number = 10,
-  width_svg: number = 300,
-  height_svg: number = 300
+  svgWidth: number = 300,
+  svgHeight: number = 300
 ) {
   const _object = new GraphParametric2D(
     xeqn,
@@ -185,8 +188,8 @@ export function create2DParametricGraph(
     parameterRange,
     x,
     y,
-    width_svg,
-    height_svg
+    svgWidth,
+    svgHeight
   );
   return _object;
 }

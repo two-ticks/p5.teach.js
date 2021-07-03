@@ -41305,7 +41305,7 @@ var transform_1 = require("../Scene/transform");
 var Graph2D =
 /** @class */
 function () {
-  function Graph2D(eqn, x, y, width_svg, height_svg) {
+  function Graph2D(eqn, x, y, svgWidth, svgHeight) {
     if (x === void 0) {
       x = 10;
     }
@@ -41314,19 +41314,19 @@ function () {
       y = 10;
     }
 
-    if (width_svg === void 0) {
-      width_svg = 300;
+    if (svgWidth === void 0) {
+      svgWidth = 300;
     }
 
-    if (height_svg === void 0) {
-      height_svg = 300;
+    if (svgHeight === void 0) {
+      svgHeight = 300;
     }
 
     this.eqn = eqn;
     this.x = x;
     this.y = y;
-    this.width_svg = width_svg;
-    this.height_svg = height_svg;
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
     this.pathData = createSVGPath(eqn);
     this.graphContainer = createElement('div'); //attaching it to sceneContainer
 
@@ -41403,8 +41403,8 @@ function () {
 
   Graph2D.prototype.plot = function () {
     this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    this.graphObject.setAttribute('width', "" + this.width_svg);
-    this.graphObject.setAttribute('height', "" + this.height_svg);
+    this.graphObject.setAttribute('width', "" + this.svgWidth);
+    this.graphObject.setAttribute('height', "" + this.svgHeight);
     this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
     this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.linePath.setAttribute('d', this.pathData);
@@ -41478,7 +41478,7 @@ function createSVGPath(eqn, minX, maxX, stepSize) {
 
 exports.createSVGPath = createSVGPath;
 
-function create2DGraph(eqn, x, y, width_svg, height_svg) {
+function create2DGraph(eqn, x, y, svgWidth, svgHeight) {
   if (x === void 0) {
     x = 10;
   }
@@ -41487,17 +41487,16 @@ function create2DGraph(eqn, x, y, width_svg, height_svg) {
     y = 10;
   }
 
-  if (width_svg === void 0) {
-    width_svg = 300;
+  if (svgWidth === void 0) {
+    svgWidth = 300;
   }
 
-  if (height_svg === void 0) {
-    height_svg = 300;
-  }
+  if (svgHeight === void 0) {
+    svgHeight = 300;
+  } //const _object =
 
-  var _object = new Graph2D(eqn, x, y, width_svg, height_svg);
 
-  return _object;
+  return new Graph2D(eqn, x, y, svgWidth, svgHeight);
 }
 
 exports.create2DGraph = create2DGraph;
@@ -41522,7 +41521,7 @@ var transform_1 = require("../Scene/transform");
 var GraphParametric2D =
 /** @class */
 function () {
-  function GraphParametric2D(xeqn, yeqn, parameterRange, x, y, width_svg, height_svg) {
+  function GraphParametric2D(xeqn, yeqn, parameterRange, x, y, svgWidth, svgHeight) {
     if (parameterRange === void 0) {
       parameterRange = [0, 2 * Math.PI];
     }
@@ -41535,12 +41534,12 @@ function () {
       y = 10;
     }
 
-    if (width_svg === void 0) {
-      width_svg = 300;
+    if (svgWidth === void 0) {
+      svgWidth = 300;
     }
 
-    if (height_svg === void 0) {
-      height_svg = 300;
+    if (svgHeight === void 0) {
+      svgHeight = 300;
     }
 
     this.xeqn = xeqn;
@@ -41548,8 +41547,8 @@ function () {
     this.parameterRange = parameterRange;
     this.x = x;
     this.y = y;
-    this.width_svg = width_svg;
-    this.height_svg = height_svg;
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
     this.pathData = createParametricSVGPath(xeqn, yeqn, parameterRange);
     this.graphContainer = createElement('div');
     this.linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -41569,7 +41568,18 @@ function () {
     this.graphContainer.position(this.x, this.y);
   };
 
-  GraphParametric2D.prototype.size = function (sizePx) {};
+  GraphParametric2D.prototype.size = function (svgWidth, svgHeight) {
+    if (svgWidth === void 0) {
+      svgWidth = 300;
+    }
+
+    if (svgHeight === void 0) {
+      svgHeight = 300;
+    }
+
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
+  };
 
   GraphParametric2D.prototype.stroke = function (_stroke) {
     this.linePath.setAttribute('stroke', "" + _stroke);
@@ -41578,8 +41588,8 @@ function () {
   GraphParametric2D.prototype.plot = function () {
     this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); //this.graphObject.setAttribute('style', `translate(-50%, -50%)`);
 
-    this.graphObject.setAttribute('width', "" + this.width_svg);
-    this.graphObject.setAttribute('height', "" + this.height_svg);
+    this.graphObject.setAttribute('width', "" + this.svgWidth);
+    this.graphObject.setAttribute('height', "" + this.svgHeight);
     this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
     this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.linePath.setAttribute('d', this.pathData);
@@ -41692,7 +41702,7 @@ function createParametricSVGPath(xeqn, yeqn, parameterRange, stepSize) {
 
 exports.createParametricSVGPath = createParametricSVGPath;
 
-function create2DParametricGraph(xeqn, yeqn, parameterRange, x, y, width_svg, height_svg) {
+function create2DParametricGraph(xeqn, yeqn, parameterRange, x, y, svgWidth, svgHeight) {
   if (parameterRange === void 0) {
     parameterRange = [0, 2 * Math.PI];
   }
@@ -41705,15 +41715,15 @@ function create2DParametricGraph(xeqn, yeqn, parameterRange, x, y, width_svg, he
     y = 10;
   }
 
-  if (width_svg === void 0) {
-    width_svg = 300;
+  if (svgWidth === void 0) {
+    svgWidth = 300;
   }
 
-  if (height_svg === void 0) {
-    height_svg = 300;
+  if (svgHeight === void 0) {
+    svgHeight = 300;
   }
 
-  var _object = new GraphParametric2D(xeqn, yeqn, parameterRange, x, y, width_svg, height_svg);
+  var _object = new GraphParametric2D(xeqn, yeqn, parameterRange, x, y, svgWidth, svgHeight);
 
   return _object;
 }
@@ -42199,7 +42209,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59599" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64216" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

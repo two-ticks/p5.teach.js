@@ -10,22 +10,22 @@ export class Graph2D {
   graphContainer: any;
   x: number;
   y: number;
-  width_svg: number;
-  height_svg: number;
+  svgWidth: number;
+  svgHeight: number;
   linePath: SVGPathElement;
 
   constructor(
     eqn: any,
     x: number = 10,
     y: number = 10,
-    width_svg: number = 300,
-    height_svg: number = 300
+    svgWidth: number = 300,
+    svgHeight: number = 300
   ) {
     this.eqn = eqn;
     this.x = x;
     this.y = y;
-    this.width_svg = width_svg;
-    this.height_svg = height_svg;
+    this.svgWidth = svgWidth;
+    this.svgHeight = svgHeight;
     this.pathData = createSVGPath(eqn);
     this.graphContainer = createElement('div'); //attaching it to sceneContainer
     this.graphContainer.parent(sceneContainer);
@@ -82,8 +82,8 @@ export class Graph2D {
       'http://www.w3.org/2000/svg',
       'svg'
     );
-    this.graphObject.setAttribute('width', `${this.width_svg}`);
-    this.graphObject.setAttribute('height', `${this.height_svg}`);
+    this.graphObject.setAttribute('width', `${this.svgWidth}`);
+    this.graphObject.setAttribute('height', `${this.svgHeight}`);
     this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
     this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
@@ -141,9 +141,9 @@ export function create2DGraph(
   eqn: any,
   x: number = 10,
   y: number = 10,
-  width_svg: number = 300,
-  height_svg: number = 300
+  svgWidth: number = 300,
+  svgHeight: number = 300
 ) {
-  const _object = new Graph2D(eqn, x, y, width_svg, height_svg);
-  return _object;
+  //const _object =
+  return new Graph2D(eqn, x, y, svgWidth, svgHeight);
 }
