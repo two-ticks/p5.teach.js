@@ -1,4 +1,6 @@
+import p5 from 'p5';
 import TeXToSVG from 'tex-to-svg';
+import { TexObject } from '../interfaces';
 import { play } from '../Scene/play';
 
 //TODO : add test cases
@@ -27,30 +29,30 @@ import { play } from '../Scene/play';
  * @experimental
  */
 export class TeX {
-  writeTexElement: any;
+  writeTexElement!: p5.Element;
   svgEquation: any;
   //startTime: number; // left for later decision -> need not specify such details at initialisation
   x: number = 10;
   y: number = 10;
   svgWidth: number;
   svgHeight: number;
-  sentence: string;
+  _tex: string;
   fillColor: p5.Color;
   strokeWidth: number;
   strokeColor: p5.Color;
-  constructor(
-    sentence: string,
-    x: number = 10,
-    y: number = 10,
-    svgWidth: number = 300,
-    svgHeight: number = 300
-  ) {
+  constructor({
+    _tex,
+    x = 10,
+    y = 10,
+    svgWidth = 300,
+    svgHeight = 300
+  }: TexObject) {
     this.x = x;
     this.y = y;
-    this.sentence = sentence;
+    this._tex = _tex;
     this.svgWidth = svgWidth;
     this.svgHeight = svgHeight;
-    this.svgEquation = TeXToSVG(sentence);
+    this.svgEquation = TeXToSVG(_tex);
     this.fillColor = color('black');
     this.strokeWidth = 0;
     this.strokeColor = color('black');
@@ -88,12 +90,14 @@ export class TeX {
 }
 
 export function createTeX(
-  sentence: string,
-  x: number = 10,
-  y: number = 10,
-  svgWidth: number = 300,
-  svgHeight: number = 300
+  ...args: any[]
 ) {
-  const object = new TeX(sentence, x, y, svgWidth, svgHeight);
-  return object;
+  const _texArg: TexObject = {
+    _tex: args[0],
+    x: args[1],
+    y: args[2],
+    svgWidth: args[3],
+    svgHeight: args[4]
+  };
+  return new TeX(_texArg);
 }

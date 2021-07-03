@@ -4,7 +4,6 @@ import { transform } from '../Scene/transform';
 export class GraphParametric2D {
   xeqn: any;
   yeqn: any;
-
   parameterRange: number[];
   pathData: any;
   graphObject: any;
@@ -31,7 +30,7 @@ export class GraphParametric2D {
     this.y = y;
     this.width_svg = width_svg;
     this.height_svg = height_svg;
-    this.pathData = createParametericSVGPath(xeqn, yeqn, parameterRange);
+    this.pathData = createParametricSVGPath(xeqn, yeqn, parameterRange);
     this.graphContainer = createElement('div');
     this.linePath = document.createElementNS(
       'http://www.w3.org/2000/svg',
@@ -69,8 +68,8 @@ export class GraphParametric2D {
   remove() {
     this.graphContainer.elt.removeChild(this.graphObject);
   }
-  update(xeqn: any, yeqn : any) {
-    this.pathData = createParametericSVGPath(xeqn, yeqn);;
+  update(xeqn: any, yeqn: any) {
+    this.pathData = createParametricSVGPath(xeqn, yeqn);
     this.linePath.setAttribute('d', this.pathData);
   }
   transform(object_finl: any, startTime: number = 0, endTime: number = 2) {
@@ -145,7 +144,7 @@ export class GraphParametric2D {
   }
 }
 
-export function createParametericSVGPath(
+export function createParametricSVGPath(
   xeqn: any,
   yeqn: any,
   parameterRange: number[] = [0, 2 * Math.PI],

@@ -38595,32 +38595,25 @@ var play_1 = require("../Scene/play"); //TODO : add test cases
 var TeX =
 /** @class */
 function () {
-  function TeX(sentence, x, y, svgWidth, svgHeight) {
-    if (x === void 0) {
-      x = 10;
-    }
-
-    if (y === void 0) {
-      y = 10;
-    }
-
-    if (svgWidth === void 0) {
-      svgWidth = 300;
-    }
-
-    if (svgHeight === void 0) {
-      svgHeight = 300;
-    } //startTime: number; // left for later decision -> need not specify such details at initialisation
-
+  function TeX(_a) {
+    var _tex = _a._tex,
+        _b = _a.x,
+        x = _b === void 0 ? 10 : _b,
+        _c = _a.y,
+        y = _c === void 0 ? 10 : _c,
+        _d = _a.svgWidth,
+        svgWidth = _d === void 0 ? 300 : _d,
+        _e = _a.svgHeight,
+        svgHeight = _e === void 0 ? 300 : _e; //startTime: number; // left for later decision -> need not specify such details at initialisation
 
     this.x = 10;
     this.y = 10;
     this.x = x;
     this.y = y;
-    this.sentence = sentence;
+    this._tex = _tex;
     this.svgWidth = svgWidth;
     this.svgHeight = svgHeight;
-    this.svgEquation = tex_to_svg_1.default(sentence);
+    this.svgEquation = tex_to_svg_1.default(_tex);
     this.fillColor = color('black');
     this.strokeWidth = 0;
     this.strokeColor = color('black');
@@ -38685,25 +38678,21 @@ function () {
 
 exports.TeX = TeX;
 
-function createTeX(sentence, x, y, svgWidth, svgHeight) {
-  if (x === void 0) {
-    x = 10;
+function createTeX() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
   }
 
-  if (y === void 0) {
-    y = 10;
-  }
-
-  if (svgWidth === void 0) {
-    svgWidth = 300;
-  }
-
-  if (svgHeight === void 0) {
-    svgHeight = 300;
-  }
-
-  var object = new TeX(sentence, x, y, svgWidth, svgHeight);
-  return object;
+  var _texArg = {
+    _tex: args[0],
+    x: args[1],
+    y: args[2],
+    svgWidth: args[3],
+    svgHeight: args[4]
+  };
+  return new TeX(_texArg);
 }
 
 exports.createTeX = createTeX;
@@ -41524,7 +41513,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create2DParametricGraph = exports.createParametericSVGPath = exports.GraphParametric2D = void 0;
+exports.create2DParametricGraph = exports.createParametricSVGPath = exports.GraphParametric2D = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
@@ -41561,7 +41550,7 @@ function () {
     this.y = y;
     this.width_svg = width_svg;
     this.height_svg = height_svg;
-    this.pathData = createParametericSVGPath(xeqn, yeqn, parameterRange);
+    this.pathData = createParametricSVGPath(xeqn, yeqn, parameterRange);
     this.graphContainer = createElement('div');
     this.linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     this.linePath.setAttribute('fill', 'none');
@@ -41603,8 +41592,7 @@ function () {
   };
 
   GraphParametric2D.prototype.update = function (xeqn, yeqn) {
-    this.pathData = createParametericSVGPath(xeqn, yeqn);
-    ;
+    this.pathData = createParametricSVGPath(xeqn, yeqn);
     this.linePath.setAttribute('d', this.pathData);
   };
 
@@ -41678,7 +41666,7 @@ function () {
 
 exports.GraphParametric2D = GraphParametric2D;
 
-function createParametericSVGPath(xeqn, yeqn, parameterRange, stepSize) {
+function createParametricSVGPath(xeqn, yeqn, parameterRange, stepSize) {
   if (parameterRange === void 0) {
     parameterRange = [0, 2 * Math.PI];
   }
@@ -41702,7 +41690,7 @@ function createParametericSVGPath(xeqn, yeqn, parameterRange, stepSize) {
   return SVG_path;
 }
 
-exports.createParametericSVGPath = createParametericSVGPath;
+exports.createParametricSVGPath = createParametricSVGPath;
 
 function create2DParametricGraph(xeqn, yeqn, parameterRange, x, y, width_svg, height_svg) {
   if (parameterRange === void 0) {
@@ -41991,8 +41979,8 @@ function transform(objectInit, objectFinl, startTime, endTime) {
 
       }, delayDuration);
     } else if (objectFinl.parameterRange) {
-      console.log('parametric');
-      var svgPath = parametric_1.createParametericSVGPath(objectFinl.xeqn, objectFinl.yeqn, objectFinl.parameterRange);
+      //console.log('parametric');
+      var svgPath = parametric_1.createParametricSVGPath(objectFinl.xeqn, objectFinl.yeqn, objectFinl.parameterRange);
       controls_1.animationTimeline.add({
         targets: objectInit.graphContainer.elt.querySelectorAll('path'),
         d: [//{value: shapes[0].d},
@@ -42211,7 +42199,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52201" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59599" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

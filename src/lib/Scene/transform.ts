@@ -3,7 +3,7 @@
 //import anime from 'animejs';
 import * as config from '../config.js';
 import { createSVGPath } from '../Geometry/graph';
-import { createParametericSVGPath } from '../Geometry/parametric';
+import { createParametricSVGPath } from '../Geometry/parametric';
 import { createPolarSVGPath } from '../Geometry/polar';
 import { animationTimeline } from './controls';
 
@@ -43,10 +43,14 @@ export function transform(
         },
         delayDuration
       );
-    }else if (objectFinl.parameterRange) {
-      console.log('parametric');
+    } else if (objectFinl.parameterRange) {
+      //console.log('parametric');
 
-      let svgPath = createParametericSVGPath(objectFinl.xeqn, objectFinl.yeqn, objectFinl.parameterRange);
+      let svgPath = createParametricSVGPath(
+        objectFinl.xeqn,
+        objectFinl.yeqn,
+        objectFinl.parameterRange
+      );
 
       animationTimeline.add(
         {

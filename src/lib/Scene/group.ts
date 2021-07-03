@@ -43,8 +43,6 @@ export class Group {
       }
     }
 
-
-
     args[0].forEach(parentDiv);
   }
   scale(scaleFactor) {

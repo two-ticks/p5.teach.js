@@ -10,8 +10,8 @@ export let animationTimeline = anime.timeline({
 
 export function createControls() {
   let p5Canvas = document
-      .getElementsByClassName('p5Canvas')[0]
-      .getBoundingClientRect();
+    .getElementsByClassName('p5Canvas')[0]
+    .getBoundingClientRect();
   let controlsDiv = document.createElement('div');
   controlsDiv.setAttribute('class', 'controls');
   document.body.appendChild(controlsDiv);

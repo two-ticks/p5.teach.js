@@ -65,7 +65,7 @@ export class GraphPolar2D {
   remove() {
     this.graphContainer.elt.removeChild(this.graphObject);
   }
-  
+
   transform(object_finl: any, startTime: number = 0, endTime: number = 2) {
     transform(this, object_finl, startTime, endTime);
   }
@@ -144,7 +144,7 @@ export function createPolarSVGPath(
   stepSize: number = 0.001
 ) {
   const pathElements = 1000;
-  stepSize = (thetaRange[1]-thetaRange[0])/pathElements; 
+  stepSize = (thetaRange[1] - thetaRange[0]) / pathElements;
 
   let minX = 0;
   let scaleX = 100;

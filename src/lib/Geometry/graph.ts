@@ -87,7 +87,6 @@ export class Graph2D {
     this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
     this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
-
     this.linePath.setAttribute('d', this.pathData);
     this.graphObject.appendChild(this.linePath);
     this.graphContainer.elt.appendChild(this.graphObject);
@@ -128,7 +127,7 @@ export function createSVGPath(
   stepSize: number = 0.001
 ) {
   const pathElements = 1000;
-  stepSize = (maxX-minX)/pathElements; 
+  stepSize = (maxX - minX) / pathElements;
   //minX = 0;
   let SVG_path = `M${1000 * minX},${eqn(minX)}`;
   for (let x = minX; x < maxX; x += stepSize) {
