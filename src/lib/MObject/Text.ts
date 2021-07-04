@@ -27,13 +27,20 @@ export class Text {
     this.fillColor = color('black');
   }
 
-  position(x: number, y: number = 10) {
-    this.x = x;
-    this.y = y;
-    //this.writeTextElement.position(this.x, this.y);
+  position(x: number = 10, y: number = 10) {
+    if (arguments.length === 0) {
+      return [this.x, this.y];
+    } else {
+      this.x = x;
+      this.y = y;
+    }
   }
-  size(_size: number) {
-    this._size = _size; //font-size
+  size(_size: number = 28) {
+    if (arguments.length === 0) {
+      return this._size; //font-size
+    } else {
+      this._size = _size; //font-size
+    }
   }
 
   //TODO : fix stroke - currently only -webkit supported
@@ -54,7 +61,7 @@ export class Text {
   //   }
   // }
 
-  fill(fillColor: p5.Color) {
+  fill(fillColor: p5.Color = color('black')) {
     if (arguments.length === 0) {
       return this.fillColor;
     } else {

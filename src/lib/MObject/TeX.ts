@@ -59,16 +59,24 @@ export class TeX {
   }
 
   position(x: number = 10, y: number = 10) {
-    this.x = x;
-    this.y = y;
+    if (arguments.length === 0) {
+      return [this.x, this.y];
+    } else {
+      this.x = x;
+      this.y = y;
+    }
   }
 
   size(svgWidth: number = 300, svgHeight: number = 300) {
-    this.svgWidth = svgWidth;
-    this.svgHeight = svgHeight;
+    if (arguments.length === 0) {
+      return [this.svgWidth, this.svgHeight];
+    } else {
+      this.svgWidth = svgWidth;
+      this.svgHeight = svgHeight;
+    }
   }
 
-  fill(fillColor: p5.Color) {
+  fill(fillColor: p5.Color = color('black')) {
     if (arguments.length === 0) {
       return this.fillColor;
     } else {
@@ -104,21 +112,33 @@ export function createTeX(...args: any[]) {
     svgHeight: args[4]
   };
   if (
-    !(typeof _texArg.svgWidth == 'undefined' || typeof _texArg.svgWidth == 'number')
+    !(
+      typeof _texArg.svgWidth == 'undefined' ||
+      typeof _texArg.svgWidth == 'number'
+    )
   ) {
     //size
     throw new Error('size must be passed as number');
-  } else if (!(typeof _texArg.svgWidth == 'undefined') && _texArg.svgWidth < 0) {
+  } else if (
+    !(typeof _texArg.svgWidth == 'undefined') &&
+    _texArg.svgWidth < 0
+  ) {
     //size
     throw new Error('width of tex should be greater than zero!');
   }
 
   if (
-    !(typeof _texArg.svgHeight == 'undefined' || typeof _texArg.svgHeight == 'number')
+    !(
+      typeof _texArg.svgHeight == 'undefined' ||
+      typeof _texArg.svgHeight == 'number'
+    )
   ) {
     //size
     throw new Error('size must be passed as number');
-  } else if (!(typeof _texArg.svgHeight == 'undefined') && _texArg.svgHeight < 0) {
+  } else if (
+    !(typeof _texArg.svgHeight == 'undefined') &&
+    _texArg.svgHeight < 0
+  ) {
     //size
     throw new Error('height of tex should be greater than zero!');
   }
