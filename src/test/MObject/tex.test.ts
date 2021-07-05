@@ -2,7 +2,6 @@
  * @jest-environment jsdom
  */
 
-import p5 from 'p5';
 import { createTeX } from '../../lib/MObject/TeX'; 
 
 global.color = require('color');
@@ -61,22 +60,27 @@ it('position without argument should return width, height', () => {
   expect(tex.position()).toEqual([10, 20]);
 });
 
-it.skip('play should be called', () => {
+it('play should be called', () => {
   const tex = createTeX('2^2');
-  const spy = jest.spyOn(tex, 'play');
+  const spy = jest.spyOn(tex, 'play').mockImplementation(()=>{});
   tex.play();
   expect(spy).toHaveBeenCalled();
-  //expect(tex.position()).toEqual([10, 20]);
 });
 
-// global.createDiv = function(html) {return createDiv(html)};
-
-it.skip('add should be called', () => {
+it('add should be called', () => {
   const tex = createTeX('2^2');
-  const element = createDiv();
-  global.createDiv = function(html){return element}
-  const spy = jest.spyOn(tex, 'add');
+
+  //const element = createDiv();
+  //global.createDiv = function(html){return element}
+
+  const spy = jest.spyOn(tex, 'add').mockImplementation(()=>{});
   tex.add();
   expect(spy).toHaveBeenCalled();
-  //expect(tex.position()).toEqual([10, 20]);
+});
+
+it('remove should be called', () => {
+  const tex = createTeX('2^2');
+  const spy = jest.spyOn(tex, 'remove').mockImplementation(()=>{});
+  tex.remove();
+  expect(spy).toHaveBeenCalled();
 });
