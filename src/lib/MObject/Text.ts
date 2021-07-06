@@ -1,30 +1,30 @@
 import { TextObject } from '../interfaces';
 import { add } from '../Scene/add';
 import { play } from '../Scene/play';
+import { MObject } from './MObject';
 
-export class Text {
-  writeTextElement!: p5.Element; //to be used by play function
+export class Text extends MObject{
+  //writeElement!: p5.Element; //to be used by play function
   //to be used by play function
   //textWrapper: any; //to be used by play function
   _text: string;
-  x: number;
-  y: number;
+  // x: number;
+  // y: number;
 
   _size: number; //px
   // strokeColor: string;
   // strokeWidth: number;
-  fillColor: p5.Color;
+  //fillColor: p5.Color;
 
   constructor({ _text, x = 10, y = 10, _size = 28 }: TextObject) {
-    this.x = x;
-    this.y = y;
+    super(x, y);
     this._text = _text;
     this._size = _size;
     //console.log('me', this._size);
 
     // this.strokeColor = 'black';
     // this._strokeWidth = 10;
-    this.fillColor = color('black');
+    //this.fillColor = color('black');
   }
 
   position(x: number = 10, y: number = 10) {
@@ -71,11 +71,11 @@ export class Text {
 
   remove() {
     //TODO : should throw error if called on object which has not been added
-    this.writeTextElement.remove();
+    this.writeElement.remove();
   }
   add() {
     add(this);
-    this.writeTextElement.style('opacity', '1');
+    this.writeElement.style('opacity', '1');
   }
   play(
     animationType: string = 'write',

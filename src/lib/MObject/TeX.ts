@@ -2,6 +2,7 @@ import TeXToSVG from 'tex-to-svg';
 import { TexObject } from '../interfaces';
 import { add } from '../Scene/add';
 import { play } from '../Scene/play';
+import { MObject } from './MObject';
 
 //TODO : add test cases
 
@@ -28,16 +29,14 @@ import { play } from '../Scene/play';
  * ```
  * @experimental
  */
-export class TeX {
-  writeTexElement!: p5.Element;
+export class TeX extends MObject {
   svgEquation: string;
   //startTime: number; // left for later decision -> need not specify such details at initialisation
-  x: number = 10;
-  y: number = 10;
+
   svgWidth: number;
   svgHeight: number;
   _tex: string;
-  fillColor: p5.Color;
+  
   strokeWidth: number;
   strokeColor: p5.Color;
   constructor({
@@ -47,13 +46,11 @@ export class TeX {
     svgWidth = 300,
     svgHeight = 300
   }: TexObject) {
-    this.x = x;
-    this.y = y;
+    super(x, y);
     this._tex = _tex;
     this.svgWidth = svgWidth;
     this.svgHeight = svgHeight;
-    this.svgEquation = TeXToSVG(_tex);
-    this.fillColor = color('black');
+    this.svgEquation = TeXToSVG(_tex);   
     this.strokeWidth = 0;
     this.strokeColor = color('black');
   }
@@ -86,7 +83,7 @@ export class TeX {
 
   remove() {
     //TODO : should throw error if called on object which has not been added
-    this.writeTexElement.remove();
+    this.writeElement.remove();
   }
 
   add() {
