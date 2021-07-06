@@ -8,7 +8,7 @@ it('createText should return a object of class Text', () => {
   expect(createText('text')).toEqual({
     x: 10,
     y: 10,
-    _text: 'text',
+    sentence: 'text',
     _size: 28,
     fillColor: { model: 'rgb', color: [0, 0, 0], valpha: 1 }
   });
@@ -54,21 +54,21 @@ it('position without argument should return width, height', () => {
 
 it('play should be called', () => {
   const text = createText('2^2');
-  const spy = jest.spyOn(text, 'play').mockImplementation(()=>{});
+  const spy = jest.spyOn(text, 'play').mockImplementation(() => {});
   text.play();
   expect(spy).toHaveBeenCalled();
 });
 
 it('add should be called', () => {
   const text = createText('text');
-  const spy = jest.spyOn(text, 'add').mockImplementation(()=>{});
+  const spy = jest.spyOn(text, 'add').mockImplementation(() => {});
   text.add();
   expect(spy).toHaveBeenCalled();
 });
 
 it('remove should be called', () => {
   const text = createText('text');
-  const spy = jest.spyOn(text, 'remove').mockImplementation(()=>{});
+  const spy = jest.spyOn(text, 'remove').mockImplementation(() => {});
   text.remove();
   expect(spy).toHaveBeenCalled();
 });
