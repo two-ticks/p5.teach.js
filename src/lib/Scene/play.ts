@@ -64,7 +64,7 @@ export function play(
   // timeDuration = 1000 * timeDuration; //sec to ms
 
   // if (timeDuration == 0) {
-  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
+  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object.sentence.length; //for text
   // }
 
   if (object instanceof TeX) {
@@ -182,7 +182,7 @@ function writeAnimatorText(
       translateZ: 0,
       easing: 'easeOutExpo',
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / (object._text.length + 1)) //time duration must be replaced with delay
+      delay: anime.stagger(timeDuration / (object.sentence.length + 1)) //time duration must be replaced with delay
     },
     delayDuration
   );
@@ -207,7 +207,7 @@ function growFromCenterAnimatorText(
       translateZ: 0,
       easing: 'easeOutExpo',
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / (object._text.length + 1), {
+      delay: anime.stagger(timeDuration / (object.sentence.length + 1), {
         from: 'center'
       }) //time duration must be replaced with delay
     },
@@ -229,7 +229,7 @@ function eraseAnimatorText(
       easing: 'easeInOutCubic',
       duration: timeDuration,
       //delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY),
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
       //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
     },
     delayDuration
@@ -259,7 +259,7 @@ function dissolveAnimatorText(
       //translateZ: 0,
       easing: 'easeInExpo',
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
       //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
       //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
     },
@@ -290,7 +290,7 @@ function spinOutAnimatorText(
       duration: timeDuration,
       //delay: (el, i) => CONFIG.PLAY.SPINOUT_STAGGERING_DELAY * i,
       //delay: anime.stagger(CONFIG.PLAY.SPINOUT_STAGGERING_DELAY)
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
     },
     delayDuration
   );
@@ -312,7 +312,7 @@ function waveOutAnimatorText(
       opacity: [1, 0.5, 0.1, 0],
       scale: [1, 0.2, 0],
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
       //delay: anime.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY)
       //delay: (el, i) => CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY * i
     },
@@ -337,7 +337,7 @@ function waveInAnimatorText(
       translateZ: 0,
 
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
       //delay: anime.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY)
       //delay: (el, i) => CONFIG.PLAY.WAVEIN_STAGGERING_DELAY * i
     },
@@ -403,11 +403,11 @@ function writeAnimatorTeX(
         g[0].setAttribute('stroke-width', '10px');
       },
       complete: function (anim) {
-        g[0].setAttribute('fill', 'black');
+        g[0].setAttribute('fill', object.fillColor.toString());
       },
       easing: 'easeInOutCubic',
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / (object._tex.length + 1))
+      delay: anime.stagger(timeDuration / (object.sentence.length + 1))
       //delay: anime.stagger(400)
     },
     delayDuration
@@ -468,7 +468,7 @@ function allAtOnceAnimatorTeX(
         pathEl.setAttribute('stroke', `${object.strokeColor}`);
         pathEl.setAttribute('fill', 'none');
         g[0].setAttribute('fill', 'none');
-        g[0].setAttribute('stroke-width', `${object.strokeWidth}px`);
+        g[0].setAttribute('stroke-width', `${object._strokeWidth}px`);
       },
       complete: function (anim) {
         pathEl.setAttribute('fill', `${object.fillColor}`);

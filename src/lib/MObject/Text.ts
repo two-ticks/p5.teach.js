@@ -7,18 +7,18 @@ export class Text extends MObject{
   //writeElement!: p5.Element; //to be used by play function
   //to be used by play function
   //textWrapper: any; //to be used by play function
-  _text: string;
+  //sentence: string;
   // x: number;
   // y: number;
 
-  _size: number; //px
+  _size: number; //px -> font size
   // strokeColor: string;
   // strokeWidth: number;
   //fillColor: p5.Color;
 
   constructor({ _text, x = 10, y = 10, _size = 28 }: TextObject) {
-    super(x, y);
-    this._text = _text;
+    super(_text, x, y);
+    //this._text = _text;
     this._size = _size;
     //console.log('me', this._size);
 

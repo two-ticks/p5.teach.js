@@ -32,12 +32,11 @@ import { MObject } from './MObject';
 export class TeX extends MObject {
   svgEquation: string;
   //startTime: number; // left for later decision -> need not specify such details at initialisation
-
+  //_tex: string;
+  
   svgWidth: number;
   svgHeight: number;
-  _tex: string;
-  
-  strokeWidth: number;
+  _strokeWidth: number;
   strokeColor: p5.Color;
   constructor({
     _tex,
@@ -46,12 +45,12 @@ export class TeX extends MObject {
     svgWidth = 300,
     svgHeight = 300
   }: TexObject) {
-    super(x, y);
-    this._tex = _tex;
+    super(_tex, x, y);
+    //this._tex = _tex;
     this.svgWidth = svgWidth;
     this.svgHeight = svgHeight;
-    this.svgEquation = TeXToSVG(_tex);   
-    this.strokeWidth = 0;
+    this.svgEquation = TeXToSVG(_tex);
+    this._strokeWidth = 8;
     this.strokeColor = color('black');
   }
 
@@ -70,6 +69,21 @@ export class TeX extends MObject {
     } else {
       this.svgWidth = svgWidth;
       this.svgHeight = svgHeight;
+    }
+  }
+
+  stroke(strokeColor: p5.Color = color('black')) {
+    if (arguments.length === 0) {
+      return this.strokeColor;
+    } else {
+      this.strokeColor = strokeColor;
+    }
+  }
+  strokeWidth(_strokeWidth: number = 8) {
+    if (arguments.length === 0) {
+      return this._strokeWidth;
+    } else {
+      this._strokeWidth = _strokeWidth;
     }
   }
 
