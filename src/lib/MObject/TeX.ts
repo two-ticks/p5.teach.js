@@ -30,7 +30,7 @@ import { play } from '../Scene/play';
  */
 export class TeX {
   writeTexElement!: p5.Element;
-  svgEquation: string | undefined;
+  svgEquation: string;
   //startTime: number; // left for later decision -> need not specify such details at initialisation
   x: number = 10;
   y: number = 10;
