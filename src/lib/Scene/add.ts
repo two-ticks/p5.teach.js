@@ -11,7 +11,7 @@ export function add(object: Text | TeX) {
     svg[0].setAttribute('height', `${object.svgHeight}px`);
     g[0].setAttribute('stroke', object.strokeColor);
     g[0].setAttribute('stroke-width', object._strokeWidth);
-    
+
     svg[0].setAttribute('fill', object.fillColor.toString());
 
     // g[0].setAttribute('fill', 'none');

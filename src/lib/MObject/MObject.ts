@@ -1,5 +1,5 @@
 export class MObject {
-  writeElement!: p5.Element; // <div> for animation 
+  writeElement!: p5.Element; // <div> for animation
   sentence: string; //input string as tex or text
   x: number = 10;
   y: number = 10;

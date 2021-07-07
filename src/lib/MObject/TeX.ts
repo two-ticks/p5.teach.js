@@ -33,7 +33,7 @@ export class TeX extends MObject {
   svgEquation: string;
   //startTime: number; // left for later decision -> need not specify such details at initialisation
   //_tex: string;
-  
+
   svgWidth: number;
   svgHeight: number;
   _strokeWidth: number;

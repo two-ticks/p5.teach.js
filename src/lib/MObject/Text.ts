@@ -3,7 +3,7 @@ import { add } from '../Scene/add';
 import { play } from '../Scene/play';
 import { MObject } from './MObject';
 
-export class Text extends MObject{
+export class Text extends MObject {
   //writeElement!: p5.Element; //to be used by play function
   //to be used by play function
   //textWrapper: any; //to be used by play function
