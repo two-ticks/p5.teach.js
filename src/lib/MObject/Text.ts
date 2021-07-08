@@ -61,11 +61,11 @@ export class Text extends MObject {
   //   }
   // }
 
-  fill(fillColor: p5.Color = color('black')) {
+  fill(fillColor: any = color('black')) {
     if (arguments.length === 0) {
       return this.fillColor;
     } else {
-      this.fillColor = fillColor;
+      this.fillColor = color(fillColor);
     }
   }
 

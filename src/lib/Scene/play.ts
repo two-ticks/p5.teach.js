@@ -393,7 +393,7 @@ function writeAnimatorTeX(
     {
       targets: object.writeElement.elt.querySelectorAll('path'),
       //scale: [4, 1],
-      fill: [color(object.fillColor).toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
+      fill: [object.fillColor.toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
       //stroke : "black",     //TODO : customisable through config
       //stroke-width: "10px", //customisable through config
       strokeDashoffset: [anime.setDashoffset, 0],
@@ -424,7 +424,7 @@ function growFromCenterAnimatorTeX(
     {
       targets: object.writeElement.elt.querySelectorAll('path'),
       //scale: [4, 1],
-      fill: [color(object.fillColor).toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
+      fill: [object.fillColor.toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
       //stroke : "black",     //TODO : customisable through config
       //stroke-width: "10px", //customisable through config
       strokeDashoffset: [anime.setDashoffset, 0],
@@ -465,14 +465,14 @@ function allAtOnceAnimatorTeX(
       duration: timeDuration,
       delay: anime.stagger(1000, { direction: 'normal' }), //customisable through config
       begin: function (anim) {
-        pathEl.setAttribute('stroke', `${object.strokeColor}`);
+        pathEl.setAttribute('stroke', `${object.strokeColor.toString()}`);
         pathEl.setAttribute('fill', 'none');
         g[0].setAttribute('fill', 'none');
         g[0].setAttribute('stroke-width', `${object._strokeWidth}px`);
       },
       complete: function (anim) {
-        pathEl.setAttribute('fill', `${object.fillColor}`);
-        g[0].setAttribute('fill', `${object.fillColor}`);
+        pathEl.setAttribute('fill', `${object.fillColor.toString()}`);
+        g[0].setAttribute('fill', `${object.fillColor.toString()}`);
       },
       autoplay: true
     });

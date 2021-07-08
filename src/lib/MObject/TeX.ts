@@ -72,11 +72,11 @@ export class TeX extends MObject {
     }
   }
 
-  stroke(strokeColor: p5.Color = color('black')) {
+  stroke(strokeColor: any = color('black')) {
     if (arguments.length === 0) {
       return this.strokeColor;
     } else {
-      this.strokeColor = strokeColor;
+      this.strokeColor = color(strokeColor);
     }
   }
   strokeWidth(_strokeWidth: number = 8) {
@@ -87,11 +87,11 @@ export class TeX extends MObject {
     }
   }
 
-  fill(fillColor: p5.Color = color('black')) {
+  fill(fillColor: any = color('black')) {
     if (arguments.length === 0) {
       return this.fillColor;
     } else {
-      this.fillColor = fillColor;
+      this.fillColor = color(fillColor);
     }
   }
 

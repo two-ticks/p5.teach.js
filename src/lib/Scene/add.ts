@@ -9,11 +9,12 @@ export function add(object: Text | TeX) {
     let g = object.writeElement.elt.querySelectorAll('g');
     //svg[0].setAttribute('width', `${object.svgWidth}px`);
     //svg[0].setAttribute('height', `${object.svgHeight}px`);
-    g[0].setAttribute('stroke', object.strokeColor);
+    g[0].setAttribute('stroke', object.strokeColor.toString());
     g[0].setAttribute('stroke-width', object._strokeWidth);
 
     svg[0].setAttribute('fill', object.fillColor.toString());
-    svg[0].style.fontSize = `${object._size}px`;
+    // svg[0].style.fontSize = `${object._size}px`;
+    object.writeElement.style('font-size', `${object._size}px`);
 
     // g[0].setAttribute('fill', 'none');
     // g[0].setAttribute('stroke-width', '10px');
