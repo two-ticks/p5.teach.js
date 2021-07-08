@@ -5,6 +5,11 @@ import { createText, Text } from './lib/MObject/Text';
 global.createText = createText;
 global.Text = Text;
 
+import { createTeX, TeX } from './lib/MObject/TeX';
+
+global.createTeX = createTeX;
+global.TeX = TeX;
+
 import { add } from './lib/Scene/add';
 global.add = add;
 

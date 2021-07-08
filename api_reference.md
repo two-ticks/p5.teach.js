@@ -1,5 +1,11 @@
 # API Reference
 
+## Index
+
+  - [`createText(text, x, y, font-size)`](#createtexttext-x-y-font-size)
+  - [`createTeX(tex, x, y, width, height)`](#createtextex-x-y-width-height)
+  - 
+
 ## `createText(text, x, y, font-size)`
 
 **Parameters**
@@ -19,12 +25,14 @@ let myText = createText('Cat and Dogs');
 
 **Methods**
 
-| Method                                                         | Description                      |
-| :------------------------------------------------------------- | :------------------------------- |
-| object.position(x, y)                                          | sets position of text object     |
-| object.size(font-size)                                         | sets size of text object         |
-| object.fill(fillColor)                                         | sets fill of text object         |
-| object.play("animation-type", [timeDuration], [delayDuration]) | play animation of specified type |
+| Method                                                | Description                                                             |
+| :---------------------------------------------------- | :---------------------------------------------------------------------- |
+| object.position(x, y)                                 | sets position of text object                                            |
+| object.size(font-size)                                | sets size of text object                                                |
+| object.fill(fillColor)                                | sets fill of text object                                                |
+| object.play("animation-type", [startTime], [endTime]) | play animation of specified type (startTime and endTime are in seconds) |
+| object.add()                                          | adds object to scene without animation                                  |
+| object.remove()                                       | removes object from scene without animation                             |
 
 **Example**
 
@@ -83,20 +91,25 @@ let tex = createTeX('\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}');
 
 **Methods**
 
-| Method                                                         | Description                         |
-| :------------------------------------------------------------- | :---------------------------------- |
-| object.position(x, y)                                          | sets position of tex object         |
-| object.size(width, height)                                     | sets width and height of tex object |
-| object.fill(fillColor)                                         | sets fill of tex object             |
-| object.stroke(strokeColor)                                     | sets stroke color of tex            |
-| object.strokeWidth(strokeWidth)                                | sets stroke-width of tex            |
-| object.play("animation-type", [timeDuration], [delayDuration]) | play animation of specified type    |
+| Method                                                | Description                                 |
+| :---------------------------------------------------- | :------------------------------------------ |
+| object.position(x, y)                                 | sets position of tex object                 |
+| object.size(width, height)                            | sets width and height of tex object         |
+| object.fill(fillColor)                                | sets fill of tex object                     |
+| object.stroke(strokeColor)                            | sets stroke color of tex                    |
+| object.strokeWidth(strokeWidth)                       | sets stroke-width of tex                    |
+| object.play("animation-type", [startTime], [endTime]) | play animation of specified type            |
+| object.add()                                          | adds object to scene without animation      |
+| object.remove()                                       | removes object from scene without animation |
 
 | **Animations** | Description                                               |
 | :------------- | :-------------------------------------------------------- |
 | `write`        | Writes the TeX with a blurry effect at each new character |
 | `fadeOut`      | Make a fade-out effect                                    |
 | `fadeIn`       | Make a fade-in effect                                     |
+| `dissolve`     | Dissolves the tex and make it disappear from the screen   |
+| `appear`       | make it appear from the screen character by character     |
+| `blink`        | blinking tex                                              |
 
 **Example**
 
