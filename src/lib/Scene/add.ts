@@ -7,12 +7,13 @@ export function add(object: Text | TeX) {
     object.writeElement = createDiv(object.svgEquation);
     let svg = object.writeElement.elt.querySelectorAll('svg');
     let g = object.writeElement.elt.querySelectorAll('g');
-    svg[0].setAttribute('width', `${object.svgWidth}px`);
-    svg[0].setAttribute('height', `${object.svgHeight}px`);
+    //svg[0].setAttribute('width', `${object.svgWidth}px`);
+    //svg[0].setAttribute('height', `${object.svgHeight}px`);
     g[0].setAttribute('stroke', object.strokeColor);
     g[0].setAttribute('stroke-width', object._strokeWidth);
 
     svg[0].setAttribute('fill', object.fillColor.toString());
+    svg[0].style.fontSize = `${object._size}px`;
 
     // g[0].setAttribute('fill', 'none');
     // g[0].setAttribute('stroke-width', '10px');

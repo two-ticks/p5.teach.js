@@ -34,21 +34,22 @@ export class TeX extends MObject {
   //startTime: number; // left for later decision -> need not specify such details at initialisation
   //_tex: string;
 
-  svgWidth: number;
-  svgHeight: number;
+  //_size: number; //px -> font size
+  // svgWidth: number;
+  // svgHeight: number;
   _strokeWidth: number;
   strokeColor: p5.Color;
   constructor({
     _tex,
     x = 10,
     y = 10,
-    svgWidth = 300,
-    svgHeight = 300
+    _size = 28
   }: TexObject) {
-    super(_tex, x, y);
+    super(_tex, x, y,_size);
     //this._tex = _tex;
-    this.svgWidth = svgWidth;
-    this.svgHeight = svgHeight;
+    // this._size = _size; //px
+    // this.svgWidth = svgWidth;
+    // this.svgHeight = svgHeight;
     this.svgEquation = TeXToSVG(_tex);
     this._strokeWidth = 8;
     this.strokeColor = color('black');
@@ -63,12 +64,11 @@ export class TeX extends MObject {
     }
   }
 
-  size(svgWidth: number = 300, svgHeight: number = 300) {
+  size(_size: number = 28) {
     if (arguments.length === 0) {
-      return [this.svgWidth, this.svgHeight];
+      return this._size;
     } else {
-      this.svgWidth = svgWidth;
-      this.svgHeight = svgHeight;
+      this._size = _size;
     }
   }
 
@@ -119,39 +119,16 @@ export function createTeX(...args: any[]) {
     _tex: args[0],
     x: args[1],
     y: args[2],
-    svgWidth: args[3],
-    svgHeight: args[4]
+    _size: args[3]
   };
   if (
-    !(
-      typeof _texArg.svgWidth == 'undefined' ||
-      typeof _texArg.svgWidth == 'number'
-    )
+    !(typeof _texArg._size == 'undefined' || typeof _texArg._size == 'number')
   ) {
     //size
     throw new Error('size must be passed as number');
-  } else if (
-    !(typeof _texArg.svgWidth == 'undefined') &&
-    _texArg.svgWidth < 0
-  ) {
+  } else if (!(typeof _texArg._size == 'undefined') && _texArg._size < 0) {
     //size
-    throw new Error('width of tex should be greater than zero!');
-  }
-
-  if (
-    !(
-      typeof _texArg.svgHeight == 'undefined' ||
-      typeof _texArg.svgHeight == 'number'
-    )
-  ) {
-    //size
-    throw new Error('size must be passed as number');
-  } else if (
-    !(typeof _texArg.svgHeight == 'undefined') &&
-    _texArg.svgHeight < 0
-  ) {
-    //size
-    throw new Error('height of tex should be greater than zero!');
+    throw new Error('size of text should be a whole number!');
   }
   return new TeX(_texArg);
 }

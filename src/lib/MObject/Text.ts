@@ -11,15 +11,15 @@ export class Text extends MObject {
   // x: number;
   // y: number;
 
-  _size: number; //px -> font size
+  
   // strokeColor: string;
   // strokeWidth: number;
   //fillColor: p5.Color;
 
   constructor({ _text, x = 10, y = 10, _size = 28 }: TextObject) {
-    super(_text, x, y);
+    super(_text, x, y, _size);
     //this._text = _text;
-    this._size = _size;
+    
     //console.log('me', this._size);
 
     // this.strokeColor = 'black';

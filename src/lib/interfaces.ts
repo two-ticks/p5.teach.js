@@ -9,6 +9,5 @@ export interface TexObject {
   _tex: string;
   x?: number;
   y?: number;
-  svgWidth?: number;
-  svgHeight?: number;
+  _size?: number;
 }
