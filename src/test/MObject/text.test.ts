@@ -44,7 +44,7 @@ it('size without argument should return size in px', () => {
   expect(text.size()).toEqual(200);
 });
 
-it('position without argument should return width, height', () => {
+it('position without argument should return x, y', () => {
   const text = createText('text', 10, 20, 200, 500);
   const spy = jest.spyOn(text, 'position');
   text.position();
