@@ -64,13 +64,13 @@ export function play(
   // timeDuration = 1000 * timeDuration; //sec to ms
 
   // if (timeDuration == 0) {
-  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
+  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object.sentence.length; //for text
   // }
 
   if (object instanceof TeX) {
     //adding element before animation
     console.log('TeX');
-    if (!object.writeTexElement) {
+    if (!object.writeElement) {
       add(object);
     }
     //tex animations
@@ -79,25 +79,25 @@ export function play(
       console.log('writing');
 
       //write(object, timeDuration);
-      // object.writeTexElement = createDiv(object.SVGEquation);
-      // let svg = object.writeTexElement.elt.querySelectorAll('svg');
+      // object.writeElement = createDiv(object.SVGEquation);
+      // let svg = object.writeElement.elt.querySelectorAll('svg');
       // svg[0].setAttribute('width', `${object.width_svg}px`);
       // svg[0].setAttribute('height', `${object.height_svg}px`);
-      // const g = object.writeTexElement.elt.querySelectorAll('g');
+      // const g = object.writeElement.elt.querySelectorAll('g');
       // // g[0].setAttribute('fill', 'none');
       // // g[0].setAttribute('stroke-width', '10px');
-      // object.writeTexElement.position(object.x, object.y);
-      //const pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+      // object.writeElement.position(object.x, object.y);
+      //const pathEls = object.writeElement.elt.querySelectorAll('path'); //nodelist
 
       writeAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'allAtOnce') {
       //object.all_at_once(timeDuration);
-      // object.writeTexElement = createDiv(object.SVGEquation);
-      // let svg = object.writeTexElement.elt.querySelectorAll('svg');
+      // object.writeElement = createDiv(object.SVGEquation);
+      // let svg = object.writeElement.elt.querySelectorAll('svg');
       // svg[0].setAttribute('width', `${object.width_svg}px`);
       // svg[0].setAttribute('height', `${object.height_svg}px`);
 
-      // object.writeTexElement.position(object.x, object.y);
+      // object.writeElement.position(object.x, object.y);
       allAtOnceAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'growFromCenter') {
       console.log('growFromCenter');
@@ -123,12 +123,12 @@ export function play(
   }
   //Text animation
   else if (object instanceof Text) {
-    if (!object.writeTextElement) {
+    if (!object.writeElement) {
       add(object);
     }
 
     console.log('Text');
-    object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
+    object.writeElement.style('opacity', '1'); //make it visible else it will not appear
 
     if (animationType == 'write') {
       console.log(object);
@@ -173,16 +173,16 @@ function writeAnimatorText(
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
   //
-  object.writeTextElement.style('opacity', '1');
+  object.writeElement.style('opacity', '1');
   animationTimeline.add(
     {
-      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      targets: object.writeElement.elt.querySelectorAll('.letter'),
       scale: [CONFIG.PLAY.WRITE_SCALE, 1],
       opacity: [0, 1],
       translateZ: 0,
       easing: 'easeOutExpo',
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / (object._text.length + 1)) //time duration must be replaced with delay
+      delay: anime.stagger(timeDuration / (object.sentence.length + 1)) //time duration must be replaced with delay
     },
     delayDuration
   );
@@ -198,16 +198,18 @@ function growFromCenterAnimatorText(
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
   //
-  object.writeTextElement.style('opacity', '1');
+  object.writeElement.style('opacity', '1');
   animationTimeline.add(
     {
-      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      targets: object.writeElement.elt.querySelectorAll('.letter'),
       scale: [CONFIG.PLAY.WRITE_SCALE, 1],
       opacity: [0, 1],
       translateZ: 0,
       easing: 'easeOutExpo',
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / (object._text.length + 1), {from: 'center'}) //time duration must be replaced with delay
+      delay: anime.stagger(timeDuration / (object.sentence.length + 1), {
+        from: 'center'
+      }) //time duration must be replaced with delay
     },
     delayDuration
   );
@@ -220,14 +222,14 @@ function eraseAnimatorText(
 ) {
   animationTimeline.add(
     {
-      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      targets: object.writeElement.elt.querySelectorAll('.letter'),
       scale: [CONFIG.PLAY.ERASE_SCALE, 1],
       opacity: [1, 0],
       //translateZ: 0,
       easing: 'easeInOutCubic',
       duration: timeDuration,
       //delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY),
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
       //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
     },
     delayDuration
@@ -241,7 +243,7 @@ function dissolveAnimatorText(
 ) {
   animationTimeline.add(
     {
-      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      targets: object.writeElement.elt.querySelectorAll('.letter'),
       opacity: [
         1,
         random(0.5, 0.9),
@@ -257,7 +259,7 @@ function dissolveAnimatorText(
       //translateZ: 0,
       easing: 'easeInExpo',
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
       //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
       //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
     },
@@ -269,23 +271,26 @@ function spinOutAnimatorText(
   timeDuration: number,
   delayDuration: string | number
 ) {
-  //object.writeTextElement.style('overflow', 'hidden');
+  //object.writeElement.style('overflow', 'hidden');
   animationTimeline.add(
     {
-      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      targets: object.writeElement.elt.querySelectorAll('.letter'),
       //translateY: [0,'1em'],
       rotateX: 360, //360deg
       opacity: [0.5, , 0],
       begin: function (anim) {
-        object.writeTextElement.elt
+        object.writeElement.elt
           .querySelectorAll('.letter')
-          .forEach((el: { style: { display: string; }; }) => (el.style.display = 'inline-block'));
+          .forEach(
+            (el: { style: { display: string } }) =>
+              (el.style.display = 'inline-block')
+          );
       },
       //scale :[1,0],
       duration: timeDuration,
       //delay: (el, i) => CONFIG.PLAY.SPINOUT_STAGGERING_DELAY * i,
       //delay: anime.stagger(CONFIG.PLAY.SPINOUT_STAGGERING_DELAY)
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
     },
     delayDuration
   );
@@ -295,19 +300,19 @@ function waveOutAnimatorText(
   timeDuration: number,
   delayDuration: string | number
 ) {
-  object.writeTextElement.elt
+  object.writeElement.elt
     .querySelectorAll('.letter')
     .forEach((el: any) => (el.style.display = 'inline-block'));
-  //object.writeTextElement.style('overflow', 'hidden');
+  //object.writeElement.style('overflow', 'hidden');
   animationTimeline.add(
     {
-      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      targets: object.writeElement.elt.querySelectorAll('.letter'),
       translateY: [0, CONFIG.PLAY.WAVEOUT_TRANSLATEY],
       translateZ: 0,
       opacity: [1, 0.5, 0.1, 0],
       scale: [1, 0.2, 0],
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
       //delay: anime.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY)
       //delay: (el, i) => CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY * i
     },
@@ -322,17 +327,17 @@ function waveInAnimatorText(
   animationTimeline.add(
     {
       begin: function (anim) {
-        object.writeTextElement.elt
+        object.writeElement.elt
           .querySelectorAll('.letter')
           .forEach((el: any) => (el.style.display = 'inline-block'));
-        object.writeTextElement.style('overflow', 'hidden');
+        object.writeElement.style('overflow', 'hidden');
       },
-      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      targets: object.writeElement.elt.querySelectorAll('.letter'),
       translateY: [CONFIG.PLAY.WAVEIN_TRANSLATEY, 0],
       translateZ: 0,
 
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / object._text.length)
+      delay: anime.stagger(timeDuration / object.sentence.length)
       //delay: anime.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY)
       //delay: (el, i) => CONFIG.PLAY.WAVEIN_STAGGERING_DELAY * i
     },
@@ -346,7 +351,7 @@ function fadeOutAnimatorText(
 ) {
   animationTimeline.add(
     {
-      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      targets: object.writeElement.elt.querySelectorAll('.letter'),
       //scale: [4, 1],
       opacity: [1, 0],
       //translateZ: 0,
@@ -365,7 +370,7 @@ function fadeInAnimatorText(
 ) {
   animationTimeline.add(
     {
-      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      targets: object.writeElement.elt.querySelectorAll('.letter'),
       //scale: [4, 1],
       opacity: [0, 1],
       //translateZ: 0,
@@ -383,10 +388,10 @@ function writeAnimatorTeX(
   timeDuration: number,
   delayDuration: string | number
 ) {
-  const g = object.writeTexElement.elt.querySelectorAll('g');
+  const g = object.writeElement.elt.querySelectorAll('g');
   animationTimeline.add(
     {
-      targets: object.writeTexElement.elt.querySelectorAll('path'),
+      targets: object.writeElement.elt.querySelectorAll('path'),
       //scale: [4, 1],
       fill: [color(object.fillColor).toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
       //stroke : "black",     //TODO : customisable through config
@@ -398,11 +403,11 @@ function writeAnimatorTeX(
         g[0].setAttribute('stroke-width', '10px');
       },
       complete: function (anim) {
-        g[0].setAttribute('fill', 'black');
+        g[0].setAttribute('fill', object.fillColor.toString());
       },
       easing: 'easeInOutCubic',
       duration: timeDuration,
-      delay: anime.stagger(timeDuration / (object._tex.length + 1))
+      delay: anime.stagger(timeDuration / (object.sentence.length + 1))
       //delay: anime.stagger(400)
     },
     delayDuration
@@ -414,10 +419,10 @@ function growFromCenterAnimatorTeX(
   timeDuration: number,
   delayDuration: string | number
 ) {
-  const g = object.writeTexElement.elt.querySelectorAll('g');
+  const g = object.writeElement.elt.querySelectorAll('g');
   animationTimeline.add(
     {
-      targets: object.writeTexElement.elt.querySelectorAll('path'),
+      targets: object.writeElement.elt.querySelectorAll('path'),
       //scale: [4, 1],
       fill: [color(object.fillColor).toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
       //stroke : "black",     //TODO : customisable through config
@@ -445,8 +450,8 @@ function allAtOnceAnimatorTeX(
   timeDuration: number,
   delayDuration: string | number
 ) {
-  const g = object.writeTexElement.elt.querySelectorAll('g');
-  const pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+  const g = object.writeElement.elt.querySelectorAll('g');
+  const pathEls = object.writeElement.elt.querySelectorAll('path'); //nodelist
 
   for (var i = 0; i < pathEls.length; i++) {
     var pathEl = pathEls[i];
@@ -463,7 +468,7 @@ function allAtOnceAnimatorTeX(
         pathEl.setAttribute('stroke', `${object.strokeColor}`);
         pathEl.setAttribute('fill', 'none');
         g[0].setAttribute('fill', 'none');
-        g[0].setAttribute('stroke-width', `${object.strokeWidth}px`);
+        g[0].setAttribute('stroke-width', `${object._strokeWidth}px`);
       },
       complete: function (anim) {
         pathEl.setAttribute('fill', `${object.fillColor}`);
@@ -480,14 +485,14 @@ function fadeInAnimatorTeX(
 ) {
   animationTimeline.add(
     {
-      targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-      //targets: object.writeTexElement.elt.querySelectorAll('path'),
+      targets: object.writeElement.elt.querySelectorAll('svg'), //simple fadeIn
+      //targets: object.writeElement.elt.querySelectorAll('path'),
       //scale: [4, 1],
       opacity: [0, 1],
       //translateZ: 0,
       easing: 'easeOutExpo',
       complete: function (anim) {
-        object.writeTexElement.style('opacity', '1'); //clear all stray elements
+        object.writeElement.style('opacity', '1'); //clear all stray elements
       },
       duration: timeDuration,
       delay: anime.stagger(180)
@@ -504,14 +509,14 @@ function appearAnimatorTeX(
 ) {
   animationTimeline.add(
     {
-      //targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-      targets: object.writeTexElement.elt.querySelectorAll('path'),
+      //targets: object.writeElement.elt.querySelectorAll('svg'), //simple fadeIn
+      targets: object.writeElement.elt.querySelectorAll('path'),
       //scale: [4, 1],
       opacity: [0, 1],
       //translateZ: 0,
       easing: 'easeOutExpo',
       complete: function (anim) {
-        object.writeTexElement.style('opacity', '1'); //clear all stray elements
+        object.writeElement.style('opacity', '1'); //clear all stray elements
       },
       duration: timeDuration,
       delay: anime.stagger(180, { start: 1000, direction: 'normal' })
@@ -527,14 +532,14 @@ function dissolveAnimatorTeX(
 ) {
   animationTimeline.add(
     {
-      //targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-      targets: object.writeTexElement.elt.querySelectorAll('path'),
+      //targets: object.writeElement.elt.querySelectorAll('svg'), //simple fadeIn
+      targets: object.writeElement.elt.querySelectorAll('path'),
       //scale: [4, 1],
       opacity: [1, 0],
       //translateZ: 0,
       easing: 'easeOutExpo',
       complete: function (anim) {
-        object.writeTexElement.style('opacity', '0'); //clear all stray elements
+        object.writeElement.style('opacity', '0'); //clear all stray elements
       },
       duration: timeDuration,
       delay: anime.stagger(180, { start: 1000 })
@@ -550,14 +555,14 @@ function fadeOutAnimatorTeX(
 ) {
   animationTimeline.add(
     {
-      targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-      //targets: object.writeTexElement.elt.querySelectorAll('path'),
+      targets: object.writeElement.elt.querySelectorAll('svg'), //simple fadeIn
+      //targets: object.writeElement.elt.querySelectorAll('path'),
       //scale: [4, 1],
       opacity: [1, 0],
       //translateZ: 0,
       easing: 'easeOutExpo',
       complete: function (anim) {
-        object.writeTexElement.style('opacity', '0'); //clear all stray elements
+        object.writeElement.style('opacity', '0'); //clear all stray elements
       },
       duration: timeDuration,
       delay: anime.stagger(180, { start: 1000 })
@@ -573,8 +578,8 @@ function blinkAnimatorTeX(
 ) {
   animationTimeline.add(
     {
-      targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-      //targets: object.writeTexElement.elt.querySelectorAll('path'),
+      targets: object.writeElement.elt.querySelectorAll('svg'), //simple fadeIn
+      //targets: object.writeElement.elt.querySelectorAll('path'),
       //scale: [4, 1],
       opacity: [0, 1, 0],
       //translateZ: 0,

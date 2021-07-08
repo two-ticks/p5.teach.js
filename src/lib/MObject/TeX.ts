@@ -2,6 +2,7 @@ import TeXToSVG from 'tex-to-svg';
 import { TexObject } from '../interfaces';
 import { add } from '../Scene/add';
 import { play } from '../Scene/play';
+import { MObject } from './MObject';
 
 //TODO : add test cases
 
@@ -28,17 +29,14 @@ import { play } from '../Scene/play';
  * ```
  * @experimental
  */
-export class TeX {
-  writeTexElement!: p5.Element;
+export class TeX extends MObject {
   svgEquation: string;
   //startTime: number; // left for later decision -> need not specify such details at initialisation
-  x: number = 10;
-  y: number = 10;
+  //_tex: string;
+
   svgWidth: number;
   svgHeight: number;
-  _tex: string;
-  fillColor: p5.Color;
-  strokeWidth: number;
+  _strokeWidth: number;
   strokeColor: p5.Color;
   constructor({
     _tex,
@@ -47,14 +45,12 @@ export class TeX {
     svgWidth = 300,
     svgHeight = 300
   }: TexObject) {
-    this.x = x;
-    this.y = y;
-    this._tex = _tex;
+    super(_tex, x, y);
+    //this._tex = _tex;
     this.svgWidth = svgWidth;
     this.svgHeight = svgHeight;
     this.svgEquation = TeXToSVG(_tex);
-    this.fillColor = color('black');
-    this.strokeWidth = 0;
+    this._strokeWidth = 8;
     this.strokeColor = color('black');
   }
 
@@ -76,6 +72,21 @@ export class TeX {
     }
   }
 
+  stroke(strokeColor: p5.Color = color('black')) {
+    if (arguments.length === 0) {
+      return this.strokeColor;
+    } else {
+      this.strokeColor = strokeColor;
+    }
+  }
+  strokeWidth(_strokeWidth: number = 8) {
+    if (arguments.length === 0) {
+      return this._strokeWidth;
+    } else {
+      this._strokeWidth = _strokeWidth;
+    }
+  }
+
   fill(fillColor: p5.Color = color('black')) {
     if (arguments.length === 0) {
       return this.fillColor;
@@ -86,7 +97,7 @@ export class TeX {
 
   remove() {
     //TODO : should throw error if called on object which has not been added
-    this.writeTexElement.remove();
+    this.writeElement.remove();
   }
 
   add() {

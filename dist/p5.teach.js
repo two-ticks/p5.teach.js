@@ -40281,14 +40281,14 @@ endTime //seconds // end time
   // }
   // timeDuration = 1000 * timeDuration; //sec to ms
   // if (timeDuration == 0) {
-  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object._text.length; //for text
+  //   timeDuration = CONFIG.PLAY.TIME_LENGHT_CHARACTER * object.sentence.length; //for text
   // }
 
   if (object instanceof TeX_1.TeX) {
     //adding element before animation
     console.log('TeX');
 
-    if (!object.writeTexElement) {
+    if (!object.writeElement) {
       add_1.add(object);
     } //tex animations
 
@@ -40297,25 +40297,28 @@ endTime //seconds // end time
 
     if (animationType === 'write') {
       console.log('writing'); //write(object, timeDuration);
-      // object.writeTexElement = createDiv(object.SVGEquation);
-      // let svg = object.writeTexElement.elt.querySelectorAll('svg');
+      // object.writeElement = createDiv(object.SVGEquation);
+      // let svg = object.writeElement.elt.querySelectorAll('svg');
       // svg[0].setAttribute('width', `${object.width_svg}px`);
       // svg[0].setAttribute('height', `${object.height_svg}px`);
-      // const g = object.writeTexElement.elt.querySelectorAll('g');
+      // const g = object.writeElement.elt.querySelectorAll('g');
       // // g[0].setAttribute('fill', 'none');
       // // g[0].setAttribute('stroke-width', '10px');
-      // object.writeTexElement.position(object.x, object.y);
-      //const pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+      // object.writeElement.position(object.x, object.y);
+      //const pathEls = object.writeElement.elt.querySelectorAll('path'); //nodelist
 
       writeAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'allAtOnce') {
       //object.all_at_once(timeDuration);
-      // object.writeTexElement = createDiv(object.SVGEquation);
-      // let svg = object.writeTexElement.elt.querySelectorAll('svg');
+      // object.writeElement = createDiv(object.SVGEquation);
+      // let svg = object.writeElement.elt.querySelectorAll('svg');
       // svg[0].setAttribute('width', `${object.width_svg}px`);
       // svg[0].setAttribute('height', `${object.height_svg}px`);
-      // object.writeTexElement.position(object.x, object.y);
+      // object.writeElement.position(object.x, object.y);
       allAtOnceAnimatorTeX(object, timeDuration, delayDuration);
+    } else if (animationType === 'growFromCenter') {
+      console.log('growFromCenter');
+      growFromCenterAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'fadeIn') {
       console.log('fadeIn called');
       fadeInAnimatorTeX(object, timeDuration, delayDuration);
@@ -40335,16 +40338,19 @@ endTime //seconds // end time
     }
   } //Text animation
   else if (object instanceof Text_1.Text) {
-      if (!object.writeTextElement) {
+      if (!object.writeElement) {
         add_1.add(object);
       }
 
       console.log('Text');
-      object.writeTextElement.style('opacity', '1'); //make it visible else it will not appear
+      object.writeElement.style('opacity', '1'); //make it visible else it will not appear
 
       if (animationType == 'write') {
         console.log(object);
         writeAnimatorText(object, timeDuration, delayDuration);
+      } else if (animationType === 'growFromCenter') {
+        console.log('growFromCenter');
+        growFromCenterAnimatorText(object, timeDuration, delayDuration);
       } else if (animationType == 'allAtOnce') {
         console.log('all at once');
       } else if (animationType == 'fadeIn') {
@@ -40379,80 +40385,102 @@ function writeAnimatorText(object, timeDuration, delayDuration) {
   //object = object;
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
-  object.writeTextElement.style('opacity', '1');
+  //
+  object.writeElement.style('opacity', '1');
   animationTimeline.add({
-    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    targets: object.writeElement.elt.querySelectorAll('.letter'),
     scale: [CONFIG.PLAY.WRITE_SCALE, 1],
     opacity: [0, 1],
     translateZ: 0,
     easing: 'easeOutExpo',
     duration: timeDuration,
-    delay: animejs_1.default.stagger(CONFIG.PLAY.WRITE_STAGGERING_DELAY) //time duration must be replaced with delay
+    delay: animejs_1.default.stagger(timeDuration / (object.sentence.length + 1)) //time duration must be replaced with delay
+
+  }, delayDuration);
+}
+
+function growFromCenterAnimatorText(object, timeDuration, delayDuration) {
+  // console.log(object);
+  //object = object;
+  // timeDuration = timeDuration; //seconds
+  // delayDuration = delayDuration; //seconds
+  //
+  object.writeElement.style('opacity', '1');
+  animationTimeline.add({
+    targets: object.writeElement.elt.querySelectorAll('.letter'),
+    scale: [CONFIG.PLAY.WRITE_SCALE, 1],
+    opacity: [0, 1],
+    translateZ: 0,
+    easing: 'easeOutExpo',
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(timeDuration / (object.sentence.length + 1), {
+      from: 'center'
+    }) //time duration must be replaced with delay
 
   }, delayDuration);
 }
 
 function eraseAnimatorText(object, timeDuration, delayDuration) {
   animationTimeline.add({
-    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    targets: object.writeElement.elt.querySelectorAll('.letter'),
     scale: [CONFIG.PLAY.ERASE_SCALE, 1],
     opacity: [1, 0],
     //translateZ: 0,
     easing: 'easeInOutCubic',
     duration: timeDuration,
     //delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY),
-    delay: animejs_1.default.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY) //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+    delay: animejs_1.default.stagger(timeDuration / object.sentence.length) //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
 
   }, delayDuration);
 }
 
 function dissolveAnimatorText(object, timeDuration, delayDuration) {
   animationTimeline.add({
-    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    targets: object.writeElement.elt.querySelectorAll('.letter'),
     opacity: [1, random(0.5, 0.9), random(0.6, 0.8), random(0.5, 0.7), random(0.4, 0.6), random(0.6, 0.9), random(0, 0.4), random(0, 0.3), random(0, 0.2), 0],
     //translateZ: 0,
     easing: 'easeInExpo',
     duration: timeDuration,
-    delay: animejs_1.default.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY) //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+    delay: animejs_1.default.stagger(timeDuration / object.sentence.length) //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
     //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
 
   }, delayDuration);
 }
 
 function spinOutAnimatorText(object, timeDuration, delayDuration) {
-  object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
-    return el.style.display = 'inline-block';
-  }); //object.writeTextElement.style('overflow', 'hidden');
-
-  animejs_1.default.timeline({
-    loop: false
-  }).add({
-    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+  //object.writeElement.style('overflow', 'hidden');
+  animationTimeline.add({
+    targets: object.writeElement.elt.querySelectorAll('.letter'),
     //translateY: [0,'1em'],
     rotateX: 360,
     opacity: [0.5,, 0],
+    begin: function begin(anim) {
+      object.writeElement.elt.querySelectorAll('.letter').forEach(function (el) {
+        return el.style.display = 'inline-block';
+      });
+    },
     //scale :[1,0],
     duration: timeDuration,
     //delay: (el, i) => CONFIG.PLAY.SPINOUT_STAGGERING_DELAY * i,
-    delay: animejs_1.default.stagger(CONFIG.PLAY.SPINOUT_STAGGERING_DELAY, {
-      start: delayDuration
-    })
-  });
+    //delay: anime.stagger(CONFIG.PLAY.SPINOUT_STAGGERING_DELAY)
+    delay: animejs_1.default.stagger(timeDuration / object.sentence.length)
+  }, delayDuration);
 }
 
 function waveOutAnimatorText(object, timeDuration, delayDuration) {
-  object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+  object.writeElement.elt.querySelectorAll('.letter').forEach(function (el) {
     return el.style.display = 'inline-block';
-  }); //object.writeTextElement.style('overflow', 'hidden');
+  }); //object.writeElement.style('overflow', 'hidden');
 
   animationTimeline.add({
-    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    targets: object.writeElement.elt.querySelectorAll('.letter'),
     translateY: [0, CONFIG.PLAY.WAVEOUT_TRANSLATEY],
     translateZ: 0,
     opacity: [1, 0.5, 0.1, 0],
     scale: [1, 0.2, 0],
     duration: timeDuration,
-    delay: animejs_1.default.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY) //delay: (el, i) => CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY * i
+    delay: animejs_1.default.stagger(timeDuration / object.sentence.length) //delay: anime.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY)
+    //delay: (el, i) => CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY * i
 
   }, delayDuration);
 }
@@ -40460,23 +40488,24 @@ function waveOutAnimatorText(object, timeDuration, delayDuration) {
 function waveInAnimatorText(object, timeDuration, delayDuration) {
   animationTimeline.add({
     begin: function begin(anim) {
-      object.writeTextElement.elt.querySelectorAll('.letter').forEach(function (el) {
+      object.writeElement.elt.querySelectorAll('.letter').forEach(function (el) {
         return el.style.display = 'inline-block';
       });
-      object.writeTextElement.style('overflow', 'hidden');
+      object.writeElement.style('overflow', 'hidden');
     },
-    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    targets: object.writeElement.elt.querySelectorAll('.letter'),
     translateY: [CONFIG.PLAY.WAVEIN_TRANSLATEY, 0],
     translateZ: 0,
     duration: timeDuration,
-    delay: animejs_1.default.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY) //delay: (el, i) => CONFIG.PLAY.WAVEIN_STAGGERING_DELAY * i
+    delay: animejs_1.default.stagger(timeDuration / object.sentence.length) //delay: anime.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY)
+    //delay: (el, i) => CONFIG.PLAY.WAVEIN_STAGGERING_DELAY * i
 
   }, delayDuration);
 }
 
 function fadeOutAnimatorText(object, timeDuration, delayDuration) {
   animationTimeline.add({
-    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    targets: object.writeElement.elt.querySelectorAll('.letter'),
     //scale: [4, 1],
     opacity: [1, 0],
     //translateZ: 0,
@@ -40489,7 +40518,7 @@ function fadeOutAnimatorText(object, timeDuration, delayDuration) {
 
 function fadeInAnimatorText(object, timeDuration, delayDuration) {
   animationTimeline.add({
-    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+    targets: object.writeElement.elt.querySelectorAll('.letter'),
     //scale: [4, 1],
     opacity: [0, 1],
     //translateZ: 0,
@@ -40501,9 +40530,33 @@ function fadeInAnimatorText(object, timeDuration, delayDuration) {
 }
 
 function writeAnimatorTeX(object, timeDuration, delayDuration) {
-  var g = object.writeTexElement.elt.querySelectorAll('g');
+  var g = object.writeElement.elt.querySelectorAll('g');
   animationTimeline.add({
-    targets: object.writeTexElement.elt.querySelectorAll('path'),
+    targets: object.writeElement.elt.querySelectorAll('path'),
+    //scale: [4, 1],
+    fill: [color(object.fillColor).toString(), object.fillColor],
+    //stroke : "black",     //TODO : customisable through config
+    //stroke-width: "10px", //customisable through config
+    strokeDashoffset: [animejs_1.default.setDashoffset, 0],
+    opacity: [0, 1],
+    begin: function begin(anim) {
+      g[0].setAttribute('fill', 'none');
+      g[0].setAttribute('stroke-width', '10px');
+    },
+    complete: function complete(anim) {
+      g[0].setAttribute('fill', object.fillColor.toString());
+    },
+    easing: 'easeInOutCubic',
+    duration: timeDuration,
+    delay: animejs_1.default.stagger(timeDuration / (object.sentence.length + 1)) //delay: anime.stagger(400)
+
+  }, delayDuration);
+}
+
+function growFromCenterAnimatorTeX(object, timeDuration, delayDuration) {
+  var g = object.writeElement.elt.querySelectorAll('g');
+  animationTimeline.add({
+    targets: object.writeElement.elt.querySelectorAll('path'),
     //scale: [4, 1],
     fill: [color(object.fillColor).toString(), object.fillColor],
     //stroke : "black",     //TODO : customisable through config
@@ -40519,14 +40572,16 @@ function writeAnimatorTeX(object, timeDuration, delayDuration) {
     },
     easing: 'easeInOutCubic',
     duration: timeDuration,
-    delay: animejs_1.default.stagger(400)
+    delay: animejs_1.default.stagger(400, {
+      from: 'center'
+    })
   }, delayDuration);
 } //TODO : fix timeline
 
 
 function allAtOnceAnimatorTeX(object, timeDuration, delayDuration) {
-  var g = object.writeTexElement.elt.querySelectorAll('g');
-  var pathEls = object.writeTexElement.elt.querySelectorAll('path'); //nodelist
+  var g = object.writeElement.elt.querySelectorAll('g');
+  var pathEls = object.writeElement.elt.querySelectorAll('path'); //nodelist
 
   for (var i = 0; i < pathEls.length; i++) {
     var pathEl = pathEls[i];
@@ -40545,7 +40600,7 @@ function allAtOnceAnimatorTeX(object, timeDuration, delayDuration) {
         pathEl.setAttribute('stroke', "" + object.strokeColor);
         pathEl.setAttribute('fill', 'none');
         g[0].setAttribute('fill', 'none');
-        g[0].setAttribute('stroke-width', object.strokeWidth + "px");
+        g[0].setAttribute('stroke-width', object._strokeWidth + "px");
       },
       complete: function complete(anim) {
         pathEl.setAttribute('fill', "" + object.fillColor);
@@ -40558,14 +40613,14 @@ function allAtOnceAnimatorTeX(object, timeDuration, delayDuration) {
 
 function fadeInAnimatorTeX(object, timeDuration, delayDuration) {
   animationTimeline.add({
-    targets: object.writeTexElement.elt.querySelectorAll('svg'),
-    //targets: object.writeTexElement.elt.querySelectorAll('path'),
+    targets: object.writeElement.elt.querySelectorAll('svg'),
+    //targets: object.writeElement.elt.querySelectorAll('path'),
     //scale: [4, 1],
     opacity: [0, 1],
     //translateZ: 0,
     easing: 'easeOutExpo',
     complete: function complete(anim) {
-      object.writeTexElement.style('opacity', '1'); //clear all stray elements
+      object.writeElement.style('opacity', '1'); //clear all stray elements
     },
     duration: timeDuration,
     delay: animejs_1.default.stagger(180)
@@ -40575,14 +40630,14 @@ function fadeInAnimatorTeX(object, timeDuration, delayDuration) {
 
 function appearAnimatorTeX(object, timeDuration, delayDuration) {
   animationTimeline.add({
-    //targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-    targets: object.writeTexElement.elt.querySelectorAll('path'),
+    //targets: object.writeElement.elt.querySelectorAll('svg'), //simple fadeIn
+    targets: object.writeElement.elt.querySelectorAll('path'),
     //scale: [4, 1],
     opacity: [0, 1],
     //translateZ: 0,
     easing: 'easeOutExpo',
     complete: function complete(anim) {
-      object.writeTexElement.style('opacity', '1'); //clear all stray elements
+      object.writeElement.style('opacity', '1'); //clear all stray elements
     },
     duration: timeDuration,
     delay: animejs_1.default.stagger(180, {
@@ -40594,14 +40649,14 @@ function appearAnimatorTeX(object, timeDuration, delayDuration) {
 
 function dissolveAnimatorTeX(object, timeDuration, delayDuration) {
   animationTimeline.add({
-    //targets: object.writeTexElement.elt.querySelectorAll('svg'), //simple fadeIn
-    targets: object.writeTexElement.elt.querySelectorAll('path'),
+    //targets: object.writeElement.elt.querySelectorAll('svg'), //simple fadeIn
+    targets: object.writeElement.elt.querySelectorAll('path'),
     //scale: [4, 1],
     opacity: [1, 0],
     //translateZ: 0,
     easing: 'easeOutExpo',
     complete: function complete(anim) {
-      object.writeTexElement.style('opacity', '0'); //clear all stray elements
+      object.writeElement.style('opacity', '0'); //clear all stray elements
     },
     duration: timeDuration,
     delay: animejs_1.default.stagger(180, {
@@ -40612,14 +40667,14 @@ function dissolveAnimatorTeX(object, timeDuration, delayDuration) {
 
 function fadeOutAnimatorTeX(object, timeDuration, delayDuration) {
   animationTimeline.add({
-    targets: object.writeTexElement.elt.querySelectorAll('svg'),
-    //targets: object.writeTexElement.elt.querySelectorAll('path'),
+    targets: object.writeElement.elt.querySelectorAll('svg'),
+    //targets: object.writeElement.elt.querySelectorAll('path'),
     //scale: [4, 1],
     opacity: [1, 0],
     //translateZ: 0,
     easing: 'easeOutExpo',
     complete: function complete(anim) {
-      object.writeTexElement.style('opacity', '0'); //clear all stray elements
+      object.writeElement.style('opacity', '0'); //clear all stray elements
     },
     duration: timeDuration,
     delay: animejs_1.default.stagger(180, {
@@ -40630,8 +40685,8 @@ function fadeOutAnimatorTeX(object, timeDuration, delayDuration) {
 
 function blinkAnimatorTeX(object, timeDuration, delayDuration) {
   animationTimeline.add({
-    targets: object.writeTexElement.elt.querySelectorAll('svg'),
-    //targets: object.writeTexElement.elt.querySelectorAll('path'),
+    targets: object.writeElement.elt.querySelectorAll('svg'),
+    //targets: object.writeElement.elt.querySelectorAll('path'),
     //scale: [4, 1],
     opacity: [0, 1, 0],
     //translateZ: 0,
@@ -40644,8 +40699,60 @@ function blinkAnimatorTeX(object, timeDuration, delayDuration) {
     loop: true
   }, delayDuration);
 }
-},{"../MObject/Text":"lib/MObject/Text.ts","../MObject/TeX":"lib/MObject/TeX.ts","animejs":"../node_modules/animejs/lib/anime.es.js","./add":"lib/Scene/add.ts","../config.js":"lib/config.js"}],"lib/MObject/TeX.ts":[function(require,module,exports) {
+},{"../MObject/Text":"lib/MObject/Text.ts","../MObject/TeX":"lib/MObject/TeX.ts","animejs":"../node_modules/animejs/lib/anime.es.js","./add":"lib/Scene/add.ts","../config.js":"lib/config.js"}],"lib/MObject/MObject.ts":[function(require,module,exports) {
 "use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MObject = void 0;
+
+var MObject =
+/** @class */
+function () {
+  function MObject(sentence, x, y) {
+    this.x = 10;
+    this.y = 10;
+    this.sentence = sentence;
+    this.x = x;
+    this.y = y;
+    this.fillColor = color('black');
+  }
+
+  return MObject;
+}();
+
+exports.MObject = MObject;
+},{}],"lib/MObject/TeX.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -40662,7 +40769,9 @@ var tex_to_svg_1 = __importDefault(require("tex-to-svg"));
 
 var add_1 = require("../Scene/add");
 
-var play_1 = require("../Scene/play"); //TODO : add test cases
+var play_1 = require("../Scene/play");
+
+var MObject_1 = require("./MObject"); //TODO : add test cases
 
 /**
  * TeX class
@@ -40691,7 +40800,9 @@ var play_1 = require("../Scene/play"); //TODO : add test cases
 
 var TeX =
 /** @class */
-function () {
+function (_super) {
+  __extends(TeX, _super);
+
   function TeX(_a) {
     var _tex = _a._tex,
         _b = _a.x,
@@ -40701,19 +40812,17 @@ function () {
         _d = _a.svgWidth,
         svgWidth = _d === void 0 ? 300 : _d,
         _e = _a.svgHeight,
-        svgHeight = _e === void 0 ? 300 : _e; //startTime: number; // left for later decision -> need not specify such details at initialisation
+        svgHeight = _e === void 0 ? 300 : _e;
 
-    this.x = 10;
-    this.y = 10;
-    this.x = x;
-    this.y = y;
-    this._tex = _tex;
-    this.svgWidth = svgWidth;
-    this.svgHeight = svgHeight;
-    this.svgEquation = tex_to_svg_1.default(_tex);
-    this.fillColor = color('black');
-    this.strokeWidth = 0;
-    this.strokeColor = color('black');
+    var _this = _super.call(this, _tex, x, y) || this; //this._tex = _tex;
+
+
+    _this.svgWidth = svgWidth;
+    _this.svgHeight = svgHeight;
+    _this.svgEquation = tex_to_svg_1.default(_tex);
+    _this._strokeWidth = 8;
+    _this.strokeColor = color('black');
+    return _this;
   }
 
   TeX.prototype.position = function (x, y) {
@@ -40725,8 +40834,12 @@ function () {
       y = 10;
     }
 
-    this.x = x;
-    this.y = y;
+    if (arguments.length === 0) {
+      return [this.x, this.y];
+    } else {
+      this.x = x;
+      this.y = y;
+    }
   };
 
   TeX.prototype.size = function (svgWidth, svgHeight) {
@@ -40738,11 +40851,43 @@ function () {
       svgHeight = 300;
     }
 
-    this.svgWidth = svgWidth;
-    this.svgHeight = svgHeight;
+    if (arguments.length === 0) {
+      return [this.svgWidth, this.svgHeight];
+    } else {
+      this.svgWidth = svgWidth;
+      this.svgHeight = svgHeight;
+    }
+  };
+
+  TeX.prototype.stroke = function (strokeColor) {
+    if (strokeColor === void 0) {
+      strokeColor = color('black');
+    }
+
+    if (arguments.length === 0) {
+      return this.strokeColor;
+    } else {
+      this.strokeColor = strokeColor;
+    }
+  };
+
+  TeX.prototype.strokeWidth = function (_strokeWidth) {
+    if (_strokeWidth === void 0) {
+      _strokeWidth = 8;
+    }
+
+    if (arguments.length === 0) {
+      return this._strokeWidth;
+    } else {
+      this._strokeWidth = _strokeWidth;
+    }
   };
 
   TeX.prototype.fill = function (fillColor) {
+    if (fillColor === void 0) {
+      fillColor = color('black');
+    }
+
     if (arguments.length === 0) {
       return this.fillColor;
     } else {
@@ -40752,7 +40897,7 @@ function () {
 
   TeX.prototype.remove = function () {
     //TODO : should throw error if called on object which has not been added
-    this.writeTexElement.remove();
+    this.writeElement.remove();
   };
 
   TeX.prototype.add = function () {
@@ -40776,7 +40921,7 @@ function () {
   };
 
   return TeX;
-}();
+}(MObject_1.MObject);
 
 exports.TeX = TeX;
 
@@ -40793,19 +40938,29 @@ function createTeX() {
     y: args[2],
     svgWidth: args[3],
     svgHeight: args[4]
-  }; // _tex: string,
-  // x: number = 10,
-  // y: number = 10,
-  // svgWidth: number = 300,
-  // svgHeight: number = 300
-  // const object = new TeX(_tex, x, y, svgWidth, svgHeight);
-  // return object;
+  };
+
+  if (!(typeof _texArg.svgWidth == 'undefined' || typeof _texArg.svgWidth == 'number')) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (!(typeof _texArg.svgWidth == 'undefined') && _texArg.svgWidth < 0) {
+    //size
+    throw new Error('width of tex should be greater than zero!');
+  }
+
+  if (!(typeof _texArg.svgHeight == 'undefined' || typeof _texArg.svgHeight == 'number')) {
+    //size
+    throw new Error('size must be passed as number');
+  } else if (!(typeof _texArg.svgHeight == 'undefined') && _texArg.svgHeight < 0) {
+    //size
+    throw new Error('height of tex should be greater than zero!');
+  }
 
   return new TeX(_texArg);
 }
 
 exports.createTeX = createTeX;
-},{"tex-to-svg":"../node_modules/tex-to-svg/TeXToSVG.js","../Scene/add":"lib/Scene/add.ts","../Scene/play":"lib/Scene/play.ts"}],"lib/Scene/add.ts":[function(require,module,exports) {
+},{"tex-to-svg":"../node_modules/tex-to-svg/TeXToSVG.js","../Scene/add":"lib/Scene/add.ts","../Scene/play":"lib/Scene/play.ts","./MObject":"lib/MObject/MObject.ts"}],"lib/Scene/add.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40820,30 +40975,59 @@ var Text_1 = require("../MObject/Text");
 function add(object) {
   if (object instanceof TeX_1.TeX) {
     //tex animations
-    object.writeTexElement = createDiv(object.svgEquation);
-    var svg = object.writeTexElement.elt.querySelectorAll('svg');
+    object.writeElement = createDiv(object.svgEquation);
+    var svg = object.writeElement.elt.querySelectorAll('svg');
+    var g = object.writeElement.elt.querySelectorAll('g');
     svg[0].setAttribute('width', object.svgWidth + "px");
     svg[0].setAttribute('height', object.svgHeight + "px");
-    svg[0].setAttribute('stroke', object.strokeColor);
-    svg[0].setAttribute('stroke-width', object.strokeWidth);
+    g[0].setAttribute('stroke', object.strokeColor);
+    g[0].setAttribute('stroke-width', object._strokeWidth);
     svg[0].setAttribute('fill', object.fillColor.toString()); // g[0].setAttribute('fill', 'none');
     // g[0].setAttribute('stroke-width', '10px');
 
-    object.writeTexElement.position(object.x, object.y);
+    object.writeElement.position(object.x, object.y);
   } else if (object instanceof Text_1.Text) {
-    var sentence = object._text;
-    object.writeTextElement = createElement('div', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
-    object.writeTextElement.position(object.x, object.y);
-    object.writeTextElement.style('font-size', object._size + "px");
-    object.writeTextElement.style('color', "" + object.fillColor); //object.writeTextElement.style('text-stroke-width', `${object._strokeWidth}`); //TODO : not working without -webkit
+    var sentence = object.sentence;
+    object.writeElement = createElement('div', sentence.replace(/\S/g, "<span class='letter'>$&</span>"));
+    object.writeElement.position(object.x, object.y);
+    object.writeElement.style('font-size', object._size + "px");
+    object.writeElement.style('color', "" + object.fillColor); //object.writeElement.style('text-stroke-width', `${object._strokeWidth}`); //TODO : not working without -webkit
 
-    object.writeTextElement.style('opacity', '0'); //to hide text at initialisation
+    object.writeElement.style('opacity', '0'); //to hide text at initialisation
   }
 }
 
 exports.add = add;
 },{"../MObject/TeX":"lib/MObject/TeX.ts","../MObject/Text":"lib/MObject/Text.ts"}],"lib/MObject/Text.ts":[function(require,module,exports) {
 "use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -40854,9 +41038,16 @@ var add_1 = require("../Scene/add");
 
 var play_1 = require("../Scene/play");
 
+var MObject_1 = require("./MObject");
+
 var Text =
 /** @class */
-function () {
+function (_super) {
+  __extends(Text, _super); // strokeColor: string;
+  // strokeWidth: number;
+  //fillColor: p5.Color;
+
+
   function Text(_a) {
     var _text = _a._text,
         _b = _a.x,
@@ -40866,27 +41057,43 @@ function () {
         _d = _a._size,
         _size = _d === void 0 ? 28 : _d;
 
-    this.x = x;
-    this.y = y;
-    this._text = _text;
-    this._size = _size; //console.log('me', this._size);
+    var _this = _super.call(this, _text, x, y) || this; //this._text = _text;
+
+
+    _this._size = _size;
+    return _this; //console.log('me', this._size);
     // this.strokeColor = 'black';
     // this._strokeWidth = 10;
-
-    this.fillColor = color('black');
+    //this.fillColor = color('black');
   }
 
   Text.prototype.position = function (x, y) {
+    if (x === void 0) {
+      x = 10;
+    }
+
     if (y === void 0) {
       y = 10;
     }
 
-    this.x = x;
-    this.y = y; //this.writeTextElement.position(this.x, this.y);
+    if (arguments.length === 0) {
+      return [this.x, this.y];
+    } else {
+      this.x = x;
+      this.y = y;
+    }
   };
 
   Text.prototype.size = function (_size) {
-    this._size = _size; //font-size
+    if (_size === void 0) {
+      _size = 28;
+    }
+
+    if (arguments.length === 0) {
+      return this._size; //font-size
+    } else {
+      this._size = _size; //font-size
+    }
   }; //TODO : fix stroke - currently only -webkit supported
   // stroke(strokeColor: string) {
   //   if (arguments.length === 0) {
@@ -40905,6 +41112,10 @@ function () {
 
 
   Text.prototype.fill = function (fillColor) {
+    if (fillColor === void 0) {
+      fillColor = color('black');
+    }
+
     if (arguments.length === 0) {
       return this.fillColor;
     } else {
@@ -40914,12 +41125,12 @@ function () {
 
   Text.prototype.remove = function () {
     //TODO : should throw error if called on object which has not been added
-    this.writeTextElement.remove();
+    this.writeElement.remove();
   };
 
   Text.prototype.add = function () {
     add_1.add(this);
-    this.writeTextElement.style('opacity', '1');
+    this.writeElement.style('opacity', '1');
   };
 
   Text.prototype.play = function (animationType, timeDuration, delayDuration) {
@@ -40939,7 +41150,7 @@ function () {
   };
 
   return Text;
-}();
+}(MObject_1.MObject);
 
 exports.Text = Text;
 
@@ -40970,7 +41181,7 @@ function createText() {
 }
 
 exports.createText = createText;
-},{"../Scene/add":"lib/Scene/add.ts","../Scene/play":"lib/Scene/play.ts"}],"lib/Scene/scene.ts":[function(require,module,exports) {
+},{"../Scene/add":"lib/Scene/add.ts","../Scene/play":"lib/Scene/play.ts","./MObject":"lib/MObject/MObject.ts"}],"lib/Scene/scene.ts":[function(require,module,exports) {
 "use strict";
 
 var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
@@ -41200,7 +41411,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52513" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51163" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
