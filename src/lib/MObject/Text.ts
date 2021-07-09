@@ -11,7 +11,6 @@ export class Text extends MObject {
   // x: number;
   // y: number;
 
-  
   // strokeColor: string;
   // strokeWidth: number;
   //fillColor: p5.Color;
@@ -19,7 +18,7 @@ export class Text extends MObject {
   constructor({ _text, x = 10, y = 10, _size = 28 }: TextObject) {
     super(_text, x, y, _size);
     //this._text = _text;
-    
+
     //console.log('me', this._size);
 
     // this.strokeColor = 'black';
@@ -77,6 +76,10 @@ export class Text extends MObject {
     add(this);
     this.writeElement.style('opacity', '1');
   }
+  style(property, value) {
+    this.writeElement.style(property, value);
+  }
+
   play(
     animationType: string = 'write',
     timeDuration: number = 0,
