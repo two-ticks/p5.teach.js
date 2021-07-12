@@ -39,8 +39,10 @@ async function reel() {
     '{\\displaystyle {\\frac {\\partial ^{2}u}{\\partial t^{2}}}=c^{2}{\\frac {\\partial ^{2}u}{\\partial x^{2}}}}'
   );
   pythag.position(25, 50);
+  pythag.add()
+  pythag.fill(color('rgba(255,0,0,255)'));
   pythag.size(320, 320);
-  pythag.play('write', 0, 2.5);
+  pythag.play('write', 0, 6.5);
 
   //await scene.delay(10);
   //scene.remove();

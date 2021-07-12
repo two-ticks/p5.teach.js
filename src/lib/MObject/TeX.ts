@@ -47,6 +47,7 @@ export class TeX {
     svgWidth = 300,
     svgHeight = 300
   }: TexObject) {
+    this.writeTexElement = createDiv();
     this.x = x;
     this.y = y;
     this._tex = _tex;
