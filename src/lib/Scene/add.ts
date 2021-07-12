@@ -4,7 +4,7 @@ import { Text } from '../MObject/Text';
 export function add(object: Text | TeX) {
   if (object instanceof TeX) {
     //tex animations
-    object.writeElement = createDiv(object.svgEquation);
+    object.writeElement.html(object.svgEquation);
     let svg = object.writeElement.elt.querySelectorAll('svg');
     let g = object.writeElement.elt.querySelectorAll('g');
     //svg[0].setAttribute('width', `${object.svgWidth}px`);
@@ -22,8 +22,7 @@ export function add(object: Text | TeX) {
   } else if (object instanceof Text) {
     const sentence = object.sentence;
 
-    object.writeElement = createElement(
-      'div',
+    object.writeElement.html(
       sentence.replace(/\S/g, "<span class='letter'>$&</span>")
     );
     object.writeElement.position(object.x, object.y);

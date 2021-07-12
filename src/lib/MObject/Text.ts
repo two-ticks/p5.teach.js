@@ -17,6 +17,8 @@ export class Text extends MObject {
 
   constructor({ _text, x = 10, y = 10, _size = 28 }: TextObject) {
     super(_text, x, y, _size);
+    this.writeElement = createElement('div');
+
     //this._text = _text;
 
     //console.log('me', this._size);

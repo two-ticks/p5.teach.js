@@ -48,16 +48,16 @@ export function play(
   //TODO : fix this after testing end and start parameters
   // if (typeof delayDuration === 'number') {
   //   delayDuration = 1000 * delayDuration; //sec to ms
-  //   //console.log(delayDuration);
+  //   ////console.log(delayDuration);
   // } else if (typeof delayDuration === 'string') {
   //   if (delayDuration.charAt(0) === '+') {
   //     delayDuration = 1000 * Number(delayDuration);
   //     delayDuration = `+=${delayDuration}`;
-  //     console.log(delayDuration);
+  //     //console.log(delayDuration);
   //   } else if (delayDuration.charAt(0) === '-') {
   //     delayDuration = 1000 * Number(delayDuration);
   //     delayDuration = `-=${-delayDuration}`;
-  //     console.log(delayDuration);
+  //     //console.log(delayDuration);
   //   }
   // }
 
@@ -69,14 +69,14 @@ export function play(
 
   if (object instanceof TeX) {
     //adding element before animation
-    console.log('TeX');
-    if (!object.writeElement) {
+    ////console.log('TeX');
+    if (!object.writeElement.elt.children.length) {
       add(object);
     }
     //tex animations
-    console.log('TeX');
+    ////console.log('TeX');
     if (animationType === 'write') {
-      console.log('writing');
+      //console.log('writing');
 
       //write(object, timeDuration);
       // object.writeElement = createDiv(object.SVGEquation);
@@ -100,64 +100,64 @@ export function play(
       // object.writeElement.position(object.x, object.y);
       allAtOnceAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'growFromCenter') {
-      console.log('growFromCenter');
+      //console.log('growFromCenter');
       growFromCenterAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'fadeIn') {
-      console.log('fadeIn called');
+      //console.log('fadeIn called');
       fadeInAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'appear') {
-      console.log('appear called');
+      //console.log('appear called');
 
       appearAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'dissolve') {
-      console.log('dissolve called');
+      //console.log('dissolve called');
       //add(object);
       dissolveAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'fadeOut') {
-      console.log('fadeout called');
+      //console.log('fadeout called');
       fadeOutAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'blink') {
-      console.log('blink');
+      //console.log('blink');
       blinkAnimatorTeX(object, timeDuration, delayDuration);
     }
   }
   //Text animation
   else if (object instanceof Text) {
-    if (!object.writeElement) {
+    if (!object.writeElement.elt.children.length) {
       add(object);
     }
 
-    console.log('Text');
+    ////console.log('Text');
     object.writeElement.style('opacity', '1'); //make it visible else it will not appear
 
     if (animationType == 'write') {
-      console.log(object);
+      //console.log(object);
       writeAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType === 'growFromCenter') {
-      console.log('growFromCenter');
+      //console.log('growFromCenter');
       growFromCenterAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType == 'allAtOnce') {
-      console.log('all at once');
+      //console.log('all at once');
     } else if (animationType == 'fadeIn') {
-      console.log('fadeIn');
+      //console.log('fadeIn');
       fadeInAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType == 'fadeOut') {
-      console.log('fadeOut');
+      //console.log('fadeOut');
       fadeOutAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType == 'erase') {
-      console.log('erase');
+      //console.log('erase');
       eraseAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType == 'dissolve') {
-      console.log('dissolve');
+      //console.log('dissolve');
       dissolveAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType == 'waveIn') {
-      console.log('waveIn');
+      //console.log('waveIn');
       waveInAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType == 'waveOut') {
-      console.log('waveOut');
+      //console.log('waveOut');
       waveOutAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType == 'spinOut') {
-      console.log('spinOut');
+      //console.log('spinOut');
       spinOutAnimatorText(object, timeDuration, delayDuration);
     }
   }
@@ -168,7 +168,7 @@ function writeAnimatorText(
   timeDuration: number,
   delayDuration: number | string
 ) {
-  // console.log(object);
+  // //console.log(object);
   //object = object;
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
@@ -193,7 +193,7 @@ function growFromCenterAnimatorText(
   timeDuration: number,
   delayDuration: number | string
 ) {
-  // console.log(object);
+  // //console.log(object);
   //object = object;
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds

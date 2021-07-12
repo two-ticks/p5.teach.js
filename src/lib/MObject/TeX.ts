@@ -39,17 +39,13 @@ export class TeX extends MObject {
   // svgHeight: number;
   _strokeWidth: number;
   strokeColor: p5.Color;
-  constructor({
-    _tex,
-    x = 10,
-    y = 10,
-    _size = 28
-  }: TexObject) {
-    super(_tex, x, y,_size);
+  constructor({ _tex, x = 10, y = 10, _size = 28 }: TexObject) {
+    super(_tex, x, y, _size);
     //this._tex = _tex;
     // this._size = _size; //px
     // this.svgWidth = svgWidth;
     // this.svgHeight = svgHeight;
+    this.writeElement = createElement('div');
     this.svgEquation = TeXToSVG(_tex);
     this._strokeWidth = 8;
     this.strokeColor = color('black');
@@ -105,6 +101,10 @@ export class TeX extends MObject {
     //this.writeTexElement.style('opacity', '1');
   }
 
+  style(property, value) {
+    this.writeElement.style(property, value);
+  }
+  
   play(
     animationType: string = 'write',
     startTime: number = 0,
