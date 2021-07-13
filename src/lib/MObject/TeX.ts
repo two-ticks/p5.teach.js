@@ -104,7 +104,7 @@ export class TeX extends MObject {
   style(property, value) {
     this.writeElement.style(property, value);
   }
-  
+
   play(
     animationType: string = 'write',
     startTime: number = 0,
