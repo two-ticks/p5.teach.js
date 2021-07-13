@@ -1,10 +1,12 @@
 import { TeX } from '../MObject/TeX';
 import { Text } from '../MObject/Text';
+import { sceneContainer } from './scene';
 
 export function add(object: Text | TeX) {
   if (object instanceof TeX) {
     //tex animations
     object.writeElement.html(object.svgEquation);
+    object.writeElement.parent(sceneContainer);
     let svg = object.writeElement.elt.querySelectorAll('svg');
     let g = object.writeElement.elt.querySelectorAll('g');
     //svg[0].setAttribute('width', `${object.svgWidth}px`);
@@ -25,6 +27,7 @@ export function add(object: Text | TeX) {
     object.writeElement.html(
       sentence.replace(/\S/g, "<span class='letter'>$&</span>")
     );
+    object.writeElement.parent(sceneContainer);
     object.writeElement.position(object.x, object.y);
     object.writeElement.style('font-size', `${object._size}px`);
     object.writeElement.style('color', `${object.fillColor}`);

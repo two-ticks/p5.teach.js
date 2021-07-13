@@ -102,6 +102,9 @@ export function play(
     } else if (animationType === 'growFromCenter') {
       //console.log('growFromCenter');
       growFromCenterAnimatorTeX(object, timeDuration, delayDuration);
+    } else if (animationType === 'createFill') {
+      //console.log('createFill');
+      createFillAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'fadeIn') {
       //console.log('fadeIn called');
       fadeInAnimatorTeX(object, timeDuration, delayDuration);
@@ -443,7 +446,77 @@ function growFromCenterAnimatorTeX(
     delayDuration
   );
 }
+function createFillAnimatorTeX(
+  object: TeX,
+  timeDuration: number,
+  delayDuration: string | number
+) {
+  const g = object.writeElement.elt.querySelectorAll('g');
+  const use = object.writeElement.elt.querySelectorAll('use');
+  let p: any[] = [];
+  use.forEach(
+    (
+      element: { getAttribute: (arg0: string) => any },
+      index: string | number
+    ) => {
+      p[index] = object.writeElement.elt.querySelectorAll(
+        element.getAttribute('xlink:href')
+      );
+    }
+  );
+  //console.log(p);
 
+  animationTimeline
+    .add(
+      {
+        targets: object.writeElement.elt.querySelectorAll('path'),
+        //scale: [4, 1],
+        //fill: [`${object.fillColor.toString('#rgb')}0` , object.fillColor.toString()], //TODO : fill is black by default can be customised through set fill methods
+        //stroke : "black",     //TODO : customisable through config
+        //stroke-width: "10px", //customisable through config
+        strokeDashoffset: [anime.setDashoffset, 0],
+        //opacity: [0, 0.2, 1],
+        // begin: function (anim) {
+        //   g[0].setAttribute('fill', 'none');
+        //   g[0].setAttribute('stroke-width', '10px');
+        // },
+        // complete: function (anim) {
+        //   //g[0].setAttribute('fill', object.fillColor.toString());
+        // },
+        easing: 'easeOutSine',
+        duration: timeDuration
+        //delay: anime.stagger(timeDuration / (object.sentence.length + 1))
+        //delay: anime.stagger(10)
+      },
+      delayDuration
+    )
+    .add(
+      {
+        targets: use,
+        //scale: [4, 1],
+        fill: [
+          `${object.fillColor.toString('#rgb')}0`,
+          object.fillColor.toString()
+        ], //TODO : fill is black by default can be customised through set fill methods
+        //stroke : "black",     //TODO : customisable through config
+        //stroke-width: "10px", //customisable through config
+        //strokeDashoffset: [anime.setDashoffset, 0],
+        //opacity: [0, 0.2, 1],
+        begin: function (anim) {
+          g[0].setAttribute('fill', 'none');
+          //g[0].setAttribute('stroke-width', '10px');
+        },
+        complete: function (anim) {
+          //g[0].setAttribute('fill', object.fillColor.toString());
+        },
+        easing: 'easeInOutQuad',
+        duration: timeDuration
+        //delay: anime.stagger(timeDuration / (object.sentence.length + 1))
+        //delay: anime.stagger(400)
+      },
+      delayDuration
+    );
+}
 //TODO : fix timeline
 function allAtOnceAnimatorTeX(
   object: TeX,
