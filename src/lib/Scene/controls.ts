@@ -1,11 +1,9 @@
 import anime from 'animejs';
-export let sceneTime: string;
+export function clock() {
+  return animationTimeline.duration * (animationTimeline.progress / 100);
+}
 
-export let animationTimeline = anime.timeline({
-  update: function (anim) {
-    sceneTime = animationTimeline.progress.toString();
-  }
-}); //initilising a timeline
+export let animationTimeline = anime.timeline({}); //initilising a timeline
 // animationTimeline.add({});
 
 export function createControls() {
@@ -29,7 +27,7 @@ export function createControls() {
   controlsDiv.appendChild(progressBar);
 
   progressBar.oninput = function () {
-    pauseScene();
+    animationTimeline.pause();
     //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
     animationTimeline.seek(
       animationTimeline.duration * (progressBar.valueAsNumber / 100)
@@ -74,17 +72,17 @@ export function createControls() {
   });
 }
 
-export function playScene() {
-  animationTimeline.play();
-}
+// export function playScene() {
+//   animationTimeline.play();
+// }
 
-export function pauseScene() {
-  animationTimeline.pause();
-}
+// export function pauseScene() {
+//   animationTimeline.pause();
+// }
 
-export function restartScene() {
-  animationTimeline.restart();
-}
+// export function restartScene() {
+//   animationTimeline.restart();
+// }
 
 //<input class="progress" step=".001" type="range" min="0" max="100" value="0">
 

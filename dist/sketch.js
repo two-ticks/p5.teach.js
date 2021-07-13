@@ -3,7 +3,7 @@ let A = 40;
 let B = 40;
 let a = 3;
 let b = 2;
-let d = Math.PI/4;
+let d = Math.PI / 4;
 function setup() {
   createCanvas(400, 400);
   button = createButton('click me');
@@ -12,18 +12,23 @@ function setup() {
 
   scene = new Scene();
   createControls();
-  reel();
+  //reel();
 }
 
-//let i = 0;
+let t;
 function draw() {
+  background(220);
+  t = clock();
+  //console.log(i);
+  fill(255, 0, 0);
+  rect(30+ 0.25 * t, 20 , 55, 10);
   //i += 0.005;
   //amp = amp + 10*Math.sin(amp+0.01);
-  background(220);
+
   //console.log(sceneTime);
   //a+=0.01;
 
- // d += 0.005;
+  // d += 0.005;
   // grp.update(
   //   (t) => A * sin(a * t + d),
   //   (t) => B * cos(b * t)
@@ -39,7 +44,7 @@ async function reel() {
     '{\\displaystyle {\\frac {\\partial ^{2}u}{\\partial t^{2}}}=c^{2}{\\frac {\\partial ^{2}u}{\\partial x^{2}}}}'
   );
   pythag.position(25, 50);
-  pythag.add()
+  pythag.add();
   pythag.fill(color('rgba(255,0,0,255)'));
   pythag.size(320, 320);
   pythag.play('write', 0, 6.5);
@@ -60,7 +65,9 @@ async function reel() {
   grp.position(50, 50);
   //grp.loop((t) => 1500 * Math.sin(t-50) * sin(2 * (t-50)), 1 , 0); //timeDuration and startTime
   //await scene.delay(2);
-  a = 5; b = 4; d = Math.PI/8;
+  a = 5;
+  b = 4;
+  d = Math.PI / 8;
 
   grp1 = create2DParametricGraph(
     (t) => A * Math.sin(a * t + d),

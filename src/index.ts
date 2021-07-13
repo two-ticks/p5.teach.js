@@ -53,17 +53,18 @@ global.GraphParametric2D = GraphParametric2D;
 global.create2DParametricGraph = create2DParametricGraph;
 
 import {
-  sceneTime,
-  createControls,
-  pauseScene,
-  playScene,
-  restartScene
+  //sceneTime,
+  createControls,clock
+  // pauseScene,
+  // playScene,
+  // restartScene
 } from './lib/Scene/controls';
-global.sceneTime = sceneTime;
+//global.sceneTime = sceneTime;
 global.createControls = createControls;
-global.pauseScene = pauseScene;
-global.playScene = playScene;
-global.restartScene = restartScene;
+global.clock = clock;
+// global.pauseScene = pauseScene;
+// global.playScene = playScene;
+// global.restartScene = restartScene;
 
 import { Group, createGroup } from './lib/Scene/group';
 global.Group = Group;

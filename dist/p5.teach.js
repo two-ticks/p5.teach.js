@@ -40358,15 +40358,16 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.restartScene = exports.pauseScene = exports.playScene = exports.createControls = exports.animationTimeline = exports.sceneTime = void 0;
+exports.createControls = exports.animationTimeline = exports.clock = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
-exports.animationTimeline = animejs_1.default.timeline({
-  update: function update(anim) {
-    exports.sceneTime = exports.animationTimeline.progress.toString();
-  }
-}); //initilising a timeline
+function clock() {
+  return exports.animationTimeline.duration * (exports.animationTimeline.progress / 100);
+}
+
+exports.clock = clock;
+exports.animationTimeline = animejs_1.default.timeline({}); //initilising a timeline
 // animationTimeline.add({});
 
 function createControls() {
@@ -40384,7 +40385,7 @@ function createControls() {
   controlsDiv.appendChild(progressBar);
 
   progressBar.oninput = function () {
-    pauseScene(); //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
+    exports.animationTimeline.pause(); //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
 
     exports.animationTimeline.seek(exports.animationTimeline.duration * (progressBar.valueAsNumber / 100)); //playScene();
     //animationTimeline.seek(parseInt(progressBar.value, 10));
@@ -40415,25 +40416,16 @@ function createControls() {
   });
 }
 
-exports.createControls = createControls;
-
-function playScene() {
-  exports.animationTimeline.play();
-}
-
-exports.playScene = playScene;
-
-function pauseScene() {
-  exports.animationTimeline.pause();
-}
-
-exports.pauseScene = pauseScene;
-
-function restartScene() {
-  exports.animationTimeline.restart();
-}
-
-exports.restartScene = restartScene; //<input class="progress" step=".001" type="range" min="0" max="100" value="0">
+exports.createControls = createControls; // export function playScene() {
+//   animationTimeline.play();
+// }
+// export function pauseScene() {
+//   animationTimeline.pause();
+// }
+// export function restartScene() {
+//   animationTimeline.restart();
+// }
+//<input class="progress" step=".001" type="range" min="0" max="100" value="0">
 // button.onclick = animationTimeline.pause;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js"}],"lib/Scene/play.ts":[function(require,module,exports) {
 "use strict";
@@ -42326,13 +42318,13 @@ var parametric_1 = require("./lib/Geometry/parametric");
 global.GraphParametric2D = parametric_1.GraphParametric2D;
 global.create2DParametricGraph = parametric_1.create2DParametricGraph;
 
-var controls_1 = require("./lib/Scene/controls");
+var controls_1 = require("./lib/Scene/controls"); //global.sceneTime = sceneTime;
 
-global.sceneTime = controls_1.sceneTime;
+
 global.createControls = controls_1.createControls;
-global.pauseScene = controls_1.pauseScene;
-global.playScene = controls_1.playScene;
-global.restartScene = controls_1.restartScene;
+global.clock = controls_1.clock; // global.pauseScene = pauseScene;
+// global.playScene = playScene;
+// global.restartScene = restartScene;
 
 var group_1 = require("./lib/Scene/group");
 
@@ -42366,7 +42358,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50311" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56840" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
