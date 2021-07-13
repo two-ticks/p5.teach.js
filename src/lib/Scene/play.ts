@@ -70,8 +70,9 @@ export function play(
 
   if (object instanceof TeX) {
     //adding element before animation
-    console.log('TeX');
-    if (!object.writeTexElement) {
+    //console.log(object.writeTexElement.elt.children.length);
+    if (!object.writeTexElement.elt.children.length) { //checks if div is empty
+      console.log('TeX added');
       add(object);
     }
     //tex animations
@@ -100,6 +101,9 @@ export function play(
 
       // object.writeTexElement.position(object.x, object.y);
       allAtOnceAnimatorTeX(object, timeDuration, delayDuration);
+    } else if (animationType === 'growFromCenter') {
+      console.log('growFromCenter');
+      growFromCenterAnimatorTeX(object, timeDuration, delayDuration);
     } else if (animationType === 'fadeIn') {
       console.log('fadeIn called');
       fadeInAnimatorTeX(object, timeDuration, delayDuration);
@@ -131,6 +135,9 @@ export function play(
     if (animationType == 'write') {
       console.log(object);
       writeAnimatorText(object, timeDuration, delayDuration);
+    } else if (animationType === 'growFromCenter') {
+      console.log('growFromCenter');
+      growFromCenterAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType == 'allAtOnce') {
       console.log('all at once');
     } else if (animationType == 'fadeIn') {
@@ -167,7 +174,7 @@ function writeAnimatorText(
   //object = object;
   // timeDuration = timeDuration; //seconds
   // delayDuration = delayDuration; //seconds
-
+  //
   object.writeTextElement.style('opacity', '1');
   animationTimeline.add(
     {
@@ -177,11 +184,39 @@ function writeAnimatorText(
       translateZ: 0,
       easing: 'easeOutExpo',
       duration: timeDuration,
-      delay: anime.stagger(CONFIG.PLAY.WRITE_STAGGERING_DELAY) //time duration must be replaced with delay
+      delay: anime.stagger(timeDuration / (object._text.length + 1)) //time duration must be replaced with delay
     },
     delayDuration
   );
 }
+
+function growFromCenterAnimatorText(
+  object: any,
+  timeDuration: number,
+  delayDuration: number | string
+) {
+  // console.log(object);
+  //object = object;
+  // timeDuration = timeDuration; //seconds
+  // delayDuration = delayDuration; //seconds
+  //
+  object.writeTextElement.style('opacity', '1');
+  animationTimeline.add(
+    {
+      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      scale: [CONFIG.PLAY.WRITE_SCALE, 1],
+      opacity: [0, 1],
+      translateZ: 0,
+      easing: 'easeOutExpo',
+      duration: timeDuration,
+      delay: anime.stagger(timeDuration / (object._text.length + 1), {
+        from: 'center'
+      }) //time duration must be replaced with delay
+    },
+    delayDuration
+  );
+}
+
 function eraseAnimatorText(
   object: any,
   timeDuration: number,
@@ -196,7 +231,7 @@ function eraseAnimatorText(
       easing: 'easeInOutCubic',
       duration: timeDuration,
       //delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY),
-      delay: anime.stagger(CONFIG.PLAY.ERASE_STAGGERING_DELAY)
+      delay: anime.stagger(timeDuration / object._text.length)
       //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
     },
     delayDuration
@@ -226,7 +261,7 @@ function dissolveAnimatorText(
       //translateZ: 0,
       easing: 'easeInExpo',
       duration: timeDuration,
-      delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+      delay: anime.stagger(timeDuration / object._text.length)
       //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
       //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
     },
@@ -238,22 +273,29 @@ function spinOutAnimatorText(
   timeDuration: number,
   delayDuration: string | number
 ) {
-  object.writeTextElement.elt
-    .querySelectorAll('.letter')
-    .forEach((el: any) => (el.style.display = 'inline-block'));
   //object.writeTextElement.style('overflow', 'hidden');
-  anime.timeline({ loop: false }).add({
-    targets: object.writeTextElement.elt.querySelectorAll('.letter'),
-    //translateY: [0,'1em'],
-    rotateX: 360, //360deg
-    opacity: [0.5, , 0],
-    //scale :[1,0],
-    duration: timeDuration,
-    //delay: (el, i) => CONFIG.PLAY.SPINOUT_STAGGERING_DELAY * i,
-    delay: anime.stagger(CONFIG.PLAY.SPINOUT_STAGGERING_DELAY, {
-      start: delayDuration
-    })
-  });
+  animationTimeline.add(
+    {
+      targets: object.writeTextElement.elt.querySelectorAll('.letter'),
+      //translateY: [0,'1em'],
+      rotateX: 360, //360deg
+      opacity: [0.5, , 0],
+      begin: function (anim) {
+        object.writeTextElement.elt
+          .querySelectorAll('.letter')
+          .forEach(
+            (el: { style: { display: string } }) =>
+              (el.style.display = 'inline-block')
+          );
+      },
+      //scale :[1,0],
+      duration: timeDuration,
+      //delay: (el, i) => CONFIG.PLAY.SPINOUT_STAGGERING_DELAY * i,
+      //delay: anime.stagger(CONFIG.PLAY.SPINOUT_STAGGERING_DELAY)
+      delay: anime.stagger(timeDuration / object._text.length)
+    },
+    delayDuration
+  );
 }
 function waveOutAnimatorText(
   object: Text,
@@ -272,7 +314,8 @@ function waveOutAnimatorText(
       opacity: [1, 0.5, 0.1, 0],
       scale: [1, 0.2, 0],
       duration: timeDuration,
-      delay: anime.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY)
+      delay: anime.stagger(timeDuration / object._text.length)
+      //delay: anime.stagger(CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY)
       //delay: (el, i) => CONFIG.PLAY.WAVEOUT_STAGGERING_DELAY * i
     },
     delayDuration
@@ -296,7 +339,8 @@ function waveInAnimatorText(
       translateZ: 0,
 
       duration: timeDuration,
-      delay: anime.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY)
+      delay: anime.stagger(timeDuration / object._text.length)
+      //delay: anime.stagger(CONFIG.PLAY.WAVEIN_STAGGERING_DELAY)
       //delay: (el, i) => CONFIG.PLAY.WAVEIN_STAGGERING_DELAY * i
     },
     delayDuration
@@ -347,6 +391,75 @@ function writeAnimatorTeX(
   delayDuration: string | number
 ) {
   const g = object.writeTexElement.elt.querySelectorAll('g');
+  const use = object.writeTexElement.elt.querySelectorAll('use');
+
+  let p: any[] = [];
+  use.forEach(
+    (
+      element: { getAttribute: (arg0: string) => any },
+      index: string | number
+    ) => {
+      p[index] = (object.writeTexElement.elt.querySelectorAll(
+        element.getAttribute('xlink:href'))
+      );
+    }
+  );
+  console.log(g);
+  animationTimeline.add(
+    {
+      targets: object.writeTexElement.elt.querySelectorAll('path'),
+      //scale: [4, 1],
+
+      fill: function (el) {
+        //console.log();
+
+        return 'none';
+      },
+      // fill: [
+      //   {
+      //     value: object.fillColor.toString(),
+      //     duration: timeDuration / (object._tex.length + 1)
+      //   },
+      //   {
+      //     value: object.fillColor.toString(),
+      //     //duration: timeDuration / (object._tex.length + 1)
+      //   }
+      // ], //TODO : fill is black by default can be customised through set fill methods
+      //stroke : "black",     //TODO : customisable through config
+      //stroke-width: "10px", //customisable through config
+      strokeDashoffset: [anime.setDashoffset, 0],
+      //opacity: [0, 1],
+      begin: function (anim) {
+        //object.fillColor.setAlpha(4)
+        //console.log(object.fillColor);
+
+        g[0].setAttribute('fill', 'none');
+        g[0].setAttribute('stroke-width', '10px');
+      },
+      complete: function (anim) {
+        //g[0].setAttribute('fill', 'black');
+      },
+      
+      easing: 'easeInOutCubic',
+      duration: timeDuration,
+      //endDelay: 100,
+      delay: anime.stagger((timeDuration * 10) / object._tex.length)
+      // delay: function (el) {
+      //   return (timeDuration * 10) / object._tex.length;
+      // }
+
+      //delay: anime.stagger(1000)
+    },
+    delayDuration
+  );
+}
+
+function growFromCenterAnimatorTeX(
+  object: TeX,
+  timeDuration: number,
+  delayDuration: string | number
+) {
+  const g = object.writeTexElement.elt.querySelectorAll('g');
   animationTimeline.add(
     {
       targets: object.writeTexElement.elt.querySelectorAll('path'),
@@ -361,11 +474,11 @@ function writeAnimatorTeX(
         g[0].setAttribute('stroke-width', '10px');
       },
       complete: function (anim) {
-        g[0].setAttribute('fill', 'black');
+        // g[0].setAttribute('fill', 'black');
       },
       easing: 'easeInOutCubic',
       duration: timeDuration,
-      delay: anime.stagger(400)
+      delay: anime.stagger(400, { from: 'center' })
     },
     delayDuration
   );

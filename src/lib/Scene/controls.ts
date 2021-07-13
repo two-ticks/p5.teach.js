@@ -1,12 +1,19 @@
 import anime from 'animejs';
+export function clock() {
+  return animationTimeline.duration * (animationTimeline.progress / 100);
+}
 
 export let animationTimeline = anime.timeline({}); //initilising a timeline
+// animationTimeline.add({});
 
 export function createControls() {
+  let p5Canvas = document
+    .getElementsByClassName('p5Canvas')[0]
+    .getBoundingClientRect();
   let controlsDiv = document.createElement('div');
-  controlsDiv.setAttribute('class','controls');
+  controlsDiv.setAttribute('class', 'controls');
   document.body.appendChild(controlsDiv);
-  
+
   let progressBar = document.createElement('input');
   progressBar.setAttribute('type', 'range');
   progressBar.setAttribute('min', `${0}`);
@@ -15,12 +22,12 @@ export function createControls() {
   progressBar.setAttribute('step', `${0.001}`);
   progressBar.setAttribute(
     'style',
-    `appearance: none; width: 400px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;`
+    `appearance: none; width: ${p5Canvas.width}px; height: 1px; background: #d3d3d3; display: block; margin-top: 10px; margin-bottom: 10px;`
   );
   controlsDiv.appendChild(progressBar);
 
   progressBar.oninput = function () {
-    pauseScene();
+    animationTimeline.pause();
     //console.log(animationTimeline.duration * (progressBar.valueAsNumber / 100));
     animationTimeline.seek(
       animationTimeline.duration * (progressBar.valueAsNumber / 100)
@@ -65,17 +72,17 @@ export function createControls() {
   });
 }
 
-export function playScene() {
-  animationTimeline.play();
-}
+// export function playScene() {
+//   animationTimeline.play();
+// }
 
-export function pauseScene() {
-  animationTimeline.pause();
-}
+// export function pauseScene() {
+//   animationTimeline.pause();
+// }
 
-export function restartScene() {
-  animationTimeline.restart();
-}
+// export function restartScene() {
+//   animationTimeline.restart();
+// }
 
 //<input class="progress" step=".001" type="range" min="0" max="100" value="0">
 
