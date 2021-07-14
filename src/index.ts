@@ -18,3 +18,18 @@ global.play = play;
 
 import { Scene } from './lib/Scene/scene';
 global.Scene = Scene;
+
+import {
+  //sceneTime,
+  createControls,
+  clock
+  // pauseScene,
+  // playScene,
+  // restartScene
+} from './lib/Scene/controls';
+//global.sceneTime = sceneTime;
+global.createControls = createControls;
+global.clock = clock;
+// global.pauseScene = pauseScene;
+// global.playScene = playScene;
+// global.restartScene = restartScene;

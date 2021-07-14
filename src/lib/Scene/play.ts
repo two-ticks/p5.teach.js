@@ -3,6 +3,7 @@ import { TeX } from '../MObject/TeX';
 import anime from 'animejs';
 import { add } from './add';
 import * as CONFIG from '../config.js';
+import { animationTimeline } from './controls';
 
 //TODO : fix relative time
 //TODO : text animation for all-at-once
@@ -22,7 +23,7 @@ import * as CONFIG from '../config.js';
  * @experimental
  */
 
-let animationTimeline = anime.timeline(); //initilising a timeline
+//let animationTimeline = anime.timeline(); //initilising a timeline
 
 export function play(
   //any, //TODO: use '...args'
@@ -469,7 +470,7 @@ function createFillAnimatorTeX(
   animationTimeline
     .add(
       {
-        targets: object.writeElement.elt.querySelectorAll('path'),
+        targets: [object.writeElement.elt.querySelectorAll('path'),object.writeElement.elt.querySelectorAll('rect')],
         //scale: [4, 1],
         //fill: [`${object.fillColor.toString('#rgb')}0` , object.fillColor.toString()], //TODO : fill is black by default can be customised through set fill methods
         //stroke : "black",     //TODO : customisable through config
@@ -492,7 +493,7 @@ function createFillAnimatorTeX(
     )
     .add(
       {
-        targets: use,
+        targets: [use,g],
         //scale: [4, 1],
         fill: [
           `${object.fillColor.toString('#rgb')}0`,
@@ -503,7 +504,7 @@ function createFillAnimatorTeX(
         //strokeDashoffset: [anime.setDashoffset, 0],
         //opacity: [0, 0.2, 1],
         begin: function (anim) {
-          g[0].setAttribute('fill', 'none');
+          //g[0].setAttribute('fill', 'none');
           //g[0].setAttribute('stroke-width', '10px');
         },
         complete: function (anim) {
