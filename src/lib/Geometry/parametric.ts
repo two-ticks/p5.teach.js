@@ -1,18 +1,19 @@
 import anime from 'animejs';
 import { transform } from '../Scene/transform';
+import { GObject } from './GObject';
 
-export class GraphParametric2D {
+export class GraphParametric2D extends GObject {
   xeqn: any;
   yeqn: any;
   parameterRange: number[];
-  pathData: any;
-  graphObject: any;
-  graphContainer: any;
-  x: number;
-  y: number;
-  svgWidth: number;
-  svgHeight: number;
-  linePath: SVGPathElement;
+  // pathData: any;
+  // graphObject: any;
+  // graphContainer: any;
+  // x: number;
+  // y: number;
+  // svgWidth: number;
+  // svgHeight: number;
+  // linePath: SVGPathElement;
 
   constructor(
     xeqn: any,
@@ -23,13 +24,14 @@ export class GraphParametric2D {
     svgWidth: number = 300,
     svgHeight: number = 300
   ) {
+    super(x, y, svgWidth, svgHeight);
     this.xeqn = xeqn;
     this.yeqn = yeqn;
     this.parameterRange = parameterRange;
-    this.x = x;
-    this.y = y;
-    this.svgWidth = svgWidth;
-    this.svgHeight = svgHeight;
+    // this.x = x;
+    // this.y = y;
+    // this.svgWidth = svgWidth;
+    // this.svgHeight = svgHeight;
     this.pathData = createParametricSVGPath(xeqn, yeqn, parameterRange);
     this.graphContainer = createElement('div');
     this.linePath = document.createElementNS(

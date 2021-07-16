@@ -2,18 +2,10 @@ import anime from 'animejs';
 import { animationTimeline } from '../Scene/controls';
 import { sceneContainer } from '../Scene/scene';
 import { transform } from '../Scene/transform';
+import { GObject } from './GObject';
 
-export class Graph2D {
+export class Graph2D extends GObject {
   eqn: any;
-  pathData: any;
-  graphObject: any;
-  graphContainer: any;
-  x: number;
-  y: number;
-  svgWidth: number;
-  svgHeight: number;
-  linePath: SVGPathElement;
-
   constructor(
     eqn: any,
     x: number = 10,
@@ -21,15 +13,16 @@ export class Graph2D {
     svgWidth: number = 300,
     svgHeight: number = 300
   ) {
+    super(x, y, svgWidth, svgHeight);
     this.eqn = eqn;
-    this.x = x;
-    this.y = y;
-    this.svgWidth = svgWidth;
-    this.svgHeight = svgHeight;
+    // this.x = x;
+    // this.y = y;
+    // this.svgWidth = svgWidth;
+    // this.svgHeight = svgHeight;
     this.pathData = createSVGPath(eqn);
     this.graphContainer = createElement('div'); //attaching it to sceneContainer
     this.graphContainer.parent(sceneContainer);
-    this.linePath = this.linePath = document.createElementNS(
+    this.linePath = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'path'
     );

@@ -1,32 +1,35 @@
 import anime from 'animejs';
 import { transform } from '../Scene/transform';
+import { GObject } from './GObject';
 
-export class GraphPolar2D {
+export class GraphPolar2D extends GObject {
   eqn: any;
   thetaRange: number[];
-  pathData: any;
-  graphObject: any;
-  graphContainer: any;
-  x: number;
-  y: number;
-  width_svg: number;
-  height_svg: number;
-  linePath: SVGPathElement;
+  // pathData: any;
+  // graphObject: any;
+  // graphContainer: any;
+  // x: number;
+  // y: number;
+  // width_svg: number;
+  // height_svg: number;
+  // linePath: SVGPathElement;
 
   constructor(
     eqn: any,
     thetaRange: number[] = [0, 2 * Math.PI],
     x: number = 10,
     y: number = 10,
-    width_svg: number = 300,
-    height_svg: number = 300
+    svgWidth: number = 300,
+    svgHeight: number = 300
   ) {
+    super(x, y, svgWidth, svgHeight);
+
     this.eqn = eqn;
     this.thetaRange = thetaRange;
-    this.x = x;
-    this.y = y;
-    this.width_svg = width_svg;
-    this.height_svg = height_svg;
+    // this.x = x;
+    // this.y = y;
+    // this.width_svg = width_svg;
+    // this.height_svg = height_svg;
     this.pathData = createPolarSVGPath(eqn, thetaRange);
     this.graphContainer = createElement('div');
     this.linePath = document.createElementNS(
@@ -53,8 +56,8 @@ export class GraphPolar2D {
       'svg'
     );
     //this.graphObject.setAttribute('style', `translate(-50%, -50%)`);
-    this.graphObject.setAttribute('width', `${this.width_svg}`);
-    this.graphObject.setAttribute('height', `${this.height_svg}`);
+    this.graphObject.setAttribute('width', `${this.svgWidth}`);
+    this.graphObject.setAttribute('height', `${this.svgHeight}`);
     this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
     this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.linePath.setAttribute('d', this.pathData);
