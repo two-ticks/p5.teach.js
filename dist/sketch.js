@@ -9,6 +9,7 @@ function setup() {
   drawTriangle();
   drawTitle();
   drawEquation();
+  drawGraph();
 }
 
 function drawTriangle() {
@@ -52,9 +53,19 @@ function drawTitle() {
 function drawEquation() {
   let equation = createTeX('a^2 + b^2 = c^2');
   equation.position(135, 315);
-  equation.size(90);
+  equation.size(40);
   equation.stroke(MAGENTA50);
   equation.strokeWidth(30);
   equation.fill(MAGENTA50);
   equation.play('createFill', 2, 12);
+}
+
+function drawGraph() {
+  grp = create2DGraph(
+    (t) =>
+      800 * Math.cos(2 * t) + 1000 * Math.sin(4 * t) + 800 * Math.sin(6 * t)
+  );
+  grp.plot();
+  grp.position(40, 120);
+  grp.play();
 }

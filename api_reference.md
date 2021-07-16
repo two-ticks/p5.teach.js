@@ -2,9 +2,9 @@
 
 ## Index
 
-  - [`createText(text, x, y, font-size)`](#createtexttext-x-y-font-size)
-  - [`createTeX(tex, x, y, width, height)`](#createtextex-x-y-width-height)
-  - 
+- [`createText(text, x, y, font-size)`](#createtexttext-x-y-font-size)
+- [`createTeX(tex, x, y, width, height)`](#createtextex-x-y-width-height)
+-
 
 ## `createText(text, x, y, font-size)`
 
@@ -137,6 +137,7 @@ async function reel() {
   play(tex, 'all-at-once');
 }
 ```
+
 ## `create2DGraph(equation, x, y, width, height)`
 
 **Parameters**
@@ -225,9 +226,13 @@ function reel() {
 
 ```js
 curve = create2DPolarGraph(
-  (t) => 15 * (Math.pow(Math.E, Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5)),
+  (t) =>
+    15 *
+    (Math.pow(Math.E, Math.cos(t)) -
+      2 * Math.cos(4 * t) -
+      Math.pow(Math.sin(t / 12), 5)),
   [0, 12 * Math.PI]
-)
+);
 ```
 
 | Method                     | Description                           |
@@ -344,15 +349,13 @@ function reel() {
 }
 ```
 
-
 ## `createControls()`
 
 **Parameters**
 
-| Parameter    | Type           | Description        |
-| :----------- | :------------- | :----------------- |
-|   |      |        |
-
+| Parameter | Type | Description |
+| :-------- | :--- | :---------- |
+|           |      |             |
 
 [ ] : optional arguments
 
@@ -360,17 +363,16 @@ function reel() {
 createControls();
 ```
 
-| Method                     | Description                           |
-| :------------------------- | :------------------------------------ |
-|               |                       |
-
+| Method | Description |
+| :----- | :---------- |
+|        |             |
 
 **Example**
 
 [🔗example sketch](https://editor.p5js.org/radium.scientist/sketches/PpfDceZsi)
 
 ```js
-let MAGENTA50 = "#dc267f";
+let MAGENTA50 = '#dc267f';
 function setup() {
   createCanvas(400, 400);
   scene = new Scene();
@@ -392,16 +394,17 @@ function draw() {
 }
 
 function reel() {
-  let title = createText("Lorentz Transformation", 30, 75, 35);
-  title.fill("red");
-  title.play("growFromCenter", 1, 4);
-  let equation = createTeX("\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}");
+  let title = createText('Lorentz Transformation', 30, 75, 35);
+  title.fill('red');
+  title.play('growFromCenter', 1, 4);
+  let equation = createTeX(
+    '\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
+  );
   equation.position(45, 175);
   equation.size(50);
   equation.stroke(MAGENTA50);
   equation.strokeWidth(20);
   equation.fill(MAGENTA50);
-  equation.play("createFill", 1, 6);
+  equation.play('createFill', 1, 6);
 }
 ```
-
