@@ -21,6 +21,7 @@ export class Graph2D extends GObject {
     super(x, y, svgWidth, svgHeight);
 
     this.config = {
+      graphColor : 'blue',
       arrowSize: 3,
       minX: -5,
       maxX: 5.5,
@@ -89,6 +90,7 @@ export class Graph2D extends GObject {
 
   configure(config) {
     this.config = {
+      graphColor: config.graphColor ? config.graphColor : this.config.graphColor,
       arrowSize: config.arrowSize ? config.arrowSize : this.config.arrowSize,
       minX: config.minX ? config.minX : this.config.minX,
       maxX: config.maxX ? config.maxX : this.config.maxX,
@@ -162,13 +164,14 @@ export class Graph2D extends GObject {
     });
   }
   stroke(_stroke: any) {
-    this.linePath.setAttribute('stroke', `${_stroke}`);
+    this.config.graphColor
+    // this.linePath.setAttribute('stroke', `${_stroke}`);
   }
   plot() {
     this.pathData = createSVGPath(this.eqn, this.config);
     this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     this.plotting.setAttribute('id', 'plot');
-
+    this.linePath.setAttribute('stroke', `${this.config.graphColor}`);
     this.linePath.setAttribute('d', this.pathData);
     this.plotting.appendChild(this.linePath); // <g id="plot">
     this.graphObject.appendChild(this.plotting);
