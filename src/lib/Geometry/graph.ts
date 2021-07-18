@@ -21,8 +21,10 @@ export class Graph2D extends GObject {
     super(x, y, svgWidth, svgHeight);
 
     this.config = {
-      graphColor : 'blue',
+      graphColor: 'blue',
       arrowSize: 3,
+      xAxis: 'true',
+      yAxis: 'true',
       minX: -5,
       maxX: 5.5,
       minY: -5,
@@ -36,6 +38,8 @@ export class Graph2D extends GObject {
       stepY: 1,
       originX: 0,
       originY: 0,
+      tickX: 'true',
+      tickY: 'true',
       tickColor: 'white',
       tickMarginX: -0.5,
       tickMarginY: -0.5
@@ -90,8 +94,12 @@ export class Graph2D extends GObject {
 
   configure(config) {
     this.config = {
-      graphColor: config.graphColor ? config.graphColor : this.config.graphColor,
+      graphColor: config.graphColor
+        ? config.graphColor
+        : this.config.graphColor,
       arrowSize: config.arrowSize ? config.arrowSize : this.config.arrowSize,
+      xAxis: config.xAxis ? config.xAxis : this.config.xAxis,
+      yAxis: config.yAxis ? config.yAxis : this.config.yAxis,
       minX: config.minX ? config.minX : this.config.minX,
       maxX: config.maxX ? config.maxX : this.config.maxX,
       minY: config.minY ? config.minY : this.config.minY,
@@ -107,6 +115,8 @@ export class Graph2D extends GObject {
       stepY: config.stepY ? config.stepY : this.config.stepY,
       originX: config.originX ? config.originX : this.config.originX,
       originY: config.originY ? config.originY : this.config.originY,
+      tickX: config.tickX ? config.tickX : this.config.tickX,
+      tickY: config.tickY ? config.tickY : this.config.tickY,
       tickColor: config.tickColor ? config.tickColor : this.config.tickColor,
       tickMarginX: config.tickMarginX
         ? config.tickMarginX
@@ -164,8 +174,8 @@ export class Graph2D extends GObject {
     });
   }
   stroke(_stroke: any) {
-    this.config.graphColor
-    // this.linePath.setAttribute('stroke', `${_stroke}`);
+    this.config.graphColor = _stroke;
+    this.linePath.setAttribute('stroke', `${_stroke}`);
   }
   plot() {
     this.pathData = createSVGPath(this.eqn, this.config);
@@ -242,146 +252,169 @@ export class Graph2D extends GObject {
     this.coordinate.appendChild(grid);
 
     //axes
-    let xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    xAxis.setAttribute('x1', `${-this.svgWidth / 2}`);
-    xAxis.setAttribute('y1', `${-this.config.originY * this.config.scaleY}`);
-    xAxis.setAttribute('x2', `${this.svgWidth / 2}`);
-    xAxis.setAttribute('y2', `${-this.config.originY * this.config.scaleY}`);
-    xAxis.setAttribute('marker-start', 'url(#marker-arrow)');
-    xAxis.setAttribute('marker-end', 'url(#marker-arrow)');
-    xAxis.setAttribute('stroke', `${this.config.axisColor}`);
-    xAxis.setAttribute('fill', `none`);
+    //console.log(this.config.axisX);
+    // console.log(this.config.tickX);
+    if (this.config.xAxis === 'true') {
+      let xAxis = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'line'
+      );
+      xAxis.setAttribute('x1', `${-this.svgWidth / 2}`);
+      xAxis.setAttribute('y1', `${-this.config.originY * this.config.scaleY}`);
+      xAxis.setAttribute('x2', `${this.svgWidth / 2}`);
+      xAxis.setAttribute('y2', `${-this.config.originY * this.config.scaleY}`);
+      xAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      xAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      xAxis.setAttribute('stroke', `${this.config.axisColor}`);
+      xAxis.setAttribute('fill', `none`);
+      this.coordinate.appendChild(xAxis);
 
-    let yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    yAxis.setAttribute('x1', `${this.config.originX * this.config.scaleX}`);
-    yAxis.setAttribute('y1', `${-this.svgHeight / 2}`);
-    yAxis.setAttribute('x2', `${this.config.originX * this.config.scaleX}`);
-    yAxis.setAttribute('y2', `${this.svgHeight / 2}`);
-    yAxis.setAttribute('marker-start', 'url(#marker-arrow)');
-    yAxis.setAttribute('marker-end', 'url(#marker-arrow)');
-    yAxis.setAttribute('stroke', `${this.config.axisColor}`);
-    yAxis.setAttribute('fill', `none`);
+      if (this.config.tickX === 'true') {
+        let tick;
+        //x axis
+        //+ve axis
+        for (
+          let i = 0;
+          i <
+          abs(
+            int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)
+          ) /
+            this.config.stepX;
+          i++
+        ) {
+          let x =
+            this.config.originX * this.config.scaleX +
+            (i + 1) * this.config.stepX * this.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', `${x}`);
+          tick.setAttribute(
+            'y',
+            `${
+              -this.config.originY * this.config.scaleY -
+              this.config.tickMarginX * this.config.scaleY
+            }`
+          );
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = `${this.config.tickColor}`;
+          this.coordinate.appendChild(tick);
+        }
+
+        //console.log(int(this.svgWidth / (2*this.config.scaleX)) + this.config.originX);
+
+        //-ve axis
+        for (
+          let i = abs(
+            int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX
+          );
+          i >= 0;
+          i--
+        ) {
+          let x =
+            this.config.originX * this.config.scaleX -
+            (i + 1) * this.config.stepX * this.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', `${x}`);
+          tick.setAttribute(
+            'y',
+            `${
+              -this.config.originY * this.config.scaleY -
+              this.config.tickMarginX * this.config.scaleY
+            }`
+          );
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = `${this.config.tickColor}`;
+          this.coordinate.appendChild(tick);
+        }
+      }
+    }
+
+    if (this.config.yAxis === 'true') {
+      let yAxis = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'line'
+      );
+      yAxis.setAttribute('x1', `${this.config.originX * this.config.scaleX}`);
+      yAxis.setAttribute('y1', `${-this.svgHeight / 2}`);
+      yAxis.setAttribute('x2', `${this.config.originX * this.config.scaleX}`);
+      yAxis.setAttribute('y2', `${this.svgHeight / 2}`);
+      yAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      yAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      yAxis.setAttribute('stroke', `${this.config.axisColor}`);
+      yAxis.setAttribute('fill', `none`);
+      this.coordinate.appendChild(yAxis);
+      if (this.config.tickY === 'true') {
+        let tick;
+        //y axis
+        //+ve axis
+        for (
+          let i = 0;
+          i <=
+          abs(
+            -int(this.svgHeight / (2 * this.config.scaleY)) +
+              this.config.originY
+          );
+          i++
+        ) {
+          let y =
+            -this.config.originY * this.config.scaleY -
+            (i + 1) * this.config.stepY * this.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute(
+            'x',
+            `${
+              this.config.originX * this.config.scaleX +
+              this.config.tickMarginY * this.config.scaleX
+            }`
+          );
+          tick.setAttribute('y', `${y}`);
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = `${this.config.tickColor}`;
+          this.coordinate.appendChild(tick);
+        }
+        //-ve axis
+        for (
+          let i = abs(
+            -int(this.svgHeight / (2 * this.config.scaleY)) -
+              this.config.originY
+          );
+          i >= 0;
+          i--
+        ) {
+          let y =
+            -this.config.originY * this.config.scaleY +
+            (i + 1) * this.config.stepY * this.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute(
+            'x',
+            `${
+              this.config.originX * this.config.scaleX +
+              this.config.tickMarginY * this.config.scaleX
+            }`
+          );
+          tick.setAttribute('y', `${y}`);
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = `${this.config.tickColor}`;
+          this.coordinate.appendChild(tick);
+        }
+      }
+    }
+
     //xAxis.setAttribute('stroke', color);
     //xAxis.setAttribute('stroke-width', w);
 
-    this.coordinate.appendChild(xAxis);
-    this.coordinate.appendChild(yAxis);
-
     //ticks
-    let tick;
-    //x axis
-    //+ve axis
-    for (
-      let i = 0;
-      i <
-      abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) /
-        this.config.stepX;
-      i++
-    ) {
-      let x =
-        this.config.originX * this.config.scaleX +
-        (i + 1) * this.config.stepX * this.config.scaleX;
-      tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      tick.setAttribute('x', `${x}`);
-      tick.setAttribute(
-        'y',
-        `${
-          -this.config.originY * this.config.scaleY -
-          this.config.tickMarginX * this.config.scaleY
-        }`
-      );
-      tick.innerHTML = (i + 1).toString();
-      tick.style.textAnchor = 'middle';
-      tick.style.alignmentBaseline = 'middle';
-      tick.style.strokeOpacity = '.2';
-      tick.style.fill = `${this.config.tickColor}`;
-      this.coordinate.appendChild(tick);
-    }
-
-    //console.log(int(this.svgWidth / (2*this.config.scaleX)) + this.config.originX);
-
-    //-ve axis
-    for (
-      let i = abs(
-        int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX
-      );
-      i >= 0;
-      i--
-    ) {
-      let x =
-        this.config.originX * this.config.scaleX -
-        (i + 1) * this.config.stepX * this.config.scaleX;
-      tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      tick.setAttribute('x', `${x}`);
-      tick.setAttribute(
-        'y',
-        `${
-          -this.config.originY * this.config.scaleY -
-          this.config.tickMarginX * this.config.scaleY
-        }`
-      );
-      tick.innerHTML = -(i + 1).toString();
-      tick.style.textAnchor = 'middle';
-      tick.style.alignmentBaseline = 'middle';
-      tick.style.strokeOpacity = '.2';
-      tick.style.fill = `${this.config.tickColor}`;
-      this.coordinate.appendChild(tick);
-    }
-
-    //y axis
-    //+ve axis
-    for (
-      let i = 0;
-      i <=
-      abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY);
-      i++
-    ) {
-      let y =
-        -this.config.originY * this.config.scaleY -
-        (i + 1) * this.config.stepY * this.config.scaleY;
-      tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      tick.setAttribute(
-        'x',
-        `${
-          this.config.originX * this.config.scaleX +
-          this.config.tickMarginY * this.config.scaleX
-        }`
-      );
-      tick.setAttribute('y', `${y}`);
-      tick.innerHTML = (i + 1).toString();
-      tick.style.textAnchor = 'middle';
-      tick.style.alignmentBaseline = 'middle';
-      tick.style.strokeOpacity = '.2';
-      tick.style.fill = `${this.config.tickColor}`;
-      this.coordinate.appendChild(tick);
-    }
-    //-ve axis
-    for (
-      let i = abs(
-        -int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY
-      );
-      i >= 0;
-      i--
-    ) {
-      let y =
-        -this.config.originY * this.config.scaleY +
-        (i + 1) * this.config.stepY * this.config.scaleY;
-      tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      tick.setAttribute(
-        'x',
-        `${
-          this.config.originX * this.config.scaleX +
-          this.config.tickMarginY * this.config.scaleX
-        }`
-      );
-      tick.setAttribute('y', `${y}`);
-      tick.innerHTML = -(i + 1).toString();
-      tick.style.textAnchor = 'middle';
-      tick.style.alignmentBaseline = 'middle';
-      tick.style.strokeOpacity = '.2';
-      tick.style.fill = `${this.config.tickColor}`;
-      this.coordinate.appendChild(tick);
-    }
 
     //this.plotting.appendChild(this.linePath);
     this.graphObject.appendChild(this.coordinate); // <g id="coordinateSystem">

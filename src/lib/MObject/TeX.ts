@@ -105,6 +105,19 @@ export class TeX extends MObject {
     this.writeElement.style(property, value);
   }
 
+  update(_tex) {
+    this.svgEquation = TeXToSVG(_tex);
+    this.writeElement.html(this.svgEquation);
+    let svg = this.writeElement.elt.querySelectorAll('svg');
+    let g = this.writeElement.elt.querySelectorAll('g');
+    //svg[0].setAttribute('width', `${object.svgWidth}px`);
+    //svg[0].setAttribute('height', `${object.svgHeight}px`);
+    g[0].setAttribute('stroke', this.strokeColor.toString());
+    g[0].setAttribute('stroke-width', this._strokeWidth);
+    g[0].setAttribute('fill', this.fillColor.toString());
+    svg[0].setAttribute('fill', this.fillColor.toString());
+  }
+
   play(
     animationType: string = 'write',
     startTime: number = 0,

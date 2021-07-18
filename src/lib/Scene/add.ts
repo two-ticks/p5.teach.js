@@ -13,7 +13,7 @@ export function add(object: Text | TeX) {
     //svg[0].setAttribute('height', `${object.svgHeight}px`);
     g[0].setAttribute('stroke', object.strokeColor.toString());
     g[0].setAttribute('stroke-width', object._strokeWidth);
-
+    g[0].setAttribute('fill', object.fillColor.toString());
     svg[0].setAttribute('fill', object.fillColor.toString());
     // svg[0].style.fontSize = `${object._size}px`;
     object.writeElement.style('font-size', `${object._size}px`);
