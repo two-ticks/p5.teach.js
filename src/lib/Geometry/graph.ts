@@ -15,36 +15,47 @@ export class Graph2D extends GObject {
     x: number = 10,
     y: number = 10,
     svgWidth: number = 300,
-    svgHeight: number = 300
+    svgHeight: number = 300,
+    config?
   ) {
     super(x, y, svgWidth, svgHeight);
-    this.eqn = eqn;
-    // this.x = x;
-    // this.y = y;
+
     this.config = {
       arrowSize: 3,
-      minX: -10,
-      maxX: 10,
-      minY: -10,
-      maxY: 10,
+      minX: -5,
+      maxX: 5.5,
+      minY: -5,
+      maxY: 5,
       scaleX: 1.2,
       scaleY: 1,
       axisColor: 'white',
-      stepX: 15,
-      stepY: 5
+      smallGridColor: 'white',
+      gridColor: 'white',
+      stepX: 1,
+      stepY: 1,
+      originX: 0,
+      originY: 0,
+      tickColor: 'white',
+      tickMarginX: -0.5,
+      tickMarginY: -0.5
     };
 
-    this.config.minX = -this.svgWidth / 2;
-    this.config.maxX = this.svgWidth / 2;
-      console.log(this.config.minX);
-      
-    this.pathData = createSVGPath(
-      eqn,
-      this.config.minX,
-      this.config.maxX,
-      this.config.scaleX,
-      this.config.scaleY
+    this.eqn = eqn;
+    // this.x = x;
+    // this.y = y;
+
+    //this.config.minX = -this.svgWidth / 2;
+    //this.config.maxX = this.svgWidth / 2;
+    this.config.scaleX = abs(
+      this.svgWidth / (this.config.maxX - this.config.minX)
     );
+    this.config.scaleY = abs(
+      this.svgHeight / (this.config.maxY - this.config.minY)
+    );
+
+    //console.log(this.config.maxX - this.config.minX);
+
+    // this.pathData = createSVGPath(eqn, this.config);
     this.graphContainer = createElement('div'); //attaching it to sceneContainer
     this.graphContainer.parent(sceneContainer);
     this.linePath = document.createElementNS(
@@ -76,6 +87,34 @@ export class Graph2D extends GObject {
     this.graphContainer.position(this.x, this.y);
   }
 
+  configure(config) {
+    this.config = {
+      arrowSize: config.arrowSize ? config.arrowSize : this.config.arrowSize,
+      minX: config.minX ? config.minX : this.config.minX,
+      maxX: config.maxX ? config.maxX : this.config.maxX,
+      minY: config.minY ? config.minY : this.config.minY,
+      maxY: config.maxY ? config.maxY : this.config.maxY,
+      scaleX: config.scaleX ? config.scaleX : this.config.scaleX,
+      scaleY: config.scaleY ? config.scaleY : this.config.scaleY,
+      axisColor: config.axisColor ? config.axisColor : this.config.axisColor,
+      smallGridColor: config.smallGridColor
+        ? config.smallGridColor
+        : this.config.smallGridColor,
+      gridColor: config.gridColor ? config.gridColor : this.config.gridColor,
+      stepX: config.stepX ? config.stepX : this.config.stepX,
+      stepY: config.stepY ? config.stepY : this.config.stepY,
+      originX: config.originX ? config.originX : this.config.originX,
+      originY: config.originY ? config.originY : this.config.originY,
+      tickColor: config.tickColor ? config.tickColor : this.config.tickColor,
+      tickMarginX: config.tickMarginX
+        ? config.tickMarginX
+        : this.config.tickMarginX,
+      tickMarginY: config.tickMarginY
+        ? config.tickMarginY
+        : this.config.tickMarginY
+    };
+    //console.log(this.config);
+  }
   size(width, height) {
     if (arguments.length === 0) {
       return [this.svgWidth, this.svgHeight];
@@ -108,7 +147,7 @@ export class Graph2D extends GObject {
       targets: this.graphContainer.elt.querySelectorAll('path')[0],
       d: [
         //{value: shapes[0].d},
-        { value: `${createSVGPath(finlEqn)}` }
+        { value: `${createSVGPath(finlEqn, this.config)}` }
       ],
       duration: timeDuration,
       direction: 'alternate',
@@ -126,6 +165,7 @@ export class Graph2D extends GObject {
     this.linePath.setAttribute('stroke', `${_stroke}`);
   }
   plot() {
+    this.pathData = createSVGPath(this.eqn, this.config);
     this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     this.plotting.setAttribute('id', 'plot');
 
@@ -157,21 +197,35 @@ export class Graph2D extends GObject {
     this.graphObject.appendChild(defs);
     // this.graphObject.appendChild(arrowPath);
 
-    let frame = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    frame.setAttribute('x', `${-this.svgWidth / 2}`);
-    frame.setAttribute('y', `${-this.svgHeight / 2}`);
-    frame.setAttribute('width', `${this.svgWidth}`);
-    frame.setAttribute('height', `${this.svgHeight}`);
-    frame.setAttribute('fill', `rgba(0,0,0,0)`);
-    frame.setAttribute('stroke', `black`);
+    // let frame = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    // frame.setAttribute('x', `${-this.svgWidth / 2}`);
+    // frame.setAttribute('y', `${-this.svgHeight / 2}`);
+    // frame.setAttribute('width', `${this.svgWidth}`);
+    // frame.setAttribute('height', `${this.svgHeight}`);
+    // frame.setAttribute('fill', `rgba(0,0,0,0)`);
+    // frame.setAttribute('stroke', `white`);
 
     //grid
-    defs.innerHTML += `<pattern id="smallGrid" width="10" height="10" patternUnits="userSpaceOnUse">
-     <path d="M 10 0 L 0 0 0 10" fill="none" stroke="darkgreen" stroke-width="0.5"/>
+    defs.innerHTML += `<pattern id="smallGrid" width="${
+      this.config.stepX * this.config.scaleX
+    }" height="${
+      this.config.stepY * this.config.scaleY
+    }" patternUnits="userSpaceOnUse">
+     <path d="M ${this.config.stepX * this.config.scaleX} 0 L 0 0 0 ${
+      this.config.stepY * this.config.scaleY
+    }" fill="none" stroke="${this.config.smallGridColor}" stroke-width="0.5"/>
     </pattern>
-    <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
-     <rect width="100" height="100" fill="url(#smallGrid)"/>
-     <path d="M 100 0 L 0 0 0 100" fill="none" stroke="darkgreen" stroke-width="1"/>
+    <pattern x = ${this.config.originX * this.config.scaleX} y = ${
+      this.config.originY * this.config.scaleY
+    } id="grid" width="${4 * this.config.stepX * this.config.scaleX}" height="${
+      4 * this.config.stepY * this.config.scaleY
+    }" patternUnits="userSpaceOnUse">
+     <rect width="${4 * this.config.stepX * this.config.scaleX}" height="${
+      4 * this.config.stepY * this.config.scaleY
+    }" fill="url(#smallGrid)"/>
+     <path d="M ${4 * this.config.stepX * this.config.scaleX} 0 L 0 0 0 ${
+      4 * this.config.stepY * this.config.scaleY
+    }" fill="none" stroke="${this.config.gridColor}" stroke-width="1"/>
     </pattern>`;
 
     let grid = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -181,24 +235,24 @@ export class Graph2D extends GObject {
     grid.setAttribute('height', `100%`);
     grid.setAttribute('fill', `url(#grid)`);
     grid.setAttribute('stroke', `white`);
-    this.coordinate.appendChild(frame);
+    //this.coordinate.appendChild(frame);
     this.coordinate.appendChild(grid);
 
     //axes
     let xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     xAxis.setAttribute('x1', `${-this.svgWidth / 2}`);
-    xAxis.setAttribute('y1', `0`);
+    xAxis.setAttribute('y1', `${-this.config.originY * this.config.scaleY}`);
     xAxis.setAttribute('x2', `${this.svgWidth / 2}`);
-    xAxis.setAttribute('y2', `0`);
+    xAxis.setAttribute('y2', `${-this.config.originY * this.config.scaleY}`);
     xAxis.setAttribute('marker-start', 'url(#marker-arrow)');
     xAxis.setAttribute('marker-end', 'url(#marker-arrow)');
     xAxis.setAttribute('stroke', `${this.config.axisColor}`);
     xAxis.setAttribute('fill', `none`);
 
     let yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    yAxis.setAttribute('x1', `0`);
+    yAxis.setAttribute('x1', `${this.config.originX * this.config.scaleX}`);
     yAxis.setAttribute('y1', `${-this.svgHeight / 2}`);
-    yAxis.setAttribute('x2', `0`);
+    yAxis.setAttribute('x2', `${this.config.originX * this.config.scaleX}`);
     yAxis.setAttribute('y2', `${this.svgHeight / 2}`);
     yAxis.setAttribute('marker-start', 'url(#marker-arrow)');
     yAxis.setAttribute('marker-end', 'url(#marker-arrow)');
@@ -211,25 +265,127 @@ export class Graph2D extends GObject {
     this.coordinate.appendChild(yAxis);
 
     //ticks
-    // let tick;
-    // for (let i = -6; i <= 6; i++) {
-    //   let x = i * this.config.stepX;
-    //   tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    //   tick.setAttribute('x', `${x}`);
-    //   tick.setAttribute('y', `${0}`);
-    //   tick.innerHTML = i.toString();
-    //   tick.style.textAnchor = 'middle';
-    //   tick.style.alignmentBaseline = 'middle';
-    //   tick.style.strokeOpacity = '.2';
-    //   this.coordinate.appendChild(tick);
-    // }
+    let tick;
+    //x axis
+    //+ve axis
+    for (
+      let i = 0;
+      i <
+      abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) /
+        this.config.stepX;
+      i++
+    ) {
+      let x =
+        this.config.originX * this.config.scaleX +
+        (i + 1) * this.config.stepX * this.config.scaleX;
+      tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tick.setAttribute('x', `${x}`);
+      tick.setAttribute(
+        'y',
+        `${
+          -this.config.originY * this.config.scaleY -
+          this.config.tickMarginX * this.config.scaleY
+        }`
+      );
+      tick.innerHTML = (i + 1).toString();
+      tick.style.textAnchor = 'middle';
+      tick.style.alignmentBaseline = 'middle';
+      tick.style.strokeOpacity = '.2';
+      tick.style.fill = `${this.config.tickColor}`;
+      this.coordinate.appendChild(tick);
+    }
+
+    //console.log(int(this.svgWidth / (2*this.config.scaleX)) + this.config.originX);
+
+    //-ve axis
+    for (
+      let i = abs(
+        int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX
+      );
+      i >= 0;
+      i--
+    ) {
+      let x =
+        this.config.originX * this.config.scaleX -
+        (i + 1) * this.config.stepX * this.config.scaleX;
+      tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tick.setAttribute('x', `${x}`);
+      tick.setAttribute(
+        'y',
+        `${
+          -this.config.originY * this.config.scaleY -
+          this.config.tickMarginX * this.config.scaleY
+        }`
+      );
+      tick.innerHTML = -(i + 1).toString();
+      tick.style.textAnchor = 'middle';
+      tick.style.alignmentBaseline = 'middle';
+      tick.style.strokeOpacity = '.2';
+      tick.style.fill = `${this.config.tickColor}`;
+      this.coordinate.appendChild(tick);
+    }
+
+    //y axis
+    //+ve axis
+    for (
+      let i = 0;
+      i <=
+      abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY);
+      i++
+    ) {
+      let y =
+        -this.config.originY * this.config.scaleY -
+        (i + 1) * this.config.stepY * this.config.scaleY;
+      tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tick.setAttribute(
+        'x',
+        `${
+          this.config.originX * this.config.scaleX +
+          this.config.tickMarginY * this.config.scaleX
+        }`
+      );
+      tick.setAttribute('y', `${y}`);
+      tick.innerHTML = (i + 1).toString();
+      tick.style.textAnchor = 'middle';
+      tick.style.alignmentBaseline = 'middle';
+      tick.style.strokeOpacity = '.2';
+      tick.style.fill = `${this.config.tickColor}`;
+      this.coordinate.appendChild(tick);
+    }
+    //-ve axis
+    for (
+      let i = abs(
+        -int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY
+      );
+      i >= 0;
+      i--
+    ) {
+      let y =
+        -this.config.originY * this.config.scaleY +
+        (i + 1) * this.config.stepY * this.config.scaleY;
+      tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tick.setAttribute(
+        'x',
+        `${
+          this.config.originX * this.config.scaleX +
+          this.config.tickMarginY * this.config.scaleX
+        }`
+      );
+      tick.setAttribute('y', `${y}`);
+      tick.innerHTML = -(i + 1).toString();
+      tick.style.textAnchor = 'middle';
+      tick.style.alignmentBaseline = 'middle';
+      tick.style.strokeOpacity = '.2';
+      tick.style.fill = `${this.config.tickColor}`;
+      this.coordinate.appendChild(tick);
+    }
 
     //this.plotting.appendChild(this.linePath);
     this.graphObject.appendChild(this.coordinate); // <g id="coordinateSystem">
   }
 
   update(eqn: any) {
-    this.pathData = createSVGPath(eqn);
+    this.pathData = createSVGPath(eqn, this.config);
     this.linePath.setAttribute('d', this.pathData);
   }
 
@@ -257,25 +413,27 @@ export class Graph2D extends GObject {
   }
 }
 
-export function createSVGPath(
-  eqn: any,
-  minX: number = -13,
-  maxX: number = 12,
-  scaleX: number = 9,
-  scaleY: number = 0.5,
-  stepSize: number = 0.00001
-) {
+export function createSVGPath(eqn: any, config) {
   const pathElements = 1000;
   // const scaleX = 9;
   // const scaleY = 0.5;
-  stepSize = (maxX - minX) / pathElements;
-  console.log((maxX - minX));
-  
+  // scaleX = width/(maxX - minX);
+  const stepSize = (config.maxX - config.minX) / pathElements;
+
   //minX = 0;
-  let SVG_path = `M${scaleX * minX},${scaleY * eqn(minX)}`;
-  for (let x = minX; x < maxX; x += stepSize) {
+  let SVG_path = `M${
+    config.scaleX * config.minX + config.originX * config.scaleX
+  },${
+    config.scaleY * -eqn(config.minX + config.originX * config.scaleX) -
+    config.originY * config.scaleY
+  }`;
+  for (let x = config.minX; x < config.maxX; x += stepSize) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-    SVG_path = SVG_path.concat(` L${scaleX * x}, ${scaleY * eqn(x)}`);
+    SVG_path = SVG_path.concat(
+      ` L${config.scaleX * x + config.originX * config.scaleX}, ${
+        config.scaleY * -eqn(x) - config.originY * config.scaleY
+      }`
+    );
   }
   return SVG_path;
 }
@@ -285,8 +443,9 @@ export function create2DGraph(
   x: number = 10,
   y: number = 10,
   svgWidth: number = 300,
-  svgHeight: number = 300
+  svgHeight: number = 300,
+  config
 ) {
   //const _object =
-  return new Graph2D(eqn, x, y, svgWidth, svgHeight);
+  return new Graph2D(eqn, x, y, svgWidth, svgHeight, config);
 }
