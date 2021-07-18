@@ -4,6 +4,13 @@ import { sceneContainer } from '../Scene/scene';
 import { transform } from '../Scene/transform';
 import { GObject } from './GObject';
 
+// color blind safe palette
+const ULTRAMARINE40 = '#648fff';
+const MAGENTA50 = '#dc267f';
+const GOLD20 = '#ffb000';
+const INDIGO50 = '#785ef0';
+const ORANGE40 = '#fe6100';
+
 export class Graph2D extends GObject {
   eqn: any;
   plotting: any;
@@ -21,7 +28,7 @@ export class Graph2D extends GObject {
     super(x, y, svgWidth, svgHeight);
 
     this.config = {
-      graphColor: 'blue',
+      graphColor: GOLD20,
       arrowSize: 3,
       xAxis: 'true',
       yAxis: 'true',
@@ -31,16 +38,16 @@ export class Graph2D extends GObject {
       maxY: 5,
       scaleX: 1.2,
       scaleY: 1,
-      axisColor: 'white',
-      smallGridColor: 'white',
-      gridColor: 'white',
+      axisColor: INDIGO50,
+      smallGridColor: MAGENTA50,
+      gridColor:  ORANGE40,
       stepX: 1,
       stepY: 1,
       originX: 0,
       originY: 0,
       tickX: 'true',
       tickY: 'true',
-      tickColor: 'white',
+      tickColor: ULTRAMARINE40 ,
       tickMarginX: -0.5,
       tickMarginY: -0.5
     };

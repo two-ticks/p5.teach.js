@@ -2,7 +2,9 @@ import anime from 'animejs';
 export function clock() {
   return animationTimeline.duration * (animationTimeline.progress / 100);
 }
-
+export function addDuration(timeDuration) {
+  animationTimeline.add({ duration: timeDuration });
+}
 export let animationTimeline = anime.timeline({}); //initilising a timeline
 // animationTimeline.add({});
 

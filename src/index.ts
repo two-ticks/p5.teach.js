@@ -22,7 +22,8 @@ global.Scene = Scene;
 import {
   //sceneTime,
   createControls,
-  clock
+  clock,
+  addDuration
   // pauseScene,
   // playScene,
   // restartScene
@@ -30,6 +31,8 @@ import {
 //global.sceneTime = sceneTime;
 global.createControls = createControls;
 global.clock = clock;
+global.addDuration = addDuration;
+
 // global.pauseScene = pauseScene;
 // global.playScene = playScene;
 // global.restartScene = restartScene;
