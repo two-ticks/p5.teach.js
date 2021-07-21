@@ -66,10 +66,10 @@ export class GraphPolar2D extends GObject {
       xAxis: 'true',
       yAxis: 'true',
       minX: -5,
-      maxX: 5.5,
+      maxX: 5,
       minY: -5,
       maxY: 5,
-      scaleX: 1.2,
+      scaleX: 1,
       scaleY: 1,
       axisColor: INDIGO50,
       smallGridColor: MAGENTA50,
@@ -99,7 +99,7 @@ export class GraphPolar2D extends GObject {
     // this.y = y;
     // this.width_svg = width_svg;
     // this.height_svg = height_svg;
-    this.pathData = createPolarSVGPath(eqn, thetaRange, this.config);
+
     this.graphContainer = createElement('div');
     this.graphContainer.parent(sceneContainer);
     this.linePath = document.createElementNS(
@@ -196,6 +196,7 @@ export class GraphPolar2D extends GObject {
   }
 
   plot() {
+    this.pathData = createPolarSVGPath(this.eqn, this.thetaRange, this.config);
     //this.graphObject.setAttribute('style', `translate(-50%, -50%)`);
     this.graphObject.setAttribute('width', `${this.svgWidth}`);
     this.graphObject.setAttribute('height', `${this.svgHeight}`);
@@ -214,6 +215,7 @@ export class GraphPolar2D extends GObject {
     if (!(thetaRange.length === 0)) {
       this.thetaRange = thetaRange;
     }
+    this.eqn = eqn;
     this.pathData = createPolarSVGPath(eqn, this.thetaRange, this.config);
     this.linePath.setAttribute('d', this.pathData);
   }
@@ -256,6 +258,10 @@ export class GraphPolar2D extends GObject {
     } ${this.config.arrowSize} L 0 ${
       2 * this.config.arrowSize
     } z" style="fill: ${this.config.axisColor}"></path></marker>`;
+
+    this.coordinate.style.transform += `scaleX(${1})`;
+    this.coordinate.style.transform += `scaleY(${1})`;
+
     this.graphObject.appendChild(defs);
     // this.graphObject.appendChild(arrowPath);
 
@@ -282,20 +288,42 @@ export class GraphPolar2D extends GObject {
       dist(
         this.config.originX * this.config.scaleX,
         this.config.originY * this.config.scaleY,
-        this.svgWidth,
-        this.svgHeight
+        this.svgWidth / 2,
+        this.svgHeight / 2
       ),
       dist(
         this.config.originX * this.config.scaleX,
         this.config.originY * this.config.scaleY,
-        0,
-        0
+        -this.svgWidth / 2,
+        -this.svgHeight / 2
+      ),
+      dist(
+        this.config.originX * this.config.scaleX,
+        this.config.originY * this.config.scaleY,
+        this.svgWidth / 2,
+        -this.svgHeight / 2
+      ),
+      dist(
+        this.config.originX * this.config.scaleX,
+        this.config.originY * this.config.scaleY,
+        -this.svgWidth / 2,
+        this.svgHeight / 2
       )
     );
 
+    console.log(radialLineMax);
+
     let polarGrid: SVGCircleElement;
     //Math.max(this.config.originX,this.svgWidth-this.originX)
-    for (let i = 1; i <= 5; i++) {
+    for (
+      let i = 0;
+      i <= radialLineMax;
+      i +=
+        Math.max(this.config.scaleX, this.config.scaleY) *
+        Math.floor(
+          radialLineMax / (5 * Math.max(this.config.scaleX, this.config.scaleY))
+        )
+    ) {
       polarGrid = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'circle'
@@ -308,7 +336,7 @@ export class GraphPolar2D extends GObject {
         'cy',
         `${-this.config.originY * this.config.scaleY}`
       );
-      polarGrid.setAttribute('r', `${(i * radialLineMax) / 10}`);
+      polarGrid.setAttribute('r', `${i}`);
 
       polarGrid.setAttribute('fill', `none`);
       polarGrid.setAttribute('stroke', `${this.config.gridColor}`);
@@ -316,7 +344,17 @@ export class GraphPolar2D extends GObject {
       this.coordinate.appendChild(polarGrid);
     }
     let smallPolarGrid: SVGCircleElement;
-    for (let i = 1; i <= 25; i++) {
+    for (
+      let i = 0;
+      i <= radialLineMax;
+      i +=
+        (Math.max(this.config.scaleX, this.config.scaleY) *
+          Math.floor(
+            radialLineMax /
+              (5 * Math.max(this.config.scaleX, this.config.scaleY))
+          )) /
+        5
+    ) {
       smallPolarGrid = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'circle'
@@ -329,7 +367,7 @@ export class GraphPolar2D extends GObject {
         'cy',
         `${-this.config.originY * this.config.scaleY}`
       );
-      smallPolarGrid.setAttribute('r', `${(i * radialLineMax) / 50}`);
+      smallPolarGrid.setAttribute('r', `${i}`);
 
       smallPolarGrid.setAttribute('fill', `none`);
       smallPolarGrid.setAttribute('stroke', `${this.config.gridColor}`);
@@ -549,18 +587,30 @@ export class GraphPolar2D extends GObject {
   }
 
   //TODO : arrow follower
-  arrow(eqn: any) {
+  arrow(timeDuration) {
+    let eqn = this.eqn;
+    let config = this.config;
+    // const scaleX = this.config.scaleX;
+    // const scaleY = this.config.scaleY;
+    // if(this.graphObject.elt.arrowPath){
+
+    // }
+    if (this.graphObject.getElementById('arrow')) {
+      this.graphObject.removeChild(this.graphObject.getElementById('arrow'));
+    }
+
     let arrowPath = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'line'
     );
+    arrowPath.setAttribute('id', 'arrow');
     arrowPath.setAttribute('fill', 'none');
-    arrowPath.setAttribute('stroke', 'black');
-    arrowPath.setAttribute('stroke-width', '40');
-    let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    defs.innerHTML =
-      '<marker id="arrowhead" markerWidth="10" markerHeight="7" refX="7.5" refY="3.5" orient="auto">  <polygon points="0 0, 10 3.5, 0 7" /></marker>';
-    this.graphObject.appendChild(defs);
+    arrowPath.setAttribute('stroke', 'green');
+    arrowPath.setAttribute('stroke-width', '1');
+    // let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    // defs.innerHTML =
+    //   '<marker id="arrowhead" markerWidth="10" markerHeight="7" refX="7.5" refY="3.5" orient="auto">  <polygon points="0 0, 10 3.5, 0 7" /></marker>';
+    // this.graphObject.appendChild(defs);
     this.graphObject.appendChild(arrowPath);
     let update = 0;
     //this.graphObject.appendChild(arrowPath);
@@ -568,7 +618,7 @@ export class GraphPolar2D extends GObject {
       targets: arrowPath,
       //strokeDashoffset: [anime.setDashoffset, 0],
       easing: 'easeOutSine',
-      duration: 50000,
+      duration: timeDuration,
       begin: function (anim) {
         //pathElement[0].setAttribute('stroke', 'black');
         //pathElement[0].setAttribute('fill', 'none');
@@ -579,20 +629,26 @@ export class GraphPolar2D extends GObject {
       update: function (anim) {
         update += 0.01;
 
-        let scaleX = 100;
-        let scaleY = 100;
-        arrowPath.setAttribute('x1', `${0}`);
+        //let scaleX = 100;
+        //let scaleY = 100;
+        arrowPath.setAttribute('x1', `${config.originX * config.scaleX}`);
 
         arrowPath.setAttribute(
           'x2',
-          `${scaleX * eqn(update) * Math.cos(update)}`
+          `${
+            config.scaleX * eqn(update) * Math.cos(update) +
+            config.originX * config.scaleX
+          }`
         );
-        arrowPath.setAttribute('y1', `${0}`);
+        arrowPath.setAttribute('y1', `${-config.originY * config.scaleY}`);
         arrowPath.setAttribute(
           'y2',
-          `${scaleY * eqn(update) * Math.sin(update)}`
+          `${
+            config.scaleY * eqn(update) * Math.sin(update) -
+            config.originY * config.scaleY
+          }`
         );
-        arrowPath.setAttribute('marker-end', 'url(#arrowhead)');
+        arrowPath.setAttribute('marker-end', 'url(#marker-arrow)');
         //document.querySelector('path').setAttribute("fill", "yellow");
       },
       autoplay: true
@@ -621,7 +677,7 @@ export function createPolarSVGPath(
     config.scaleY * eqn(thetaRange[0]) * Math.sin(0) -
     config.originY * config.scaleY
   }`;
-  for (let theta = thetaRange[0]; theta < thetaRange[1]; theta += stepSize) {
+  for (let theta = thetaRange[0]; theta <= thetaRange[1]; theta += stepSize) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
     SVG_path = SVG_path.concat(
       ` L${
@@ -641,16 +697,8 @@ export function create2DPolarGraph(
   thetaRange: number[] = [0, 2 * Math.PI],
   x: number = 10,
   y: number = 10,
-  width_svg: number = 300,
-  height_svg: number = 300
+  svgWidth: number = 300,
+  svgHeight: number = 300
 ) {
-  const _object = new GraphPolar2D(
-    eqn,
-    thetaRange,
-    x,
-    y,
-    width_svg,
-    height_svg
-  );
-  return _object;
+  return new GraphPolar2D(eqn, thetaRange, x, y, svgWidth, svgHeight);
 }
