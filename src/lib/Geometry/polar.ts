@@ -1,4 +1,5 @@
 import anime from 'animejs';
+import { animationTimeline } from '../Scene/controls';
 import { sceneContainer } from '../Scene/scene';
 import { transform } from '../Scene/transform';
 import { GObject } from './GObject';
@@ -40,6 +41,7 @@ export class GraphPolar2D extends GObject {
     tickColor: any;
     tickMarginX: any;
     tickMarginY: any;
+    arrowFollowerColor: any;
   };
   // pathData: any;
   // graphObject: any;
@@ -82,7 +84,8 @@ export class GraphPolar2D extends GObject {
       tickY: 'true',
       tickColor: ULTRAMARINE40,
       tickMarginX: -0.5,
-      tickMarginY: -0.5
+      tickMarginY: -0.5,
+      arrowFollowerColor: MAGENTA50
     };
 
     this.eqn = eqn;
@@ -168,7 +171,10 @@ export class GraphPolar2D extends GObject {
         : this.config.tickMarginX,
       tickMarginY: config.tickMarginY
         ? config.tickMarginY
-        : this.config.tickMarginY
+        : this.config.tickMarginY,
+      arrowFollowerColor: config.arrowFollowerColor
+        ? config.arrowFollowerColor
+        : this.config.arrowFollowerColor
     };
     //console.log(this.config);
   }
@@ -200,6 +206,7 @@ export class GraphPolar2D extends GObject {
     //this.graphObject.setAttribute('style', `translate(-50%, -50%)`);
     this.graphObject.setAttribute('width', `${this.svgWidth}`);
     this.graphObject.setAttribute('height', `${this.svgHeight}`);
+    this.linePath.setAttribute('stroke', `${this.config.graphColor}`);
     //this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
     //this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.linePath.setAttribute('d', this.pathData);
@@ -311,7 +318,7 @@ export class GraphPolar2D extends GObject {
       )
     );
 
-    console.log(radialLineMax);
+    //console.log(radialLineMax);
 
     let polarGrid: SVGCircleElement;
     //Math.max(this.config.originX,this.svgWidth-this.originX)
@@ -370,7 +377,7 @@ export class GraphPolar2D extends GObject {
       smallPolarGrid.setAttribute('r', `${i}`);
 
       smallPolarGrid.setAttribute('fill', `none`);
-      smallPolarGrid.setAttribute('stroke', `${this.config.gridColor}`);
+      smallPolarGrid.setAttribute('stroke', `${this.config.smallGridColor}`);
       smallPolarGrid.setAttribute('stroke-opacity', `0.25`);
       this.coordinate.appendChild(smallPolarGrid);
     }
@@ -605,7 +612,7 @@ export class GraphPolar2D extends GObject {
     );
     arrowPath.setAttribute('id', 'arrow');
     arrowPath.setAttribute('fill', 'none');
-    arrowPath.setAttribute('stroke', 'green');
+    arrowPath.setAttribute('stroke', `${this.config.arrowFollowerColor}`);
     arrowPath.setAttribute('stroke-width', '1');
     // let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     // defs.innerHTML =
@@ -614,18 +621,18 @@ export class GraphPolar2D extends GObject {
     this.graphObject.appendChild(arrowPath);
     let update = 0;
     //this.graphObject.appendChild(arrowPath);
-    const arrowDrawing = anime({
+    animationTimeline.add({
       targets: arrowPath,
       //strokeDashoffset: [anime.setDashoffset, 0],
       easing: 'easeOutSine',
       duration: timeDuration,
-      begin: function (anim) {
-        //pathElement[0].setAttribute('stroke', 'black');
-        //pathElement[0].setAttribute('fill', 'none');
-      },
-      complete: function (anim) {
-        //document.querySelector('path').setAttribute("fill", "yellow");
-      },
+      // begin: function (anim) {
+      //   //pathElement[0].setAttribute('stroke', 'black');
+      //   //pathElement[0].setAttribute('fill', 'none');
+      // },
+      // complete: function (anim) {
+      //   //document.querySelector('path').setAttribute("fill", "yellow");
+      // },
       update: function (anim) {
         update += 0.01;
 
@@ -644,7 +651,7 @@ export class GraphPolar2D extends GObject {
         arrowPath.setAttribute(
           'y2',
           `${
-            config.scaleY * eqn(update) * Math.sin(update) -
+            -config.scaleY * eqn(update) * Math.sin(update) -
             config.originY * config.scaleY
           }`
         );
@@ -674,7 +681,7 @@ export function createPolarSVGPath(
     config.scaleX * eqn(thetaRange[0]) * Math.cos(0) +
     config.originX * config.scaleX
   },${
-    config.scaleY * eqn(thetaRange[0]) * Math.sin(0) -
+    -config.scaleY * eqn(thetaRange[0]) * Math.sin(0) -
     config.originY * config.scaleY
   }`;
   for (let theta = thetaRange[0]; theta <= thetaRange[1]; theta += stepSize) {
@@ -684,7 +691,7 @@ export function createPolarSVGPath(
         config.scaleX * eqn(theta) * Math.cos(theta) +
         config.originX * config.scaleX
       },${
-        config.scaleY * eqn(theta) * Math.sin(theta) -
+        -config.scaleY * eqn(theta) * Math.sin(theta) -
         config.originY * config.scaleY
       }`
     );

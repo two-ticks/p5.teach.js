@@ -11,43 +11,81 @@ const GOLD20 = '#ffb000';
 const INDIGO50 = '#785ef0';
 const ORANGE40 = '#fe6100';
 
+/**
+ * class representing a 2-D Cartesian Graph
+ */
+
 export class Graph2D extends GObject {
-  eqn: any;
-  plotting: any;
-  coordinate: any;
-  //config
-  config;
+  eqn: Function;
+  plotting!: SVGGElement;
+  coordinate!: SVGGElement;
+  config: {
+    //configuration for graph
+    scaleX: any;
+    maxX: any;
+    minX: any;
+    scaleY: any;
+    maxY: any;
+    minY: any;
+    graphColor: any;
+    graphStrokeWidth: any;
+    arrowSize: any;
+    xAxis: any;
+    yAxis: any;
+    axisColor: any;
+    smallGridColor: any;
+    gridColor: any;
+    stepX: any;
+    stepY: any;
+    originX: any;
+    originY: any;
+    tickX: any;
+    tickY: any;
+    tickColor: any;
+    tickMarginX: any;
+    tickMarginY: any;
+  };
+
+  /**
+   * creates a graph object
+   * @param {Function} eqn function to plot
+   * @param {number} [x] x-coordinate of graph
+   * @param {number} [y] y-coordinate of graph
+   * @param {Number} [svgWidth] width of the graph
+   * @param {Number} [svgHeight] height of the graph
+   */
+
   constructor(
-    eqn: any,
+    eqn: Function,
     x: number = 10,
     y: number = 10,
     svgWidth: number = 300,
-    svgHeight: number = 300,
-    config?
+    svgHeight: number = 300
   ) {
     super(x, y, svgWidth, svgHeight);
 
     this.config = {
       graphColor: GOLD20,
+      graphStrokeWidth: 1,
       arrowSize: 3,
       xAxis: 'true',
       yAxis: 'true',
       minX: -5,
-      maxX: 5.5,
+      maxX: 5,
       minY: -5,
       maxY: 5,
-      scaleX: 1.2,
+      scaleX: 1,
       scaleY: 1,
       axisColor: INDIGO50,
       smallGridColor: MAGENTA50,
-      gridColor:  ORANGE40,
+      gridColor: ORANGE40,
       stepX: 1,
       stepY: 1,
       originX: 0,
       originY: 0,
       tickX: 'true',
       tickY: 'true',
-      tickColor: ULTRAMARINE40 ,
+      tickColor: ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5
     };
@@ -93,6 +131,13 @@ export class Graph2D extends GObject {
     );
     this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
   }
+
+  /**
+   * sets position of text
+   * @param {number} x-coordinate x-coordinate of text
+   * @param {number} y-coordinate y-coordinate of text
+   */
+
   position(x: number, y: number = 10) {
     this.x = x;
     this.y = y;
@@ -104,6 +149,9 @@ export class Graph2D extends GObject {
       graphColor: config.graphColor
         ? config.graphColor
         : this.config.graphColor,
+      graphStrokeWidth: config.graphStrokeWidth
+        ? config.graphStrokeWidth
+        : this.config.graphStrokeWidth,
       arrowSize: config.arrowSize ? config.arrowSize : this.config.arrowSize,
       xAxis: config.xAxis ? config.xAxis : this.config.xAxis,
       yAxis: config.yAxis ? config.yAxis : this.config.yAxis,
@@ -134,6 +182,12 @@ export class Graph2D extends GObject {
     };
     //console.log(this.config);
   }
+
+  /**
+   * sets font-size of text
+   * @param {number} font-size font-size of the text
+   */
+
   size(width, height) {
     if (arguments.length === 0) {
       return [this.svgWidth, this.svgHeight];
@@ -158,6 +212,7 @@ export class Graph2D extends GObject {
   transform(object_finl: any, startTime: number = 0, endTime: number = 2) {
     transform(this, object_finl, startTime, endTime);
   }
+
   loop(finlEqn, timeDuration: number = 2, startTime: number = 0) {
     timeDuration = timeDuration * 1000;
     startTime = startTime * 1000; //s to ms
@@ -180,10 +235,12 @@ export class Graph2D extends GObject {
       //elasticity: 1
     });
   }
+
   stroke(_stroke: any) {
     this.config.graphColor = _stroke;
     this.linePath.setAttribute('stroke', `${_stroke}`);
   }
+
   plot() {
     this.pathData = createSVGPath(this.eqn, this.config);
     this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -456,7 +513,14 @@ export class Graph2D extends GObject {
   }
 }
 
-export function createSVGPath(eqn: any, config) {
+/**
+ * createSVGPath function creates a graph object and returns graph object
+ * @param {Function} eqn function to plot
+ * @param {object} [config] config for graph
+ * @returns {Graph2D} 2D Graph object
+ */
+
+export function createSVGPath(eqn: Function, config) {
   const pathElements = 1000;
   // const scaleX = 9;
   // const scaleY = 0.5;
@@ -481,14 +545,23 @@ export function createSVGPath(eqn: any, config) {
   return SVG_path;
 }
 
+/**
+ * create2DGraph function creates a graph object and return graph object
+ * @param {Function} eqn function to plot
+ * @param {number} [x] x-coordinate of graph
+ * @param {number} [y] y-coordinate of graph
+ * @param {Number} [svgWidth] width of the graph
+ * @param {Number} [svgHeight] height of the graph
+ * @returns {Graph2D} 2D Graph object
+ */
+
 export function create2DGraph(
-  eqn: any,
+  eqn: Function,
   x: number = 10,
   y: number = 10,
   svgWidth: number = 300,
-  svgHeight: number = 300,
-  config
+  svgHeight: number = 300
 ) {
   //const _object =
-  return new Graph2D(eqn, x, y, svgWidth, svgHeight, config);
+  return new Graph2D(eqn, x, y, svgWidth, svgHeight);
 }
