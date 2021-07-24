@@ -473,12 +473,12 @@ export class GraphParametric2D extends GObject {
     const elementToAnimate = this.graphContainer.elt.querySelectorAll(
       `${element}`
     );
-    let pathElement : Array<string> = [];
+    let pathElement: Array<string> = [];
     let it = elementToAnimate;
-    console.log(it);
-    
+    //console.log(it);
+
     it.forEach((currentElement) => {
-      console.log(currentElement);
+      //console.log(currentElement);
       pathElement.push(
         currentElement.querySelectorAll('path, line, rect, circle, marker')
       );
@@ -489,7 +489,7 @@ export class GraphParametric2D extends GObject {
       {
         targets: pathElement,
         strokeDashoffset: [anime.setDashoffset, 0],
-        opacity : [0, 1],
+        opacity: [0, 1],
         // fill : ['currentColor'],
         easing: 'easeInOutCubic',
         duration: timeDuration,

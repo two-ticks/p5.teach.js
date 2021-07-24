@@ -1,10 +1,9 @@
-import { sceneContainer } from '../Scene/scene';
-import { createSVGPath } from './graph';
+import p5 from 'p5';
 
 export class GObject {
-  pathData: any;
-  graphObject: any;
-  graphContainer: any;
+  pathData!: string;
+  graphObject!: SVGSVGElement;
+  graphContainer!: p5.Element;
   linePath!: SVGPathElement;
   x: number;
   y: number;
