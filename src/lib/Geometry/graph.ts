@@ -44,6 +44,7 @@ export class Graph2D extends GObject {
     tickColor: any;
     tickMarginX: any;
     tickMarginY: any;
+    pathElements: any;
   };
 
   /**
@@ -87,7 +88,8 @@ export class Graph2D extends GObject {
       tickY: 'true',
       tickColor: ULTRAMARINE40,
       tickMarginX: -0.5,
-      tickMarginY: -0.5
+      tickMarginY: -0.5,
+      pathElements: 1000
     };
 
     this.eqn = eqn;
@@ -178,7 +180,10 @@ export class Graph2D extends GObject {
         : this.config.tickMarginX,
       tickMarginY: config.tickMarginY
         ? config.tickMarginY
-        : this.config.tickMarginY
+        : this.config.tickMarginY,
+      pathElements: config.pathElements
+        ? config.pathElements
+        : this.config.pathElements
     };
     //console.log(this.config);
   }
@@ -246,6 +251,10 @@ export class Graph2D extends GObject {
     this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     this.plotting.setAttribute('id', 'plot');
     this.linePath.setAttribute('stroke', `${this.config.graphColor}`);
+    this.linePath.setAttribute(
+      'stroke-width',
+      `${this.config.graphStrokeWidth}`
+    );
     this.linePath.setAttribute('d', this.pathData);
     this.plotting.appendChild(this.linePath); // <g id="plot">
     this.graphObject.appendChild(this.plotting);
@@ -521,24 +530,29 @@ export class Graph2D extends GObject {
  */
 
 export function createSVGPath(eqn: Function, config) {
-  const pathElements = 1000;
+  //const pathElements = 1000;
   // const scaleX = 9;
   // const scaleY = 0.5;
   // scaleX = width/(maxX - minX);
-  const stepSize = (config.maxX - config.minX) / pathElements;
+  const stepSize = (config.maxX - config.minX) / config.pathElements;
 
   //minX = 0;
   let SVG_path = `M${
-    config.scaleX * config.minX + config.originX * config.scaleX
+    config.stepX *
+    (config.scaleX * config.minX + config.originX * config.scaleX)
   },${
-    config.scaleY * -eqn(config.minX + config.originX * config.scaleX) -
-    config.originY * config.scaleY
+    config.stepY *
+    (config.scaleY * -eqn(config.minX + config.originX * config.scaleX) -
+      config.originY * config.scaleY)
   }`;
   for (let x = config.minX; x < config.maxX; x += stepSize) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
     SVG_path = SVG_path.concat(
-      ` L${config.scaleX * x + config.originX * config.scaleX}, ${
-        config.scaleY * -eqn(x) - config.originY * config.scaleY
+      ` L${
+        config.stepX * (config.scaleX * x + config.originX * config.scaleX)
+      }, ${
+        config.stepY *
+        (config.scaleY * -eqn(x) - config.originY * config.scaleY)
       }`
     );
   }
