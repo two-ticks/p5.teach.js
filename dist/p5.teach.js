@@ -153,9 +153,6 @@ var PrioritizedList = (function () {
             this.items.splice(i, 1);
         }
     };
-    PrioritizedList.prototype.toArray = function () {
-        return Array.from(this);
-    };
     PrioritizedList.DEFAULTPRIORITY = 5;
     return PrioritizedList;
 }());
@@ -269,7 +266,7 @@ exports.mathjax = void 0;
 var HandlerList_js_1 = require("./core/HandlerList.js");
 var Retries_js_1 = require("./util/Retries.js");
 exports.mathjax = {
-    version: '3.1.4',
+    version: '3.2.0',
     handlers: new HandlerList_js_1.HandlerList(),
     document: function (document, options) {
         return exports.mathjax.handlers.document(document, options);
@@ -314,14 +311,24 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
     return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.separateOptions = exports.selectOptionsFromKeys = exports.selectOptions = exports.userOptions = exports.defaultOptions = exports.insert = exports.copy = exports.keys = exports.makeArray = exports.expandable = exports.Expandable = exports.REMOVE = exports.APPEND = void 0;
+exports.lookup = exports.separateOptions = exports.selectOptionsFromKeys = exports.selectOptions = exports.userOptions = exports.defaultOptions = exports.insert = exports.copy = exports.keys = exports.makeArray = exports.expandable = exports.Expandable = exports.OPTIONS = exports.REMOVE = exports.APPEND = exports.isObject = void 0;
 var OBJECT = {}.constructor;
 function isObject(obj) {
     return typeof obj === 'object' && obj !== null &&
         (obj.constructor === OBJECT || obj.constructor === Expandable);
 }
+exports.isObject = isObject;
 exports.APPEND = '[+]';
 exports.REMOVE = '[-]';
+exports.OPTIONS = {
+    invalidOption: 'warn',
+    optionError: function (message, _key) {
+        if (exports.OPTIONS.invalidOption === 'fatal') {
+            throw new Error(message);
+        }
+        console.warn('MathJax: ' + message);
+    }
+};
 var Expandable = (function () {
     function Expandable() {
     }
@@ -380,7 +387,8 @@ function insert(dst, src, warn) {
             if (typeof key === 'symbol') {
                 key = key.toString();
             }
-            throw new Error('Invalid option "' + key + '" (no default value).');
+            exports.OPTIONS.optionError("Invalid option \"" + key + "\" (no default value).", key);
+            return "continue";
         }
         var sval = src[key], dval = dst[key];
         if (isObject(sval) && dval !== null &&
@@ -514,6 +522,11 @@ function separateOptions(options) {
     return results;
 }
 exports.separateOptions = separateOptions;
+function lookup(name, lookup, def) {
+    if (def === void 0) { def = null; }
+    return (lookup.hasOwnProperty(name) ? lookup[name] : def);
+}
+exports.lookup = lookup;
 //# sourceMappingURL=Options.js.map
 },{}],"../node_modules/mathjax-full/js/util/FunctionList.js":[function(require,module,exports) {
 "use strict";
@@ -1151,6 +1164,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
@@ -1266,6 +1290,27 @@ var AbstractNode = (function () {
         var i = this.childNodes.indexOf(node);
         return (i === -1 ? null : i);
     };
+    AbstractNode.prototype.copy = function () {
+        var e_4, _a;
+        var node = this.factory.create(this.kind);
+        node.properties = __assign({}, this.properties);
+        try {
+            for (var _b = __values(this.childNodes || []), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var child = _c.value;
+                if (child) {
+                    node.appendChild(child.copy());
+                }
+            }
+        }
+        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_4) throw e_4.error; }
+        }
+        return node;
+    };
     AbstractNode.prototype.findNodes = function (kind) {
         var nodes = [];
         this.walkTree(function (node) {
@@ -1276,7 +1321,7 @@ var AbstractNode = (function () {
         return nodes;
     };
     AbstractNode.prototype.walkTree = function (func, data) {
-        var e_4, _a;
+        var e_5, _a;
         func(this, data);
         try {
             for (var _b = __values(this.childNodes), _c = _b.next(); !_c.done; _c = _b.next()) {
@@ -1286,12 +1331,12 @@ var AbstractNode = (function () {
                 }
             }
         }
-        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_4) throw e_4.error; }
+            finally { if (e_5) throw e_5.error; }
         }
         return data;
     };
@@ -1433,6 +1478,55 @@ var AbstractMmlNode = (function (_super) {
         _this.attributes.setList(attributes);
         return _this;
     }
+    AbstractMmlNode.prototype.copy = function (keepIds) {
+        var e_1, _a, e_2, _b;
+        if (keepIds === void 0) { keepIds = false; }
+        var node = this.factory.create(this.kind);
+        node.properties = __assign({}, this.properties);
+        if (this.attributes) {
+            var attributes = this.attributes.getAllAttributes();
+            try {
+                for (var _c = __values(Object.keys(attributes)), _d = _c.next(); !_d.done; _d = _c.next()) {
+                    var name_1 = _d.value;
+                    if (name_1 !== 'id' || keepIds) {
+                        node.attributes.set(name_1, attributes[name_1]);
+                    }
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+        }
+        if (this.childNodes && this.childNodes.length) {
+            var children = this.childNodes;
+            if (children.length === 1 && children[0].isInferred) {
+                children = children[0].childNodes;
+            }
+            try {
+                for (var children_1 = __values(children), children_1_1 = children_1.next(); !children_1_1.done; children_1_1 = children_1.next()) {
+                    var child = children_1_1.value;
+                    if (child) {
+                        node.appendChild(child.copy());
+                    }
+                    else {
+                        node.childNodes.push(null);
+                    }
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (children_1_1 && !children_1_1.done && (_b = children_1.return)) _b.call(children_1);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+        }
+        return node;
+    };
     Object.defineProperty(AbstractMmlNode.prototype, "texClass", {
         get: function () {
             return this.texclass;
@@ -1517,7 +1611,7 @@ var AbstractMmlNode = (function (_super) {
         return _super.prototype.setChildren.call(this, children);
     };
     AbstractMmlNode.prototype.appendChild = function (child) {
-        var e_1, _a;
+        var e_3, _a;
         var _this = this;
         if (this.arity < 0) {
             this.childNodes[0].appendChild(child);
@@ -1534,16 +1628,16 @@ var AbstractMmlNode = (function (_super) {
             child.attributes = original.attributes;
             try {
                 for (var _b = __values(original.getPropertyNames()), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var name_1 = _c.value;
-                    child.setProperty(name_1, original.getProperty(name_1));
+                    var name_2 = _c.value;
+                    child.setProperty(name_2, original.getProperty(name_2));
                 }
             }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            catch (e_3_1) { e_3 = { error: e_3_1 }; }
             finally {
                 try {
                     if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
                 }
-                finally { if (e_1) throw e_1.error; }
+                finally { if (e_3) throw e_3.error; }
             }
         }
         return _super.prototype.appendChild.call(this, child);
@@ -1565,7 +1659,7 @@ var AbstractMmlNode = (function (_super) {
         return 0;
     };
     AbstractMmlNode.prototype.childPosition = function () {
-        var e_2, _a;
+        var e_4, _a;
         var child = this;
         var parent = child.parent;
         while (parent && parent.notParent) {
@@ -1583,12 +1677,12 @@ var AbstractMmlNode = (function (_super) {
                     i++;
                 }
             }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
             finally {
                 try {
                     if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
                 }
-                finally { if (e_2) throw e_2.error; }
+                finally { if (e_4) throw e_4.error; }
             }
         }
         return null;
@@ -1633,7 +1727,7 @@ var AbstractMmlNode = (function (_super) {
         return this.isEmbellished && this.coreMO().hasSpacingAttributes();
     };
     AbstractMmlNode.prototype.setInheritedAttributes = function (attributes, display, level, prime) {
-        var e_3, _a;
+        var e_5, _a;
         if (attributes === void 0) { attributes = {}; }
         if (display === void 0) { display = false; }
         if (level === void 0) { level = 0; }
@@ -1651,12 +1745,12 @@ var AbstractMmlNode = (function (_super) {
                 }
             }
         }
-        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_3) throw e_3.error; }
+            finally { if (e_5) throw e_5.error; }
         }
         var displaystyle = this.attributes.getExplicit('displaystyle');
         if (displaystyle === undefined) {
@@ -1684,38 +1778,38 @@ var AbstractMmlNode = (function (_super) {
         this.setChildInheritedAttributes(attributes, display, level, prime);
     };
     AbstractMmlNode.prototype.setChildInheritedAttributes = function (attributes, display, level, prime) {
-        var e_4, _a;
+        var e_6, _a;
         try {
             for (var _b = __values(this.childNodes), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var child = _c.value;
                 child.setInheritedAttributes(attributes, display, level, prime);
             }
         }
-        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        catch (e_6_1) { e_6 = { error: e_6_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_4) throw e_4.error; }
+            finally { if (e_6) throw e_6.error; }
         }
     };
     AbstractMmlNode.prototype.addInheritedAttributes = function (current, attributes) {
-        var e_5, _a;
+        var e_7, _a;
         var updated = __assign({}, current);
         try {
             for (var _b = __values(Object.keys(attributes)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var name_2 = _c.value;
-                if (name_2 !== 'displaystyle' && name_2 !== 'scriptlevel' && name_2 !== 'style') {
-                    updated[name_2] = [this.kind, attributes[name_2]];
+                var name_3 = _c.value;
+                if (name_3 !== 'displaystyle' && name_3 !== 'scriptlevel' && name_3 !== 'style') {
+                    updated[name_3] = [this.kind, attributes[name_3]];
                 }
             }
         }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        catch (e_7_1) { e_7 = { error: e_7_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_5) throw e_5.error; }
+            finally { if (e_7) throw e_7.error; }
         }
         return updated;
     };
@@ -1746,25 +1840,25 @@ var AbstractMmlNode = (function (_super) {
         this.verifyChildren(options);
     };
     AbstractMmlNode.prototype.verifyAttributes = function (options) {
-        var e_6, _a;
+        var e_8, _a;
         if (options['checkAttributes']) {
             var attributes = this.attributes;
             var bad = [];
             try {
                 for (var _b = __values(attributes.getExplicitNames()), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var name_3 = _c.value;
-                    if (name_3.substr(0, 5) !== 'data-' && attributes.getDefault(name_3) === undefined &&
-                        !name_3.match(/^(?:class|style|id|(?:xlink:)?href)$/)) {
-                        bad.push(name_3);
+                    var name_4 = _c.value;
+                    if (name_4.substr(0, 5) !== 'data-' && attributes.getDefault(name_4) === undefined &&
+                        !name_4.match(/^(?:class|style|id|(?:xlink:)?href)$/)) {
+                        bad.push(name_4);
                     }
                 }
             }
-            catch (e_6_1) { e_6 = { error: e_6_1 }; }
+            catch (e_8_1) { e_8 = { error: e_8_1 }; }
             finally {
                 try {
                     if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
                 }
-                finally { if (e_6) throw e_6.error; }
+                finally { if (e_8) throw e_8.error; }
             }
             if (bad.length) {
                 this.mError('Unknown attributes for ' + this.kind + ' node: ' + bad.join(', '), options);
@@ -1772,19 +1866,19 @@ var AbstractMmlNode = (function (_super) {
         }
     };
     AbstractMmlNode.prototype.verifyChildren = function (options) {
-        var e_7, _a;
+        var e_9, _a;
         try {
             for (var _b = __values(this.childNodes), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var child = _c.value;
                 child.verifyTree(options);
             }
         }
-        catch (e_7_1) { e_7 = { error: e_7_1 }; }
+        catch (e_9_1) { e_9 = { error: e_9_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_7) throw e_7.error; }
+            finally { if (e_9) throw e_9.error; }
         }
     };
     AbstractMmlNode.prototype.mError = function (message, options, short) {
@@ -1850,7 +1944,7 @@ var AbstractMmlTokenNode = (function (_super) {
         configurable: true
     });
     AbstractMmlTokenNode.prototype.getText = function () {
-        var e_8, _a;
+        var e_10, _a;
         var text = '';
         try {
             for (var _b = __values(this.childNodes), _c = _b.next(); !_c.done; _c = _b.next()) {
@@ -1860,17 +1954,17 @@ var AbstractMmlTokenNode = (function (_super) {
                 }
             }
         }
-        catch (e_8_1) { e_8 = { error: e_8_1 }; }
+        catch (e_10_1) { e_10 = { error: e_10_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_8) throw e_8.error; }
+            finally { if (e_10) throw e_10.error; }
         }
         return text;
     };
     AbstractMmlTokenNode.prototype.setChildInheritedAttributes = function (attributes, display, level, prime) {
-        var e_9, _a;
+        var e_11, _a;
         try {
             for (var _b = __values(this.childNodes), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var child = _c.value;
@@ -1879,16 +1973,16 @@ var AbstractMmlTokenNode = (function (_super) {
                 }
             }
         }
-        catch (e_9_1) { e_9 = { error: e_9_1 }; }
+        catch (e_11_1) { e_11 = { error: e_11_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_9) throw e_9.error; }
+            finally { if (e_11) throw e_11.error; }
         }
     };
     AbstractMmlTokenNode.prototype.walkTree = function (func, data) {
-        var e_10, _a;
+        var e_12, _a;
         func(this, data);
         try {
             for (var _b = __values(this.childNodes), _c = _b.next(); !_c.done; _c = _b.next()) {
@@ -1898,12 +1992,12 @@ var AbstractMmlTokenNode = (function (_super) {
                 }
             }
         }
-        catch (e_10_1) { e_10 = { error: e_10_1 }; }
+        catch (e_12_1) { e_12 = { error: e_12_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_10) throw e_10.error; }
+            finally { if (e_12) throw e_12.error; }
         }
         return data;
     };
@@ -1971,7 +2065,7 @@ var AbstractMmlBaseNode = (function (_super) {
         return this.childNodes[0].coreMO();
     };
     AbstractMmlBaseNode.prototype.setTeXclass = function (prev) {
-        var e_11, _a;
+        var e_13, _a;
         this.getPrevClass(prev);
         this.texClass = exports.TEXCLASS.ORD;
         var base = this.childNodes[0];
@@ -1996,12 +2090,12 @@ var AbstractMmlBaseNode = (function (_super) {
                 }
             }
         }
-        catch (e_11_1) { e_11 = { error: e_11_1 }; }
+        catch (e_13_1) { e_13 = { error: e_13_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_11) throw e_11.error; }
+            finally { if (e_13) throw e_13.error; }
         }
         return prev;
     };
@@ -2156,6 +2250,9 @@ var TextNode = (function (_super) {
         this.text = text;
         return this;
     };
+    TextNode.prototype.copy = function () {
+        return this.factory.create(this.kind).setText(this.getText());
+    };
     TextNode.prototype.toString = function () {
         return this.text;
     };
@@ -2189,6 +2286,9 @@ var XMLNode = (function (_super) {
     XMLNode.prototype.getSerializedXML = function () {
         return this.adaptor.serializeXML(this.xml);
     };
+    XMLNode.prototype.copy = function () {
+        return this.factory.create(this.kind).setXML(this.adaptor.clone(this.xml));
+    };
     XMLNode.prototype.toString = function () {
         return 'XML data';
     };
@@ -2198,8 +2298,19 @@ exports.XMLNode = XMLNode;
 //# sourceMappingURL=MmlNode.js.map
 },{"./Attributes.js":"../node_modules/mathjax-full/js/core/MmlTree/Attributes.js","../Tree/Node.js":"../node_modules/mathjax-full/js/core/Tree/Node.js"}],"../node_modules/mathjax-full/js/core/MmlTree/OperatorDictionary.js":[function(require,module,exports) {
 "use strict";
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OPTABLE = exports.MMLSPACING = exports.RANGES = exports.MO = exports.OPDEF = void 0;
+exports.OPTABLE = exports.MMLSPACING = exports.getRange = exports.RANGES = exports.MO = exports.OPDEF = void 0;
 var MmlNode_js_1 = require("./MmlNode.js");
 function OPDEF(lspace, rspace, texClass, properties) {
     if (texClass === void 0) { texClass = MmlNode_js_1.TEXCLASS.BIN; }
@@ -2237,35 +2348,79 @@ exports.MO = {
     WIDEACCENT: OPDEF(0, 0, MmlNode_js_1.TEXCLASS.ORD, { accent: true, stretchy: true })
 };
 exports.RANGES = [
-    [0x20, 0x7F, MmlNode_js_1.TEXCLASS.REL, 'BasicLatin'],
-    [0xA0, 0xFF, MmlNode_js_1.TEXCLASS.ORD, 'Latin1Supplement'],
-    [0x100, 0x17F, MmlNode_js_1.TEXCLASS.ORD, 'LatinExtendedA'],
-    [0x180, 0x24F, MmlNode_js_1.TEXCLASS.ORD, 'LatinExtendedB'],
-    [0x2B0, 0x2FF, MmlNode_js_1.TEXCLASS.ORD, 'SpacingModLetters'],
-    [0x300, 0x36F, MmlNode_js_1.TEXCLASS.ORD, 'CombDiacritMarks'],
-    [0x370, 0x3FF, MmlNode_js_1.TEXCLASS.ORD, 'GreekAndCoptic'],
-    [0x1E00, 0x1EFF, MmlNode_js_1.TEXCLASS.ORD, 'LatinExtendedAdditional'],
-    [0x2000, 0x206F, MmlNode_js_1.TEXCLASS.PUNCT, 'GeneralPunctuation'],
-    [0x2070, 0x209F, MmlNode_js_1.TEXCLASS.ORD, 'SuperAndSubscripts'],
-    [0x20A0, 0x20CF, MmlNode_js_1.TEXCLASS.ORD, 'Currency'],
-    [0x20D0, 0x20FF, MmlNode_js_1.TEXCLASS.ORD, 'CombDiactForSymbols'],
-    [0x2100, 0x214F, MmlNode_js_1.TEXCLASS.ORD, 'LetterlikeSymbols'],
-    [0x2150, 0x218F, MmlNode_js_1.TEXCLASS.ORD, 'NumberForms'],
-    [0x2190, 0x21FF, MmlNode_js_1.TEXCLASS.REL, 'Arrows'],
-    [0x2200, 0x22FF, MmlNode_js_1.TEXCLASS.BIN, 'MathOperators'],
-    [0x2300, 0x23FF, MmlNode_js_1.TEXCLASS.ORD, 'MiscTechnical'],
-    [0x2460, 0x24FF, MmlNode_js_1.TEXCLASS.ORD, 'EnclosedAlphaNums'],
-    [0x2500, 0x259F, MmlNode_js_1.TEXCLASS.ORD, 'BoxDrawing'],
-    [0x25A0, 0x25FF, MmlNode_js_1.TEXCLASS.ORD, 'GeometricShapes'],
-    [0x2700, 0x27BF, MmlNode_js_1.TEXCLASS.ORD, 'Dingbats'],
-    [0x27C0, 0x27EF, MmlNode_js_1.TEXCLASS.ORD, 'MiscMathSymbolsA'],
-    [0x27F0, 0x27FF, MmlNode_js_1.TEXCLASS.REL, 'SupplementalArrowsA'],
-    [0x2900, 0x297F, MmlNode_js_1.TEXCLASS.REL, 'SupplementalArrowsB'],
-    [0x2980, 0x29FF, MmlNode_js_1.TEXCLASS.ORD, 'MiscMathSymbolsB'],
-    [0x2A00, 0x2AFF, MmlNode_js_1.TEXCLASS.BIN, 'SuppMathOperators'],
-    [0x2B00, 0x2BFF, MmlNode_js_1.TEXCLASS.ORD, 'MiscSymbolsAndArrows'],
-    [0x1D400, 0x1D7FF, MmlNode_js_1.TEXCLASS.ORD, 'MathAlphabets']
+    [0x0020, 0x007F, MmlNode_js_1.TEXCLASS.REL, 'mo'],
+    [0x00A0, 0x00BF, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x00C0, 0x024F, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x02B0, 0x036F, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x0370, 0x1A20, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x1AB0, 0x1AFF, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x1B00, 0x1DBF, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x1DC0, 0x1DFF, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x1E00, 0x1FFF, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x2000, 0x206F, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x2070, 0x209F, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x2100, 0x214F, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x2150, 0x218F, MmlNode_js_1.TEXCLASS.ORD, 'mn'],
+    [0x2190, 0x21FF, MmlNode_js_1.TEXCLASS.REL, 'mo'],
+    [0x2200, 0x22FF, MmlNode_js_1.TEXCLASS.BIN, 'mo'],
+    [0x2300, 0x23FF, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x2460, 0x24FF, MmlNode_js_1.TEXCLASS.ORD, 'mn'],
+    [0x2500, 0x27EF, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x27F0, 0x27FF, MmlNode_js_1.TEXCLASS.REL, 'mo'],
+    [0x2800, 0x28FF, MmlNode_js_1.TEXCLASS.ORD, 'mtext'],
+    [0x2900, 0x297F, MmlNode_js_1.TEXCLASS.REL, 'mo'],
+    [0x2980, 0x29FF, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x2A00, 0x2AFF, MmlNode_js_1.TEXCLASS.BIN, 'mo'],
+    [0x2B00, 0x2B2F, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x2B30, 0x2B4F, MmlNode_js_1.TEXCLASS.REL, 'mo'],
+    [0x2B50, 0x2BFF, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x2C00, 0x2DE0, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x2E00, 0x2E7F, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x2E80, 0x2FDF, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x2FF0, 0x303F, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x3040, 0xA82F, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0xA830, 0xA83F, MmlNode_js_1.TEXCLASS.ORD, 'mn'],
+    [0xA840, 0xD7FF, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0xF900, 0xFDFF, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0xFE00, 0xFE6F, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0xFE70, 0x100FF, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x10100, 0x1018F, MmlNode_js_1.TEXCLASS.ORD, 'mn'],
+    [0x10190, 0x123FF, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x12400, 0x1247F, MmlNode_js_1.TEXCLASS.ORD, 'mn'],
+    [0x12480, 0x1BC9F, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x1BCA0, 0x1D25F, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x1D360, 0x1D37F, MmlNode_js_1.TEXCLASS.ORD, 'mn'],
+    [0x1D400, 0x1D7CD, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
+    [0x1D7CE, 0x1D7FF, MmlNode_js_1.TEXCLASS.ORD, 'mn'],
+    [0x1DF00, 0x1F7FF, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x1F800, 0x1F8FF, MmlNode_js_1.TEXCLASS.REL, 'mo'],
+    [0x1F900, 0x1F9FF, MmlNode_js_1.TEXCLASS.ORD, 'mo'],
+    [0x20000, 0x2FA1F, MmlNode_js_1.TEXCLASS.ORD, 'mi'],
 ];
+function getRange(text) {
+    var e_1, _a;
+    var n = text.codePointAt(0);
+    try {
+        for (var RANGES_1 = __values(exports.RANGES), RANGES_1_1 = RANGES_1.next(); !RANGES_1_1.done; RANGES_1_1 = RANGES_1.next()) {
+            var range = RANGES_1_1.value;
+            if (n <= range[1]) {
+                if (n >= range[0]) {
+                    return range;
+                }
+                break;
+            }
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (RANGES_1_1 && !RANGES_1_1.done && (_a = RANGES_1.return)) _a.call(RANGES_1);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+    return null;
+}
+exports.getRange = getRange;
 exports.MMLSPACING = [
     [0, 0],
     [1, 2],
@@ -3613,15 +3768,6 @@ var MmlMo = (function (_super) {
                 this.texClass = MmlNode_js_1.TEXCLASS.CLOSE;
             }
         }
-        if (this.getText() === '\u2061') {
-            if (prev && prev.getProperty('texClass') === undefined &&
-                prev.attributes.get('mathvariant') !== 'italic') {
-                prev.texClass = MmlNode_js_1.TEXCLASS.OP;
-                prev.setProperty('fnOP', true);
-            }
-            this.texClass = this.prevClass = MmlNode_js_1.TEXCLASS.NONE;
-            return prev;
-        }
         return this.adjustTeXclass(prev);
     };
     MmlMo.prototype.adjustTeXclass = function (prev) {
@@ -3703,7 +3849,7 @@ var MmlMo = (function (_super) {
             this.rspace = (def[1] + 1) / 18;
         }
         else {
-            var range = this.getRange(mo);
+            var range = OperatorDictionary_js_1.getRange(mo);
             if (range) {
                 if (this.getProperty('texClass') === undefined) {
                     this.texClass = range[2];
@@ -3740,33 +3886,6 @@ var MmlMo = (function (_super) {
         }
         return forms;
     };
-    MmlMo.prototype.getRange = function (mo) {
-        var e_2, _a;
-        if (!mo.match(/^[\uD800-\uDBFF]?.$/)) {
-            return null;
-        }
-        var n = mo.codePointAt(0);
-        var ranges = this.constructor.RANGES;
-        try {
-            for (var ranges_1 = __values(ranges), ranges_1_1 = ranges_1.next(); !ranges_1_1.done; ranges_1_1 = ranges_1.next()) {
-                var range = ranges_1_1.value;
-                if (range[0] <= n && n <= range[1]) {
-                    return range;
-                }
-                if (n < range[0]) {
-                    return null;
-                }
-            }
-        }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
-        finally {
-            try {
-                if (ranges_1_1 && !ranges_1_1.done && (_a = ranges_1.return)) _a.call(ranges_1);
-            }
-            finally { if (e_2) throw e_2.error; }
-        }
-        return null;
-    };
     MmlMo.prototype.checkPseudoScripts = function (mo) {
         var PSEUDOSCRIPTS = this.constructor.pseudoScripts;
         if (!mo.match(PSEUDOSCRIPTS))
@@ -3800,7 +3919,6 @@ var MmlMo = (function (_super) {
         }
     };
     MmlMo.defaults = __assign(__assign({}, MmlNode_js_1.AbstractMmlTokenNode.defaults), { form: 'infix', fence: false, separator: false, lspace: 'thickmathspace', rspace: 'thickmathspace', stretchy: false, symmetric: false, maxsize: 'infinity', minsize: '0em', largeop: false, movablelimits: false, accent: false, linebreak: 'auto', lineleading: '1ex', linebreakstyle: 'before', indentalign: 'auto', indentshift: '0', indenttarget: '', indentalignfirst: 'indentalign', indentshiftfirst: 'indentshift', indentalignlast: 'indentalign', indentshiftlast: 'indentshift' });
-    MmlMo.RANGES = OperatorDictionary_js_1.RANGES;
     MmlMo.MMLSPACING = OperatorDictionary_js_1.MMLSPACING;
     MmlMo.OPTABLE = OperatorDictionary_js_1.OPTABLE;
     MmlMo.pseudoScripts = new RegExp([
@@ -4146,10 +4264,11 @@ var FilterUtil;
         }, {});
     };
     FilterUtil.combineRelations = function (arg) {
-        var e_3, _a;
+        var e_3, _a, e_4, _b;
+        var remove = [];
         try {
-            for (var _b = __values(arg.data.getList('mo')), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var mo = _c.value;
+            for (var _c = __values(arg.data.getList('mo')), _e = _c.next(); !_e.done; _e = _c.next()) {
+                var mo = _e.value;
                 if (mo.getProperty('relationsCombined') || !mo.parent ||
                     (mo.parent && !NodeUtil_js_1.default.isType(mo.parent, 'mrow')) ||
                     NodeUtil_js_1.default.getTexClass(mo) !== MmlNode_js_1.TEXCLASS.REL) {
@@ -4167,8 +4286,21 @@ var FilterUtil;
                         _compareExplicit(mo, m2)) {
                         NodeUtil_js_1.default.appendChildren(mo, NodeUtil_js_1.default.getChildren(m2));
                         _copyExplicit(['stretchy', 'rspace'], mo, m2);
-                        NodeUtil_js_1.default.setProperties(mo, m2.getAllProperties());
+                        try {
+                            for (var _f = (e_4 = void 0, __values(m2.getPropertyNames())), _g = _f.next(); !_g.done; _g = _f.next()) {
+                                var name_1 = _g.value;
+                                mo.setProperty(name_1, m2.getProperty(name_1));
+                            }
+                        }
+                        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+                        finally {
+                            try {
+                                if (_g && !_g.done && (_b = _f.return)) _b.call(_f);
+                            }
+                            finally { if (e_4) throw e_4.error; }
+                        }
                         children.splice(next, 1);
+                        remove.push(m2);
                         m2.parent = null;
                         m2.setProperty('relationsCombined', true);
                     }
@@ -4188,10 +4320,11 @@ var FilterUtil;
         catch (e_3_1) { e_3 = { error: e_3_1 }; }
         finally {
             try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                if (_e && !_e.done && (_a = _c.return)) _a.call(_c);
             }
             finally { if (e_3) throw e_3.error; }
         }
+        arg.data.removeFromList('mo', remove);
     };
     var _copyExplicit = function (attrs, node1, node2) {
         var attr1 = node1.attributes;
@@ -4204,7 +4337,7 @@ var FilterUtil;
         });
     };
     var _compareExplicit = function (node1, node2) {
-        var e_4, _a;
+        var e_5, _a;
         var filter = function (attr, space) {
             var exp = attr.getExplicitNames();
             return exp.filter(function (x) {
@@ -4222,23 +4355,24 @@ var FilterUtil;
         }
         try {
             for (var exp1_1 = __values(exp1), exp1_1_1 = exp1_1.next(); !exp1_1_1.done; exp1_1_1 = exp1_1.next()) {
-                var name_1 = exp1_1_1.value;
-                if (attr1.getExplicit(name_1) !== attr2.getExplicit(name_1)) {
+                var name_2 = exp1_1_1.value;
+                if (attr1.getExplicit(name_2) !== attr2.getExplicit(name_2)) {
                     return false;
                 }
             }
         }
-        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
         finally {
             try {
                 if (exp1_1_1 && !exp1_1_1.done && (_a = exp1_1.return)) _a.call(exp1_1);
             }
-            finally { if (e_4) throw e_4.error; }
+            finally { if (e_5) throw e_5.error; }
         }
         return true;
     };
     var _cleanSubSup = function (options, low, up) {
-        var e_5, _a;
+        var e_6, _a;
+        var remove = [];
         try {
             for (var _b = __values(options.getList('m' + low + up)), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var mml = _c.value;
@@ -4257,15 +4391,17 @@ var FilterUtil;
                 else {
                     options.root = newNode;
                 }
+                remove.push(mml);
             }
         }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        catch (e_6_1) { e_6 = { error: e_6_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_5) throw e_5.error; }
+            finally { if (e_6) throw e_6.error; }
         }
+        options.removeFromList('m' + low + up, remove);
     };
     FilterUtil.cleanSubSup = function (arg) {
         var options = arg.data;
@@ -4276,7 +4412,8 @@ var FilterUtil;
         _cleanSubSup(options, 'under', 'over');
     };
     var _moveLimits = function (options, underover, subsup) {
-        var e_6, _a;
+        var e_7, _a;
+        var remove = [];
         try {
             for (var _b = __values(options.getList(underover)), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var mml = _c.value;
@@ -4294,16 +4431,18 @@ var FilterUtil;
                     else {
                         options.root = node;
                     }
+                    remove.push(mml);
                 }
             }
         }
-        catch (e_6_1) { e_6 = { error: e_6_1 }; }
+        catch (e_7_1) { e_7 = { error: e_7_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_6) throw e_6.error; }
+            finally { if (e_7) throw e_7.error; }
         }
+        options.removeFromList(underover, remove);
     };
     FilterUtil.moveLimits = function (arg) {
         var options = arg.data;
@@ -4925,6 +5064,14 @@ var ParseUtil;
         return m.toFixed(3).replace(/\.?0+$/, '') + 'em';
     }
     ParseUtil.Em = Em;
+    function cols() {
+        var W = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            W[_i] = arguments[_i];
+        }
+        return W.map(function (n) { return Em(n); }).join(' ');
+    }
+    ParseUtil.cols = cols;
     function fenced(configuration, open, mml, close, big, color) {
         if (big === void 0) { big = ''; }
         if (color === void 0) { color = ''; }
@@ -5090,6 +5237,30 @@ var ParseUtil;
         return parser.create('node', 'mtext', [], def, textNode);
     }
     ParseUtil.internalText = internalText;
+    function underOver(parser, base, script, pos, stack) {
+        ParseUtil.checkMovableLimits(base);
+        if (NodeUtil_js_1.default.isType(base, 'munderover') && NodeUtil_js_1.default.isEmbellished(base)) {
+            NodeUtil_js_1.default.setProperties(NodeUtil_js_1.default.getCoreMO(base), { lspace: 0, rspace: 0 });
+            var mo = parser.create('node', 'mo', [], { rspace: 0 });
+            base = parser.create('node', 'mrow', [mo, base]);
+        }
+        var mml = parser.create('node', 'munderover', [base]);
+        NodeUtil_js_1.default.setChild(mml, pos === 'over' ? mml.over : mml.under, script);
+        var node = mml;
+        if (stack) {
+            node = parser.create('node', 'TeXAtom', [mml], { texClass: MmlNode_js_1.TEXCLASS.OP, movesupsub: true });
+        }
+        NodeUtil_js_1.default.setProperty(node, 'subsupOK', true);
+        return node;
+    }
+    ParseUtil.underOver = underOver;
+    function checkMovableLimits(base) {
+        var symbol = (NodeUtil_js_1.default.isType(base, 'mo') ? NodeUtil_js_1.default.getForm(base) : null);
+        if (NodeUtil_js_1.default.getProperty(base, 'movablelimits') || (symbol && symbol[3] && symbol[3].movablelimits)) {
+            NodeUtil_js_1.default.setProperties(base, { movablelimits: false });
+        }
+    }
+    ParseUtil.checkMovableLimits = checkMovableLimits;
     function trimSpaces(text) {
         if (typeof (text) !== 'string') {
             return text;
@@ -5110,7 +5281,7 @@ var ParseUtil;
             array.arraydef.align = 'baseline -1';
         }
         else if (align === 'c') {
-            array.arraydef.align = 'center';
+            array.arraydef.align = 'axis';
         }
         else if (align) {
             array.arraydef.align = align;
@@ -5158,6 +5329,21 @@ var ParseUtil;
         return s1 + s2;
     }
     ParseUtil.addArgs = addArgs;
+    function checkMaxMacros(parser, isMacro) {
+        if (isMacro === void 0) { isMacro = true; }
+        if (++parser.macroCount <= parser.configuration.options['maxMacros']) {
+            return;
+        }
+        if (isMacro) {
+            throw new TexError_js_1.default('MaxMacroSub1', 'MathJax maximum macro substitution count exceeded; ' +
+                'is here a recursive macro call?');
+        }
+        else {
+            throw new TexError_js_1.default('MaxMacroSub2', 'MathJax maximum substitution count exceeded; ' +
+                'is there a recursive latex environment?');
+        }
+    }
+    ParseUtil.checkMaxMacros = checkMaxMacros;
     function checkEqnEnv(parser) {
         if (parser.stack.global.eqnenv) {
             throw new TexError_js_1.default('ErroneousNestingEq', 'Erroneous nesting of equation structures');
@@ -5165,6 +5351,30 @@ var ParseUtil;
         parser.stack.global.eqnenv = true;
     }
     ParseUtil.checkEqnEnv = checkEqnEnv;
+    function copyNode(node, parser) {
+        var tree = node.copy();
+        var options = parser.configuration;
+        tree.walkTree(function (n) {
+            var e_1, _a;
+            options.addNode(n.kind, n);
+            var lists = (n.getProperty('in-lists') || '').split(/,/);
+            try {
+                for (var lists_1 = __values(lists), lists_1_1 = lists_1.next(); !lists_1_1.done; lists_1_1 = lists_1.next()) {
+                    var list = lists_1_1.value;
+                    options.addNode(list, n);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (lists_1_1 && !lists_1_1.done && (_a = lists_1.return)) _a.call(lists_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+        });
+        return tree;
+    }
+    ParseUtil.copyNode = copyNode;
     function MmlFilterAttribute(_parser, _name, value) {
         return value;
     }
@@ -5175,7 +5385,7 @@ var ParseUtil;
     }
     ParseUtil.getFontDef = getFontDef;
     function keyvalOptions(attrib, allowed, error) {
-        var e_1, _a;
+        var e_2, _a;
         if (allowed === void 0) { allowed = null; }
         if (error === void 0) { error = false; }
         var def = readKeyval(attrib);
@@ -5185,18 +5395,18 @@ var ParseUtil;
                     var key = _c.value;
                     if (!allowed.hasOwnProperty(key)) {
                         if (error) {
-                            throw new TexError_js_1.default('InvalidOption', 'Invalid optional argument: %1', key);
+                            throw new TexError_js_1.default('InvalidOption', 'Invalid option: %1', key);
                         }
                         delete def[key];
                     }
                 }
             }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
             finally {
                 try {
                     if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
                 }
-                finally { if (e_1) throw e_1.error; }
+                finally { if (e_2) throw e_2.error; }
             }
         }
         return def;
@@ -5680,7 +5890,7 @@ var TexParser = (function () {
             }
             else if (c === '{' && braceOK) {
                 this.i--;
-                c = this.GetArgument(name);
+                c = this.GetArgument(name).trim();
             }
             if (this.contains('delimiter', c)) {
                 return this.convertDelimiter(c);
@@ -6300,6 +6510,7 @@ var __values = (this && this.__values) || function(o) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var StackItemFactory_js_1 = require("./StackItemFactory.js");
 var NodeFactory_js_1 = require("./NodeFactory.js");
+var NodeUtil_js_1 = require("./NodeUtil.js");
 var Options_js_1 = require("../../util/Options.js");
 var ParseOptions = (function () {
     function ParseOptions(configuration, options) {
@@ -6345,6 +6556,11 @@ var ParseOptions = (function () {
             list = this.nodeLists[property] = [];
         }
         list.push(node);
+        if (node.kind !== property) {
+            var inlists = (NodeUtil_js_1.default.getProperty(node, 'in-lists') || '');
+            var lists = (inlists ? inlists.split(/,/) : []).concat(property).join(',');
+            NodeUtil_js_1.default.setProperty(node, 'in-lists', lists);
+        }
     };
     ParseOptions.prototype.getList = function (property) {
         var e_1, _a;
@@ -6368,6 +6584,26 @@ var ParseOptions = (function () {
         this.nodeLists[property] = result;
         return result;
     };
+    ParseOptions.prototype.removeFromList = function (property, nodes) {
+        var e_2, _a;
+        var list = this.nodeLists[property] || [];
+        try {
+            for (var nodes_1 = __values(nodes), nodes_1_1 = nodes_1.next(); !nodes_1_1.done; nodes_1_1 = nodes_1.next()) {
+                var node = nodes_1_1.value;
+                var i = list.indexOf(node);
+                if (i >= 0) {
+                    list.splice(i, 1);
+                }
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (nodes_1_1 && !nodes_1_1.done && (_a = nodes_1.return)) _a.call(nodes_1);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+    };
     ParseOptions.prototype.inTree = function (node) {
         while (node && node !== this.root) {
             node = node.parent;
@@ -6378,7 +6614,7 @@ var ParseOptions = (function () {
 }());
 exports.default = ParseOptions;
 //# sourceMappingURL=ParseOptions.js.map
-},{"./StackItemFactory.js":"../node_modules/mathjax-full/js/input/tex/StackItemFactory.js","./NodeFactory.js":"../node_modules/mathjax-full/js/input/tex/NodeFactory.js","../../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js"}],"../node_modules/mathjax-full/js/input/tex/Tags.js":[function(require,module,exports) {
+},{"./StackItemFactory.js":"../node_modules/mathjax-full/js/input/tex/StackItemFactory.js","./NodeFactory.js":"../node_modules/mathjax-full/js/input/tex/NodeFactory.js","./NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js"}],"../node_modules/mathjax-full/js/input/tex/Tags.js":[function(require,module,exports) {
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -6653,7 +6889,6 @@ var TagsFactory;
         tags: defaultTags,
         tagSide: 'right',
         tagIndent: '0.8em',
-        multlineWidth: '85%',
         useLabelIds: true,
         ignoreDuplicateLabels: false
     };
@@ -6783,7 +7018,7 @@ var SubHandler = (function () {
             finally { if (e_2) throw e_2.error; }
         }
         var _d = __read(input, 2), env = _d[0], symbol = _d[1];
-        this._fallback.toArray()[0].item(env, symbol);
+        Array.from(this._fallback)[0].item(env, symbol);
     };
     SubHandler.prototype.lookup = function (symbol) {
         var map = this.applicable(symbol);
@@ -6951,7 +7186,7 @@ var FunctionList_js_1 = require("../../util/FunctionList.js");
 var PrioritizedList_js_1 = require("../../util/PrioritizedList.js");
 var Tags_js_1 = require("./Tags.js");
 var Configuration = (function () {
-    function Configuration(name, handler, fallback, items, tags, options, nodes, preprocessors, postprocessors, initMethod, configMethod, priority) {
+    function Configuration(name, handler, fallback, items, tags, options, nodes, preprocessors, postprocessors, initMethod, configMethod, priority, parser) {
         if (handler === void 0) { handler = {}; }
         if (fallback === void 0) { fallback = {}; }
         if (items === void 0) { items = {}; }
@@ -6974,6 +7209,7 @@ var Configuration = (function () {
         this.initMethod = initMethod;
         this.configMethod = configMethod;
         this.priority = priority;
+        this.parser = parser;
         this.handler = Object.assign({ character: [], delimiter: [], macro: [], environment: [] }, handler);
     }
     Configuration.makeProcessor = function (func, priority) {
@@ -6987,7 +7223,8 @@ var Configuration = (function () {
         var conf = config.config ? this.makeProcessor(config.config, priority) : null;
         var preprocessors = (config.preprocessors || []).map(function (pre) { return _this.makeProcessor(pre, priority); });
         var postprocessors = (config.postprocessors || []).map(function (post) { return _this.makeProcessor(post, priority); });
-        return new Configuration(name, config.handler || {}, config.fallback || {}, config.items || {}, config.tags || {}, config.options || {}, config.nodes || {}, preprocessors, postprocessors, init, conf, priority);
+        var parser = config.parser || 'tex';
+        return new Configuration(name, config.handler || {}, config.fallback || {}, config.items || {}, config.tags || {}, config.options || {}, config.nodes || {}, preprocessors, postprocessors, init, conf, priority, parser);
     };
     Configuration.create = function (name, config) {
         if (config === void 0) { config = {}; }
@@ -7030,16 +7267,19 @@ var ConfigurationHandler;
     };
 })(ConfigurationHandler = exports.ConfigurationHandler || (exports.ConfigurationHandler = {}));
 var ParserConfiguration = (function () {
-    function ParserConfiguration(packages) {
+    function ParserConfiguration(packages, parsers) {
         var e_1, _a, e_2, _b;
+        if (parsers === void 0) { parsers = ['tex']; }
         this.initMethod = new FunctionList_js_1.FunctionList();
         this.configMethod = new FunctionList_js_1.FunctionList();
         this.configurations = new PrioritizedList_js_1.PrioritizedList();
+        this.parsers = [];
         this.handlers = new MapHandler_js_1.SubHandlers();
         this.items = {};
         this.tags = {};
         this.options = {};
         this.nodes = {};
+        this.parsers = parsers;
         try {
             for (var _c = __values(packages.slice().reverse()), _d = _c.next(); !_d.done; _d = _c.next()) {
                 var pkg = _d.value;
@@ -7089,14 +7329,13 @@ var ParserConfiguration = (function () {
     };
     ParserConfiguration.prototype.addPackage = function (pkg) {
         var name = typeof pkg === 'string' ? pkg : pkg[0];
-        var conf = ConfigurationHandler.get(name);
-        if (conf) {
-            this.configurations.add(conf, typeof pkg === 'string' ? conf.priority : pkg[1]);
-        }
+        var conf = this.getPackage(name);
+        conf && this.configurations.add(conf, typeof pkg === 'string' ? conf.priority : pkg[1]);
     };
-    ParserConfiguration.prototype.add = function (config, jax, options) {
+    ParserConfiguration.prototype.add = function (name, jax, options) {
         var e_4, _a;
         if (options === void 0) { options = {}; }
+        var config = this.getPackage(name);
         this.append(config);
         this.configurations.add(config, config.priority);
         this.init();
@@ -7122,6 +7361,13 @@ var ParserConfiguration = (function () {
         if (config.config) {
             config.config(this, jax);
         }
+    };
+    ParserConfiguration.prototype.getPackage = function (name) {
+        var config = ConfigurationHandler.get(name);
+        if (config && this.parsers.indexOf(config.parser) < 0) {
+            throw Error("Package " + name + " doesn't target the proper parser");
+        }
+        return config;
     };
     ParserConfiguration.prototype.append = function (config, priority) {
         priority = priority || config.priority;
@@ -7525,7 +7771,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
     return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EquationItem = exports.EqnArrayItem = exports.ArrayItem = exports.DotsItem = exports.NotItem = exports.FnItem = exports.MmlItem = exports.CellItem = exports.PositionItem = exports.StyleItem = exports.EndItem = exports.BeginItem = exports.RightItem = exports.Middle = exports.LeftItem = exports.OverItem = exports.SubsupItem = exports.PrimeItem = exports.CloseItem = exports.OpenItem = exports.StopItem = exports.StartItem = void 0;
+exports.EquationItem = exports.EqnArrayItem = exports.ArrayItem = exports.DotsItem = exports.NonscriptItem = exports.NotItem = exports.FnItem = exports.MmlItem = exports.CellItem = exports.PositionItem = exports.StyleItem = exports.EndItem = exports.BeginItem = exports.RightItem = exports.Middle = exports.LeftItem = exports.OverItem = exports.SubsupItem = exports.PrimeItem = exports.CloseItem = exports.OpenItem = exports.StopItem = exports.StartItem = void 0;
 var MapHandler_js_1 = require("../MapHandler.js");
 var Entities_js_1 = require("../../../util/Entities.js");
 var MmlNode_js_1 = require("../../../core/MmlTree/MmlNode.js");
@@ -7966,7 +8212,8 @@ var PositionItem = (function (_super) {
                         voffset: this.getProperty('dh') });
                     return [[this.factory.create('mml', mml)], true];
                 case 'horizontal':
-                    return [[this.factory.create('mml', this.getProperty('left')), item, this.factory.create('mml', this.getProperty('right'))], true];
+                    return [[this.factory.create('mml', this.getProperty('left')), item,
+                            this.factory.create('mml', this.getProperty('right'))], true];
             }
         }
         return _super.prototype.checkItem.call(this, item);
@@ -8110,6 +8357,37 @@ var NotItem = (function (_super) {
     return NotItem;
 }(StackItem_js_1.BaseItem));
 exports.NotItem = NotItem;
+var NonscriptItem = (function (_super) {
+    __extends(NonscriptItem, _super);
+    function NonscriptItem() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Object.defineProperty(NonscriptItem.prototype, "kind", {
+        get: function () {
+            return 'nonscript';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    NonscriptItem.prototype.checkItem = function (item) {
+        if (item.isKind('mml') && item.Size() === 1) {
+            var mml = item.First;
+            if (mml.isKind('mstyle') && mml.notParent) {
+                mml = NodeUtil_js_1.default.getChildren(NodeUtil_js_1.default.getChildren(mml)[0])[0];
+            }
+            if (mml.isKind('mspace')) {
+                if (mml !== item.First) {
+                    var mrow = this.create('node', 'mrow', [item.Pop()]);
+                    item.Push(mrow);
+                }
+                this.factory.configuration.addNode('nonscript', item.First);
+            }
+        }
+        return [[item], true];
+    };
+    return NonscriptItem;
+}(StackItem_js_1.BaseItem));
+exports.NonscriptItem = NonscriptItem;
 var DotsItem = (function (_super) {
     __extends(DotsItem, _super);
     function DotsItem() {
@@ -8187,30 +8465,7 @@ var ArrayItem = (function (_super) {
             }
             this.EndTable();
             this.clearEnv();
-            var scriptlevel = this.arraydef['scriptlevel'];
-            delete this.arraydef['scriptlevel'];
-            var mml = this.create('node', 'mtable', this.table, this.arraydef);
-            if (scriptlevel) {
-                mml.setProperty('scriptlevel', scriptlevel);
-            }
-            if (this.frame.length === 4) {
-                NodeUtil_js_1.default.setAttribute(mml, 'frame', this.dashed ? 'dashed' : 'solid');
-            }
-            else if (this.frame.length) {
-                if (this.arraydef['rowlines']) {
-                    this.arraydef['rowlines'] =
-                        this.arraydef['rowlines'].replace(/none( none)+$/, 'none');
-                }
-                mml = this.create('node', 'menclose', [mml], { notation: this.frame.join(' '), isFrame: true });
-                if ((this.arraydef['columnlines'] || 'none') !== 'none' ||
-                    (this.arraydef['rowlines'] || 'none') !== 'none') {
-                    NodeUtil_js_1.default.setAttribute(mml, 'padding', 0);
-                }
-            }
-            if (this.getProperty('open') || this.getProperty('close')) {
-                mml = ParseUtil_js_1.default.fenced(this.factory.configuration, this.getProperty('open'), mml, this.getProperty('close'));
-            }
-            var newItem = this.factory.create('mml', mml);
+            var newItem = this.factory.create('mml', this.createMml());
             if (this.getProperty('requireClose')) {
                 if (item.isKind('close')) {
                     return [[newItem], true];
@@ -8220,6 +8475,33 @@ var ArrayItem = (function (_super) {
             return [[newItem, item], true];
         }
         return _super.prototype.checkItem.call(this, item);
+    };
+    ArrayItem.prototype.createMml = function () {
+        var scriptlevel = this.arraydef['scriptlevel'];
+        delete this.arraydef['scriptlevel'];
+        var mml = this.create('node', 'mtable', this.table, this.arraydef);
+        if (scriptlevel) {
+            mml.setProperty('scriptlevel', scriptlevel);
+        }
+        if (this.frame.length === 4) {
+            NodeUtil_js_1.default.setAttribute(mml, 'frame', this.dashed ? 'dashed' : 'solid');
+        }
+        else if (this.frame.length) {
+            if (this.arraydef['rowlines']) {
+                this.arraydef['rowlines'] =
+                    this.arraydef['rowlines'].replace(/none( none)+$/, 'none');
+            }
+            NodeUtil_js_1.default.setAttribute(mml, 'frame', '');
+            mml = this.create('node', 'menclose', [mml], { notation: this.frame.join(' ') });
+            if ((this.arraydef['columnlines'] || 'none') !== 'none' ||
+                (this.arraydef['rowlines'] || 'none') !== 'none') {
+                NodeUtil_js_1.default.setAttribute(mml, 'data-padding', 0);
+            }
+        }
+        if (this.getProperty('open') || this.getProperty('close')) {
+            mml = ParseUtil_js_1.default.fenced(this.factory.configuration, this.getProperty('open'), mml, this.getProperty('close'));
+        }
+        return mml;
     };
     ArrayItem.prototype.EndEntry = function () {
         var mtd = this.create('node', 'mtd', this.nodes);
@@ -8274,6 +8556,21 @@ var ArrayItem = (function (_super) {
             this.arraydef['rowspacing'] = rows.join(' ');
         }
     };
+    ArrayItem.prototype.addRowSpacing = function (spacing) {
+        if (this.arraydef['rowspacing']) {
+            var rows = this.arraydef['rowspacing'].split(/ /);
+            if (!this.getProperty('rowspacing')) {
+                var dimem = ParseUtil_js_1.default.dimen2em(rows[0]);
+                this.setProperty('rowspacing', dimem);
+            }
+            var rowspacing = this.getProperty('rowspacing');
+            while (rows.length < this.table.length) {
+                rows.push(ParseUtil_js_1.default.Em(rowspacing));
+            }
+            rows[this.table.length - 1] = ParseUtil_js_1.default.Em(Math.max(0, rowspacing + ParseUtil_js_1.default.dimen2em(spacing)));
+            this.arraydef['rowspacing'] = rows.join(' ');
+        }
+    };
     return ArrayItem;
 }(StackItem_js_1.BaseItem));
 exports.ArrayItem = ArrayItem;
@@ -8285,6 +8582,7 @@ var EqnArrayItem = (function (_super) {
             args[_i - 1] = arguments[_i];
         }
         var _this = _super.call(this, factory) || this;
+        _this.maxrow = 0;
         _this.factory.configuration.tags.start(args[0], args[2], args[1]);
         return _this;
     }
@@ -8304,6 +8602,9 @@ var EqnArrayItem = (function (_super) {
         this.Clear();
     };
     EqnArrayItem.prototype.EndRow = function () {
+        if (this.row.length > this.maxrow) {
+            this.maxrow = this.row.length;
+        }
         var mtr = 'mtr';
         var tag = this.factory.configuration.tags.getTag();
         if (tag) {
@@ -8318,6 +8619,21 @@ var EqnArrayItem = (function (_super) {
     EqnArrayItem.prototype.EndTable = function () {
         _super.prototype.EndTable.call(this);
         this.factory.configuration.tags.end();
+        this.extendArray('columnalign', this.maxrow);
+        this.extendArray('columnwidth', this.maxrow);
+        this.extendArray('columnspacing', this.maxrow - 1);
+    };
+    EqnArrayItem.prototype.extendArray = function (name, max) {
+        if (!this.arraydef[name])
+            return;
+        var repeat = this.arraydef[name].split(/ /);
+        var columns = __spreadArray([], __read(repeat));
+        if (columns.length > 1) {
+            while (columns.length < max) {
+                columns.push.apply(columns, __spreadArray([], __read(repeat)));
+            }
+            this.arraydef[name] = columns.slice(0, max).join(' ');
+        }
     };
     return EqnArrayItem;
 }(ArrayItem));
@@ -8639,6 +8955,7 @@ var MmlNode_js_1 = require("../../../core/MmlTree/MmlNode.js");
 var Tags_js_1 = require("../Tags.js");
 var lengths_js_1 = require("../../../util/lengths.js");
 var Entities_js_1 = require("../../../util/Entities.js");
+var Options_js_1 = require("../../../util/Options.js");
 var BaseMethods = {};
 var P_HEIGHT = 1.2 / .85;
 var MmlTokenAllow = {
@@ -8778,10 +9095,7 @@ BaseMethods.Hash = function (_parser, _c) {
 BaseMethods.MathFont = function (parser, name, variant) {
     var text = parser.GetArgument(name);
     var mml = new TexParser_js_1.default(text, __assign(__assign({}, parser.stack.env), { font: variant, multiLetterIdentifiers: true }), parser.configuration).mml();
-    if (mml.isKind('inferredMrow')) {
-        mml = parser.create('node', 'mrow', mml.childNodes);
-    }
-    parser.Push(mml);
+    parser.Push(parser.create('node', 'TeXAtom', [mml]));
 };
 BaseMethods.SetFont = function (parser, _name, font) {
     parser.stack.env['font'] = font;
@@ -8951,43 +9265,32 @@ BaseMethods.Accent = function (parser, name, accent, stretchy) {
     parser.Push(texAtom);
 };
 BaseMethods.UnderOver = function (parser, name, c, stack) {
-    var base = parser.ParseArg(name);
-    var symbol = NodeUtil_js_1.default.getForm(base);
-    if ((symbol && symbol[3] && symbol[3]['movablelimits'])
-        || NodeUtil_js_1.default.getProperty(base, 'movablelimits')) {
-        NodeUtil_js_1.default.setProperties(base, { 'movablelimits': false });
-    }
-    var mo;
-    if (NodeUtil_js_1.default.isType(base, 'munderover') && NodeUtil_js_1.default.isEmbellished(base)) {
-        NodeUtil_js_1.default.setProperties(NodeUtil_js_1.default.getCoreMO(base), { lspace: 0, rspace: 0 });
-        mo = parser.create('node', 'mo', [], { rspace: 0 });
-        base = parser.create('node', 'mrow', [mo, base]);
-    }
-    var mml = parser.create('node', 'munderover', [base]);
     var entity = NodeUtil_js_1.default.createEntity(c);
-    mo = parser.create('token', 'mo', { stretchy: true, accent: true }, entity);
-    NodeUtil_js_1.default.setChild(mml, name.charAt(1) === 'o' ? mml.over : mml.under, mo);
-    var node = mml;
-    if (stack) {
-        node = parser.create('node', 'TeXAtom', [mml], { texClass: MmlNode_js_1.TEXCLASS.OP, movesupsub: true });
-    }
-    NodeUtil_js_1.default.setProperty(node, 'subsupOK', true);
-    parser.Push(node);
+    var mo = parser.create('token', 'mo', { stretchy: true, accent: true }, entity);
+    var pos = (name.charAt(1) === 'o' ? 'over' : 'under');
+    var base = parser.ParseArg(name);
+    parser.Push(ParseUtil_js_1.default.underOver(parser, base, mo, pos, stack));
 };
 BaseMethods.Overset = function (parser, name) {
-    var top = parser.ParseArg(name), base = parser.ParseArg(name);
-    if (NodeUtil_js_1.default.getAttribute(base, 'movablelimits') || NodeUtil_js_1.default.getProperty(base, 'movablelimits')) {
-        NodeUtil_js_1.default.setProperties(base, { 'movablelimits': false });
-    }
+    var top = parser.ParseArg(name);
+    var base = parser.ParseArg(name);
+    ParseUtil_js_1.default.checkMovableLimits(base);
     var node = parser.create('node', 'mover', [base, top]);
     parser.Push(node);
 };
 BaseMethods.Underset = function (parser, name) {
-    var bot = parser.ParseArg(name), base = parser.ParseArg(name);
-    if (NodeUtil_js_1.default.isType(base, 'mo') || NodeUtil_js_1.default.getProperty(base, 'movablelimits')) {
-        NodeUtil_js_1.default.setProperties(base, { 'movablelimits': false });
-    }
+    var bot = parser.ParseArg(name);
+    var base = parser.ParseArg(name);
+    ParseUtil_js_1.default.checkMovableLimits(base);
     var node = parser.create('node', 'munder', [base, bot]);
+    parser.Push(node);
+};
+BaseMethods.Overunderset = function (parser, name) {
+    var top = parser.ParseArg(name);
+    var bot = parser.ParseArg(name);
+    var base = parser.ParseArg(name);
+    ParseUtil_js_1.default.checkMovableLimits(base);
+    var node = parser.create('node', 'munderover', [base, bot, top]);
     parser.Push(node);
 };
 BaseMethods.TeXAtom = function (parser, name, mclass) {
@@ -9135,6 +9438,9 @@ BaseMethods.Hskip = function (parser, name) {
     var node = parser.create('node', 'mspace', [], { width: parser.GetDimen(name) });
     parser.Push(node);
 };
+BaseMethods.Nonscript = function (parser, _name) {
+    parser.Push(parser.itemFactory.create('nonscript'));
+};
 BaseMethods.Rule = function (parser, name, style) {
     var w = parser.GetDimen(name), h = parser.GetDimen(name), d = parser.GetDimen(name);
     var def = { width: w, height: h, depth: d };
@@ -9191,6 +9497,19 @@ BaseMethods.FBox = function (parser, name) {
     var node = parser.create('node', 'menclose', internal, { notation: 'box' });
     parser.Push(node);
 };
+BaseMethods.FrameBox = function (parser, name) {
+    var width = parser.GetBrackets(name);
+    var pos = parser.GetBrackets(name) || 'c';
+    var mml = ParseUtil_js_1.default.internalMath(parser, parser.GetArgument(name));
+    if (width) {
+        mml = [parser.create('node', 'mpadded', mml, {
+                width: width,
+                'data-align': Options_js_1.lookup(pos, { l: 'left', r: 'right' }, 'center')
+            })];
+    }
+    var node = parser.create('node', 'TeXAtom', [parser.create('node', 'menclose', mml, { notation: 'box' })], { texClass: MmlNode_js_1.TEXCLASS.ORD });
+    parser.Push(node);
+};
 BaseMethods.Not = function (parser, _name) {
     parser.Push(parser.itemFactory.create('not'));
 };
@@ -9242,48 +9561,53 @@ BaseMethods.Matrix = function (parser, _name, open, close, align, spacing, vspac
 };
 BaseMethods.Entry = function (parser, name) {
     parser.Push(parser.itemFactory.create('cell').setProperties({ isEntry: true, name: name }));
-    if (parser.stack.Top().getProperty('isCases')) {
-        var str = parser.string;
-        var braces = 0, close_1 = -1, i = parser.i, m = str.length;
-        while (i < m) {
-            var c = str.charAt(i);
-            if (c === '{') {
-                braces++;
-                i++;
-            }
-            else if (c === '}') {
-                if (braces === 0) {
-                    m = 0;
-                }
-                else {
-                    braces--;
-                    if (braces === 0 && close_1 < 0) {
-                        close_1 = i - parser.i;
-                    }
-                    i++;
-                }
-            }
-            else if (c === '&' && braces === 0) {
-                throw new TexError_js_1.default('ExtraAlignTab', 'Extra alignment tab in \\cases text');
-            }
-            else if (c === '\\') {
-                if (str.substr(i).match(/^((\\cr)[^a-zA-Z]|\\\\)/)) {
-                    m = 0;
-                }
-                else {
-                    i += 2;
-                }
+    var top = parser.stack.Top();
+    var env = top.getProperty('casesEnv');
+    var cases = top.getProperty('isCases');
+    if (!cases && !env)
+        return;
+    var str = parser.string;
+    var braces = 0, close = -1, i = parser.i, m = str.length;
+    var end = (env ? new RegExp("^\\\\end\\s*\\{" + env.replace(/\*/, '\\*') + "\\}") : null);
+    while (i < m) {
+        var c = str.charAt(i);
+        if (c === '{') {
+            braces++;
+            i++;
+        }
+        else if (c === '}') {
+            if (braces === 0) {
+                m = 0;
             }
             else {
+                braces--;
+                if (braces === 0 && close < 0) {
+                    close = i - parser.i;
+                }
                 i++;
             }
         }
-        var text = str.substr(parser.i, i - parser.i);
-        if (!text.match(/^\s*\\text[^a-zA-Z]/) || close_1 !== text.replace(/\s+$/, '').length - 1) {
-            var internal = ParseUtil_js_1.default.internalMath(parser, text, 0);
-            parser.PushAll(internal);
-            parser.i = i;
+        else if (c === '&' && braces === 0) {
+            throw new TexError_js_1.default('ExtraAlignTab', 'Extra alignment tab in \\cases text');
         }
+        else if (c === '\\') {
+            var rest = str.substr(i);
+            if (rest.match(/^((\\cr)[^a-zA-Z]|\\\\)/) || (end && rest.match(end))) {
+                m = 0;
+            }
+            else {
+                i += 2;
+            }
+        }
+        else {
+            i++;
+        }
+    }
+    var text = str.substr(parser.i, i - parser.i);
+    if (!text.match(/^\s*\\text[^a-zA-Z]/) || close !== text.replace(/\s+$/, '').length - 1) {
+        var internal = ParseUtil_js_1.default.internalMath(parser, ParseUtil_js_1.default.trimSpaces(text), 0);
+        parser.PushAll(internal);
+        parser.i = i;
     }
 };
 BaseMethods.Cr = function (parser, name) {
@@ -9309,18 +9633,8 @@ BaseMethods.CrLaTeX = function (parser, name, nobrackets) {
     var top = parser.stack.Top();
     var node;
     if (top instanceof sitem.ArrayItem) {
-        if (n && top.arraydef['rowspacing']) {
-            var rows = top.arraydef['rowspacing'].split(/ /);
-            if (!top.getProperty('rowspacing')) {
-                var dimem = ParseUtil_js_1.default.dimen2em(rows[0]);
-                top.setProperty('rowspacing', dimem);
-            }
-            var rowspacing = top.getProperty('rowspacing');
-            while (rows.length < top.table.length) {
-                rows.push(ParseUtil_js_1.default.Em(rowspacing));
-            }
-            rows[top.table.length - 1] = ParseUtil_js_1.default.Em(Math.max(0, rowspacing + ParseUtil_js_1.default.dimen2em(n)));
-            top.arraydef['rowspacing'] = rows.join(' ');
+        if (n) {
+            top.addRowSpacing(n);
         }
     }
     else {
@@ -9375,10 +9689,7 @@ BaseMethods.BeginEnd = function (parser, name) {
         }
         parser.stack.env['closing'] = env;
     }
-    if (++parser.macroCount > parser.configuration.options['maxMacros']) {
-        throw new TexError_js_1.default('MaxMacroSub2', 'MathJax maximum substitution count exceeded; ' +
-            'is there a recursive latex environment?');
-    }
+    ParseUtil_js_1.default.checkMaxMacros(parser, false);
     parser.parse('environment', [parser, env]);
 };
 BaseMethods.Array = function (parser, begin, open, close, align, spacing, vspacing, style, raggedHeight) {
@@ -9411,6 +9722,10 @@ BaseMethods.Array = function (parser, begin, open, close, align, spacing, vspaci
     }
     if (close) {
         array.setProperty('close', parser.convertDelimiter(close));
+    }
+    if ((style || '').charAt(1) === '\'') {
+        array.arraydef['data-cramped'] = true;
+        style = style.charAt(0);
     }
     if (style === 'D') {
         array.arraydef['displaystyle'] = true;
@@ -9507,10 +9822,7 @@ BaseMethods.Macro = function (parser, name, macro, argcount, def) {
     }
     parser.string = ParseUtil_js_1.default.addArgs(parser, macro, parser.string.slice(parser.i));
     parser.i = 0;
-    if (++parser.macroCount > parser.configuration.options['maxMacros']) {
-        throw new TexError_js_1.default('MaxMacroSub1', 'MathJax maximum macro substitution count exceeded; ' +
-            'is there a recursive macro call?');
-    }
+    ParseUtil_js_1.default.checkMaxMacros(parser);
 };
 BaseMethods.MathChoice = function (parser, name) {
     var D = parser.ParseArg(name);
@@ -9521,7 +9833,7 @@ BaseMethods.MathChoice = function (parser, name) {
 };
 exports.default = BaseMethods;
 //# sourceMappingURL=BaseMethods.js.map
-},{"./BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../../../core/MmlTree/MmlNode.js":"../node_modules/mathjax-full/js/core/MmlTree/MmlNode.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js","../../../util/lengths.js":"../node_modules/mathjax-full/js/util/lengths.js","../../../util/Entities.js":"../node_modules/mathjax-full/js/util/Entities.js"}],"../node_modules/mathjax-full/js/input/tex/ParseMethods.js":[function(require,module,exports) {
+},{"./BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../../../core/MmlTree/MmlNode.js":"../node_modules/mathjax-full/js/core/MmlTree/MmlNode.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js","../../../util/lengths.js":"../node_modules/mathjax-full/js/util/lengths.js","../../../util/Entities.js":"../node_modules/mathjax-full/js/util/Entities.js","../../../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js"}],"../node_modules/mathjax-full/js/input/tex/ParseMethods.js":[function(require,module,exports) {
 "use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -9631,6 +9943,7 @@ var sm = require("../SymbolMap.js");
 var TexConstants_js_1 = require("../TexConstants.js");
 var BaseMethods_js_1 = require("./BaseMethods.js");
 var ParseMethods_js_1 = require("../ParseMethods.js");
+var ParseUtil_js_1 = require("../ParseUtil.js");
 var MmlNode_js_1 = require("../../../core/MmlTree/MmlNode.js");
 var lengths_js_1 = require("../../../util/lengths.js");
 new sm.RegExpMap('letter', ParseMethods_js_1.default.variable, /[a-z]/i);
@@ -10051,7 +10364,9 @@ new sm.CommandMap('macros', {
     underleftrightarrow: ['UnderOver', '2194'],
     overset: 'Overset',
     underset: 'Underset',
+    overunderset: 'Overunderset',
     stackrel: ['Macro', '\\mathrel{\\mathop{#2}\\limits^{#1}}', 2],
+    stackbin: ['Macro', '\\mathbin{\\mathop{#2}\\limits^{#1}}', 2],
     over: 'Over',
     overwithdelims: 'Over',
     atop: 'Over',
@@ -10094,6 +10409,7 @@ new sm.CommandMap('macros', {
     rule: 'rule',
     Rule: ['Rule'],
     Space: ['Rule', 'blank'],
+    nonscript: 'Nonscript',
     big: ['MakeBig', MmlNode_js_1.TEXCLASS.ORD, 0.85],
     Big: ['MakeBig', MmlNode_js_1.TEXCLASS.ORD, 1.15],
     bigg: ['MakeBig', MmlNode_js_1.TEXCLASS.ORD, 1.45],
@@ -10124,6 +10440,8 @@ new sm.CommandMap('macros', {
     text: 'HBox',
     mbox: ['HBox', 0],
     fbox: 'FBox',
+    boxed: ['Macro', '\\fbox{$\\displaystyle{#1}$}', 1],
+    framebox: 'FrameBox',
     strut: 'Strut',
     mathstrut: ['Macro', '\\vphantom{(}'],
     phantom: 'Phantom',
@@ -10194,9 +10512,8 @@ new sm.CommandMap('macros', {
 new sm.EnvironmentMap('environment', ParseMethods_js_1.default.environment, {
     array: ['AlignedArray'],
     equation: ['Equation', null, true],
-    'equation*': ['Equation', null, false],
     eqnarray: ['EqnArray', null, true, true, 'rcl',
-        '0 ' + lengths_js_1.em(lengths_js_1.MATHSPACE.thickmathspace), '.5em']
+        ParseUtil_js_1.default.cols(0, lengths_js_1.MATHSPACE.thickmathspace), '.5em']
 }, BaseMethods_js_1.default);
 new sm.CharacterMap('not_remap', null, {
     '\u2190': '\u219A',
@@ -10246,7 +10563,7 @@ new sm.CharacterMap('not_remap', null, {
     '\u2203': '\u2204'
 });
 //# sourceMappingURL=BaseMappings.js.map
-},{"../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","./BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js","../ParseMethods.js":"../node_modules/mathjax-full/js/input/tex/ParseMethods.js","../../../core/MmlTree/MmlNode.js":"../node_modules/mathjax-full/js/core/MmlTree/MmlNode.js","../../../util/lengths.js":"../node_modules/mathjax-full/js/util/lengths.js"}],"../node_modules/mathjax-full/js/input/tex/base/BaseConfiguration.js":[function(require,module,exports) {
+},{"../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","./BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js","../ParseMethods.js":"../node_modules/mathjax-full/js/input/tex/ParseMethods.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../../../core/MmlTree/MmlNode.js":"../node_modules/mathjax-full/js/core/MmlTree/MmlNode.js","../../../util/lengths.js":"../node_modules/mathjax-full/js/util/lengths.js"}],"../node_modules/mathjax-full/js/input/tex/base/BaseConfiguration.js":[function(require,module,exports) {
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -10263,6 +10580,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseConfiguration = exports.BaseTags = exports.Other = void 0;
@@ -10274,6 +10602,7 @@ var SymbolMap_js_1 = require("../SymbolMap.js");
 var bitem = require("./BaseItems.js");
 var Tags_js_1 = require("../Tags.js");
 require("./BaseMappings.js");
+var OperatorDictionary_js_1 = require("../../../core/MmlTree/OperatorDictionary.js");
 new SymbolMap_js_1.CharacterMap('remap', null, {
     '-': '\u2212',
     '*': '\u2217',
@@ -10283,11 +10612,14 @@ function Other(parser, char) {
     var font = parser.stack.env['font'];
     var def = font ?
         { mathvariant: parser.stack.env['font'] } : {};
-    var remap = MapHandler_js_1.MapHandler.getMap('remap').
-        lookup(char);
-    var mo = parser.create('token', 'mo', def, (remap ? remap.char : char));
-    NodeUtil_js_1.default.setProperty(mo, 'fixStretchy', true);
-    parser.configuration.addNode('fixStretchy', mo);
+    var remap = MapHandler_js_1.MapHandler.getMap('remap').lookup(char);
+    var range = OperatorDictionary_js_1.getRange(char);
+    var type = (range ? range[3] : 'mo');
+    var mo = parser.create('token', type, def, (remap ? remap.char : char));
+    if (type === 'mo') {
+        NodeUtil_js_1.default.setProperty(mo, 'fixStretchy', true);
+        parser.configuration.addNode('fixStretchy', mo);
+    }
     parser.Push(mo);
 }
 exports.Other = Other;
@@ -10296,6 +10628,36 @@ function csUndefined(_parser, name) {
 }
 function envUndefined(_parser, env) {
     throw new TexError_js_1.default('UnknownEnv', 'Unknown environment \'%1\'', env);
+}
+function filterNonscript(_a) {
+    var e_1, _b;
+    var data = _a.data;
+    try {
+        for (var _c = __values(data.getList('nonscript')), _d = _c.next(); !_d.done; _d = _c.next()) {
+            var mml = _d.value;
+            if (mml.attributes.get('scriptlevel') > 0) {
+                var parent_1 = mml.parent;
+                parent_1.childNodes.splice(parent_1.childIndex(mml), 1);
+                data.removeFromList(mml.kind, [mml]);
+                if (mml.isKind('mrow')) {
+                    var mstyle = mml.childNodes[0];
+                    data.removeFromList('mstyle', [mstyle]);
+                    data.removeFromList('mspace', mstyle.childNodes[0].childNodes);
+                }
+            }
+            else if (mml.isKind('mrow')) {
+                mml.parent.replaceChild(mml.childNodes[0], mml);
+                data.removeFromList('mrow', [mml]);
+            }
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (_d && !_d.done && (_b = _c.return)) _b.call(_c);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
 }
 var BaseTags = (function (_super) {
     __extends(BaseTags, _super);
@@ -10336,6 +10698,7 @@ exports.BaseConfiguration = Configuration_js_1.Configuration.create('base', {
         _a[bitem.MmlItem.prototype.kind] = bitem.MmlItem,
         _a[bitem.FnItem.prototype.kind] = bitem.FnItem,
         _a[bitem.NotItem.prototype.kind] = bitem.NotItem,
+        _a[bitem.NonscriptItem.prototype.kind] = bitem.NonscriptItem,
         _a[bitem.DotsItem.prototype.kind] = bitem.DotsItem,
         _a[bitem.ArrayItem.prototype.kind] = bitem.ArrayItem,
         _a[bitem.EqnArrayItem.prototype.kind] = bitem.EqnArrayItem,
@@ -10349,10 +10712,11 @@ exports.BaseConfiguration = Configuration_js_1.Configuration.create('base', {
     },
     tags: {
         base: BaseTags
-    }
+    },
+    postprocessors: [[filterNonscript, -4]]
 });
 //# sourceMappingURL=BaseConfiguration.js.map
-},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../MapHandler.js":"../node_modules/mathjax-full/js/input/tex/MapHandler.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","./BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js","./BaseMappings.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMappings.js"}],"../node_modules/mathjax-full/js/input/tex.js":[function(require,module,exports) {
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../MapHandler.js":"../node_modules/mathjax-full/js/input/tex/MapHandler.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","./BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js","./BaseMappings.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMappings.js","../../../core/MmlTree/OperatorDictionary.js":"../node_modules/mathjax-full/js/core/MmlTree/OperatorDictionary.js"}],"../node_modules/mathjax-full/js/input/tex.js":[function(require,module,exports) {
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -10433,7 +10797,7 @@ var TeX = (function (_super) {
         return _this;
     }
     TeX.configure = function (packages) {
-        var configuration = new Configuration_js_1.ParserConfiguration(packages);
+        var configuration = new Configuration_js_1.ParserConfiguration(packages, ['tex']);
         configuration.init();
         return configuration;
     };
@@ -10465,9 +10829,11 @@ var TeX = (function (_super) {
         this.latex = math.math;
         var node;
         this.parseOptions.tags.startEquation(math);
+        var globalEnv;
         try {
             var parser = new TexParser_js_1.default(this.latex, { display: display, isInner: false }, this.parseOptions);
             node = parser.mml();
+            globalEnv = parser.stack.global;
         }
         catch (err) {
             if (!(err instanceof TexError_js_1.default)) {
@@ -10477,6 +10843,9 @@ var TeX = (function (_super) {
             node = this.options.formatError(this, err);
         }
         node = this.parseOptions.nodeFactory.create('node', 'math', [node]);
+        if (globalEnv === null || globalEnv === void 0 ? void 0 : globalEnv.indentalign) {
+            NodeUtil_js_1.default.setAttribute(node, 'indentalign', globalEnv.indentalign);
+        }
         if (display) {
             NodeUtil_js_1.default.setAttribute(node, 'display', 'block');
         }
@@ -11109,6 +11478,9 @@ var CssStyles = (function () {
         this.styles = {};
     };
     CssStyles.prototype.getStyleString = function () {
+        return this.getStyleRules().join('\n\n');
+    };
+    CssStyles.prototype.getStyleRules = function () {
         var e_3, _a;
         var selectors = Object.keys(this.styles);
         var defs = new Array(selectors.length);
@@ -11126,7 +11498,7 @@ var CssStyles = (function () {
             }
             finally { if (e_3) throw e_3.error; }
         }
-        return defs.join('\n\n');
+        return defs;
     };
     CssStyles.prototype.getStyleDefString = function (styles) {
         var e_4, _a;
@@ -11434,8 +11806,9 @@ var CommonOutputJax = (function (_super) {
         var adaptor = this.adaptor;
         var family = (getFamily ? adaptor.fontFamily(node) : '');
         var em = adaptor.fontSize(node);
-        var ex = (adaptor.nodeSize(adaptor.childNode(node, 1))[1] / 60) || (em * this.options.exFactor);
-        var containerWidth = (adaptor.getStyle(node, 'display') === 'table' ?
+        var _a = __read(adaptor.nodeSize(adaptor.childNode(node, 1)), 2), w = _a[0], h = _a[1];
+        var ex = (w ? h / 60 : em * this.options.exFactor);
+        var containerWidth = (!w ? 1000000 : adaptor.getStyle(node, 'display') === 'table' ?
             adaptor.nodeSize(adaptor.lastChild(node))[0] - 1 :
             adaptor.nodeBBox(adaptor.lastChild(node)).left -
                 adaptor.nodeBBox(adaptor.firstChild(node)).left - 2);
@@ -11444,44 +11817,51 @@ var CommonOutputJax = (function (_super) {
         return { em: em, ex: ex, containerWidth: containerWidth, lineWidth: lineWidth, scale: scale, family: family };
     };
     CommonOutputJax.prototype.styleSheet = function (html) {
-        var e_7, _a, e_8, _b;
+        var e_7, _a;
         this.setDocument(html);
         this.cssStyles.clear();
         this.cssStyles.addStyles(this.constructor.commonStyles);
         if ('getStyles' in html) {
             try {
-                for (var _c = __values(html.getStyles()), _d = _c.next(); !_d.done; _d = _c.next()) {
-                    var styles = _d.value;
+                for (var _b = __values(html.getStyles()), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var styles = _c.value;
                     this.cssStyles.addStyles(styles);
                 }
             }
             catch (e_7_1) { e_7 = { error: e_7_1 }; }
             finally {
                 try {
-                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
                 }
                 finally { if (e_7) throw e_7.error; }
             }
         }
+        this.addWrapperStyles(this.cssStyles);
+        this.addFontStyles(this.cssStyles);
+        var sheet = this.html('style', { id: 'MJX-styles' }, [this.text('\n' + this.cssStyles.cssText + '\n')]);
+        return sheet;
+    };
+    CommonOutputJax.prototype.addFontStyles = function (styles) {
+        styles.addStyles(this.font.styles);
+    };
+    CommonOutputJax.prototype.addWrapperStyles = function (styles) {
+        var e_8, _a;
         try {
-            for (var _e = __values(this.factory.getKinds()), _f = _e.next(); !_f.done; _f = _e.next()) {
-                var kind = _f.value;
-                this.addClassStyles(this.factory.getNodeClass(kind));
+            for (var _b = __values(this.factory.getKinds()), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var kind = _c.value;
+                this.addClassStyles(this.factory.getNodeClass(kind), styles);
             }
         }
         catch (e_8_1) { e_8 = { error: e_8_1 }; }
         finally {
             try {
-                if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
             finally { if (e_8) throw e_8.error; }
         }
-        this.cssStyles.addStyles(this.font.styles);
-        var sheet = this.html('style', { id: 'MJX-styles' }, [this.text('\n' + this.cssStyles.cssText + '\n')]);
-        return sheet;
     };
-    CommonOutputJax.prototype.addClassStyles = function (CLASS) {
-        this.cssStyles.addStyles(CLASS.styles);
+    CommonOutputJax.prototype.addClassStyles = function (CLASS, styles) {
+        styles.addStyles(CLASS.styles);
     };
     CommonOutputJax.prototype.setDocument = function (html) {
         if (html) {
@@ -11570,7 +11950,7 @@ var CommonOutputJax = (function (_super) {
             styles.get('font-weight') === 'bold'];
     };
     CommonOutputJax.NAME = 'Common';
-    CommonOutputJax.OPTIONS = __assign(__assign({}, OutputJax_js_1.AbstractOutputJax.OPTIONS), { scale: 1, minScale: .5, matchFontHeight: true, mtextInheritFont: false, merrorInheritFont: false, mtextFont: '', merrorFont: 'serif', mathmlSpacing: false, skipAttributes: {}, exFactor: .5, displayAlign: 'center', displayIndent: '0', wrapperFactory: null, font: null, cssStyles: null });
+    CommonOutputJax.OPTIONS = __assign(__assign({}, OutputJax_js_1.AbstractOutputJax.OPTIONS), { scale: 1, minScale: .5, mtextInheritFont: false, merrorInheritFont: false, mtextFont: '', merrorFont: 'serif', mathmlSpacing: false, skipAttributes: {}, exFactor: .5, displayAlign: 'center', displayIndent: '0', wrapperFactory: null, font: null, cssStyles: null });
     CommonOutputJax.commonStyles = {};
     return CommonOutputJax;
 }(OutputJax_js_1.AbstractOutputJax));
@@ -11716,7 +12096,7 @@ var BBox = (function () {
         this.w = def.w || 0;
         this.h = ('h' in def ? def.h : -lengths_js_1.BIGDIMEN);
         this.d = ('d' in def ? def.d : -lengths_js_1.BIGDIMEN);
-        this.L = this.R = this.ic = this.sk = 0;
+        this.L = this.R = this.ic = this.sk = this.dx = 0;
         this.scale = this.rscale = 1;
         this.pwidth = '';
     }
@@ -12409,11 +12789,14 @@ var CommonWrapper = (function (_super) {
     };
     CommonWrapper.prototype.copySkewIC = function (bbox) {
         var first = this.childNodes[0];
-        if (first && first.bbox.sk) {
+        if (first === null || first === void 0 ? void 0 : first.bbox.sk) {
             bbox.sk = first.bbox.sk;
         }
+        if (first === null || first === void 0 ? void 0 : first.bbox.dx) {
+            bbox.dx = first.bbox.dx;
+        }
         var last = this.childNodes[this.childNodes.length - 1];
-        if (last && last.bbox.ic) {
+        if (last === null || last === void 0 ? void 0 : last.bbox.ic) {
             bbox.ic = last.bbox.ic;
             bbox.w += bbox.ic;
         }
@@ -13929,6 +14312,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -14073,7 +14467,7 @@ function CommonMoMixin(Base) {
                                 this.variant = this.font.getSizeVariant(c, i);
                                 this.size = i;
                                 if (delim.schar && delim.schar[i]) {
-                                    this.stretch.c = delim.schar[i];
+                                    this.stretch = __assign(__assign({}, this.stretch), { c: delim.schar[i] });
                                 }
                                 return;
                             }
@@ -16831,6 +17225,7 @@ function CommonScriptbaseMixin(Base) {
                         finally { if (e_3) throw e_3.error; }
                     }
                 }
+                [1, 2].map(function (i) { return dw[i] += (boxes[i] ? boxes[i].dx * boxes[0].scale : 0); });
                 return dw;
             };
             class_1.prototype.getDelta = function (noskew) {
@@ -18344,7 +18739,7 @@ function CommonMtableMixin(Base) {
             _this.getPercentageWidth();
             var attributes = _this.node.attributes;
             _this.frame = attributes.get('frame') !== 'none';
-            _this.fLine = (_this.frame ? .07 : 0);
+            _this.fLine = (_this.frame && attributes.get('frame') ? .07 : 0);
             _this.fSpace = (_this.frame ? _this.convertLengths(_this.getAttributeArray('framespacing')) : [0, 0]);
             _this.cSpace = _this.convertLengths(_this.getColumnAttributes('columnspacing'));
             _this.rSpace = _this.convertLengths(_this.getRowAttributes('rowspacing'));
@@ -18579,7 +18974,8 @@ function CommonMtableMixin(Base) {
                 this.container.bbox.pwidth = '';
             }
             var _a = this.bbox, w = _a.w, L = _a.L, R = _a.R;
-            var W = Math.max(w, this.length2em(width, Math.max(cwidth, L + w + R)));
+            var labelInWidth = this.node.attributes.get('data-width-includes-label');
+            var W = Math.max(w, this.length2em(width, Math.max(cwidth, L + w + R))) - (labelInWidth ? L + R : 0);
             var cols = (this.node.attributes.get('equalcolumns') ?
                 Array(this.numCols).fill(this.percent(1 / Math.max(1, this.numCols))) :
                 this.getColumnAttributes('columnwidth', 0));
@@ -18636,9 +19032,14 @@ function CommonMtableMixin(Base) {
         };
         class_1.prototype.getBBoxLR = function () {
             if (this.hasLabels) {
-                var side = this.node.attributes.get('side');
+                var attributes = this.node.attributes;
+                var side = attributes.get('side');
                 var _a = __read(this.getPadAlignShift(side), 2), pad = _a[0], align = _a[1];
-                return (align === 'center' ? [pad, pad] :
+                var labels = this.hasLabels && !!attributes.get('data-width-includes-label');
+                if (labels && this.frame && this.fSpace[0]) {
+                    pad -= this.fSpace[0];
+                }
+                return (align === 'center' && !labels ? [pad, pad] :
                     side === 'left' ? [pad, 0] : [0, pad]);
             }
             return [0, 0];
@@ -18747,7 +19148,7 @@ function CommonMtableMixin(Base) {
             var dw = cwidth;
             indices.forEach(function (i) {
                 var x = swidths[i];
-                dw -= (x === 'fit' || x === 'auto' ? W[i] : _this.length2em(x, width));
+                dw -= (x === 'fit' || x === 'auto' ? W[i] : _this.length2em(x, cwidth));
             });
             var fw = (n && dw > 0 ? dw / n : 0);
             return indices.map(function (i) {
@@ -18949,7 +19350,7 @@ var MmlMtable = (function (_super) {
         }
         _super.prototype.setInheritedAttributes.call(this, attributes, display, level, prime);
     };
-    MmlMtable.prototype.setChildInheritedAttributes = function (attributes, display, level, prime) {
+    MmlMtable.prototype.setChildInheritedAttributes = function (attributes, display, level, _prime) {
         var e_2, _a, e_3, _b;
         try {
             for (var _c = __values(this.childNodes), _d = _c.next(); !_d.done; _d = _c.next()) {
@@ -18973,12 +19374,13 @@ var MmlMtable = (function (_super) {
             columnalign: this.attributes.get('columnalign'),
             rowalign: 'center'
         });
+        var cramped = this.attributes.getExplicit('data-cramped');
         var ralign = string_js_1.split(this.attributes.get('rowalign'));
         try {
             for (var _e = __values(this.childNodes), _f = _e.next(); !_f.done; _f = _e.next()) {
                 var child = _f.value;
                 attributes.rowalign[1] = ralign.shift() || attributes.rowalign[1];
-                child.setInheritedAttributes(attributes, display, level, prime);
+                child.setInheritedAttributes(attributes, display, level, !!cramped);
             }
         }
         catch (e_3_1) { e_3 = { error: e_3_1 }; }
@@ -19166,7 +19568,7 @@ var SVGmtable = (function (_super) {
         }
     };
     SVGmtable.prototype.handleFrame = function (svg) {
-        if (this.frame) {
+        if (this.frame && this.fLine) {
             var _a = this.getBBox(), h = _a.h, d = _a.d, w = _a.w;
             var style = this.node.attributes.get('frame');
             this.adaptor.append(svg, this.makeFrame(w, h, d, style));
@@ -21853,6 +22255,7 @@ function CommonTextNodeMixin(Base) {
                             bbox.d = d;
                         bbox.ic = data.ic || 0;
                         bbox.sk = data.sk || 0;
+                        bbox.dx = data.dx || 0;
                     }
                 }
                 catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -28126,7 +28529,7 @@ var LiteDocument = (function () {
             this.head = new Element_js_1.LiteElement('head'),
             this.body = new Element_js_1.LiteElement('body')
         ]);
-        this.type = '<!DOCTYPE html>';
+        this.type = '';
     }
     Object.defineProperty(LiteDocument.prototype, "kind", {
         get: function () {
@@ -28973,6 +29376,9 @@ var LiteAdaptor = (function (_super) {
     LiteAdaptor.prototype.allStyles = function (node) {
         return this.getAttribute(node, 'style');
     };
+    LiteAdaptor.prototype.insertRules = function (node, rules) {
+        node.children = [this.text(rules.join('\n\n') + '\n\n' + this.textContent(node))];
+    };
     LiteAdaptor.prototype.fontSize = function (_node) {
         return this.options.fontSize;
     };
@@ -29030,6 +29436,33 @@ exports.liteAdaptor = liteAdaptor;
 //# sourceMappingURL=liteAdaptor.js.map
 },{"../core/DOMAdaptor.js":"../node_modules/mathjax-full/js/core/DOMAdaptor.js","./lite/Document.js":"../node_modules/mathjax-full/js/adaptors/lite/Document.js","./lite/Element.js":"../node_modules/mathjax-full/js/adaptors/lite/Element.js","./lite/Text.js":"../node_modules/mathjax-full/js/adaptors/lite/Text.js","./lite/Window.js":"../node_modules/mathjax-full/js/adaptors/lite/Window.js","./lite/Parser.js":"../node_modules/mathjax-full/js/adaptors/lite/Parser.js","../util/Styles.js":"../node_modules/mathjax-full/js/util/Styles.js","../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js"}],"../node_modules/mathjax-full/js/util/LinkedList.js":[function(require,module,exports) {
 "use strict";
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -29085,9 +29518,6 @@ var LinkedList = (function () {
         this.list.next = this.list.prev = this.list;
         this.push.apply(this, __spreadArray([], __read(args)));
     }
-    LinkedList.prototype.toArray = function () {
-        return Array.from(this);
-    };
     LinkedList.prototype.isBefore = function (a, b) {
         return a < b;
     };
@@ -29198,33 +29628,40 @@ var LinkedList = (function () {
         return this;
     };
     LinkedList.prototype[Symbol.iterator] = function () {
-        var current = this.list;
-        return {
-            next: function () {
-                current = current.next;
-                return (current.data === exports.END ?
-                    { value: null, done: true } :
-                    { value: current.data, done: false });
+        var current;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    current = this.list.next;
+                    _a.label = 1;
+                case 1:
+                    if (!(current.data !== exports.END)) return [3, 3];
+                    return [4, current.data];
+                case 2:
+                    _a.sent();
+                    current = current.next;
+                    return [3, 1];
+                case 3: return [2];
             }
-        };
+        });
     };
     LinkedList.prototype.reversed = function () {
-        var _a;
-        var current = this.list;
-        return _a = {},
-            _a[Symbol.iterator] = function () {
-                return this;
-            },
-            _a.next = function () {
-                current = current.prev;
-                return (current.data === exports.END ?
-                    { value: null, done: true } :
-                    { value: current.data, done: false });
-            },
-            _a.toArray = function () {
-                return Array.from(this);
-            },
-            _a;
+        var current;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    current = this.list.prev;
+                    _a.label = 1;
+                case 1:
+                    if (!(current.data !== exports.END)) return [3, 3];
+                    return [4, current.data];
+                case 2:
+                    _a.sent();
+                    current = current.prev;
+                    return [3, 1];
+                case 3: return [2];
+            }
+        });
     };
     LinkedList.prototype.insert = function (data, isBefore) {
         if (isBefore === void 0) { isBefore = null; }
@@ -29433,10 +29870,16 @@ var MmlMstyle = (function (_super) {
             else {
                 level = parseInt(scriptlevel);
             }
+            prime = false;
         }
         var displaystyle = this.attributes.getExplicit('displaystyle');
         if (displaystyle != null) {
             display = (displaystyle === true);
+            prime = false;
+        }
+        var cramped = this.attributes.getExplicit('data-cramped');
+        if (cramped != null) {
+            prime = cramped;
         }
         attributes = this.addInheritedAttributes(attributes, this.attributes.getAllAttributes());
         this.childNodes[0].setInheritedAttributes(attributes, display, level, prime);
@@ -30417,7 +30860,9 @@ var AbstractMathDocument = (function () {
     };
     AbstractMathDocument.prototype.clearMathItemsWithin = function (containers) {
         var _a;
-        (_a = this.math).remove.apply(_a, __spreadArray([], __read(this.getMathItemsWithin(containers))));
+        var items = this.getMathItemsWithin(containers);
+        (_a = this.math).remove.apply(_a, __spreadArray([], __read(items)));
+        return items;
     };
     AbstractMathDocument.prototype.getMathItemsWithin = function (elements) {
         var e_11, _a, e_12, _b;
@@ -31936,8 +32381,19 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MultlineItem = void 0;
+exports.FlalignItem = exports.MultlineItem = void 0;
 var BaseItems_js_1 = require("../base/BaseItems.js");
 var ParseUtil_js_1 = require("../ParseUtil.js");
 var NodeUtil_js_1 = require("../NodeUtil.js");
@@ -32003,6 +32459,79 @@ var MultlineItem = (function (_super) {
     return MultlineItem;
 }(BaseItems_js_1.ArrayItem));
 exports.MultlineItem = MultlineItem;
+var FlalignItem = (function (_super) {
+    __extends(FlalignItem, _super);
+    function FlalignItem(factory, name, numbered, padded, center) {
+        var _this = _super.call(this, factory) || this;
+        _this.name = name;
+        _this.numbered = numbered;
+        _this.padded = padded;
+        _this.center = center;
+        _this.factory.configuration.tags.start(name, numbered, numbered);
+        return _this;
+    }
+    Object.defineProperty(FlalignItem.prototype, "kind", {
+        get: function () {
+            return 'flalign';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    FlalignItem.prototype.EndEntry = function () {
+        _super.prototype.EndEntry.call(this);
+        var n = this.getProperty('xalignat');
+        if (!n)
+            return;
+        if (this.row.length > n) {
+            throw new TexError_js_1.default('XalignOverflow', 'Extra %1 in row of %2', '&', this.name);
+        }
+    };
+    FlalignItem.prototype.EndRow = function () {
+        var cell;
+        var row = this.row;
+        var n = this.getProperty('xalignat');
+        while (row.length < n) {
+            row.push(this.create('node', 'mtd'));
+        }
+        this.row = [];
+        if (this.padded) {
+            this.row.push(this.create('node', 'mtd'));
+        }
+        while ((cell = row.shift())) {
+            this.row.push(cell);
+            cell = row.shift();
+            if (cell)
+                this.row.push(cell);
+            if (row.length || this.padded) {
+                this.row.push(this.create('node', 'mtd'));
+            }
+        }
+        if (this.row.length > this.maxrow) {
+            this.maxrow = this.row.length;
+        }
+        _super.prototype.EndRow.call(this);
+        var mtr = this.table[this.table.length - 1];
+        if (this.getProperty('zeroWidthLabel') && mtr.isKind('mlabeledtr')) {
+            var mtd = NodeUtil_js_1.default.getChildren(mtr)[0];
+            var side = this.factory.configuration.options['tagSide'];
+            var def = __assign({ width: 0 }, (side === 'right' ? { lspace: '-1width' } : {}));
+            var mpadded = this.create('node', 'mpadded', NodeUtil_js_1.default.getChildren(mtd), def);
+            mtd.setChildren([mpadded]);
+        }
+    };
+    FlalignItem.prototype.EndTable = function () {
+        _super.prototype.EndTable.call(this);
+        if (this.center) {
+            if (this.maxrow <= 2) {
+                var def = this.arraydef;
+                delete def.width;
+                delete this.global.indentalign;
+            }
+        }
+    };
+    return FlalignItem;
+}(BaseItems_js_1.EqnArrayItem));
+exports.FlalignItem = FlalignItem;
 //# sourceMappingURL=AmsItems.js.map
 },{"../base/BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js"}],"../node_modules/mathjax-full/js/input/tex/ams/AmsMethods.js":[function(require,module,exports) {
 "use strict";
@@ -32052,11 +32581,50 @@ exports.AmsMethods.Multline = function (parser, begin, numbered) {
     item.arraydef = {
         displaystyle: true,
         rowspacing: '.5em',
-        columnwidth: '100%',
-        width: parser.options['multlineWidth'],
+        columnspacing: '100%',
+        width: parser.options.ams['multlineWidth'],
         side: parser.options['tagSide'],
-        minlabelspacing: parser.options['tagIndent']
+        minlabelspacing: parser.options['tagIndent'],
+        framespacing: parser.options.ams['multlineIndent'] + ' 0',
+        frame: '',
+        'data-width-includes-label': true
     };
+    return item;
+};
+exports.AmsMethods.XalignAt = function (parser, begin, numbered, padded) {
+    var n = parser.GetArgument('\\begin{' + begin.getName() + '}');
+    if (n.match(/[^0-9]/)) {
+        throw new TexError_js_1.default('PositiveIntegerArg', 'Argument to %1 must me a positive integer', '\\begin{' + begin.getName() + '}');
+    }
+    var align = (padded ? 'crl' : 'rlc');
+    var width = (padded ? 'fit auto auto' : 'auto auto fit');
+    var item = exports.AmsMethods.FlalignArray(parser, begin, numbered, padded, false, align, width, true);
+    item.setProperty('xalignat', 2 * parseInt(n));
+    return item;
+};
+exports.AmsMethods.FlalignArray = function (parser, begin, numbered, padded, center, align, width, zeroWidthLabel) {
+    if (zeroWidthLabel === void 0) { zeroWidthLabel = false; }
+    parser.Push(begin);
+    ParseUtil_js_1.default.checkEqnEnv(parser);
+    align = align
+        .split('')
+        .join(' ')
+        .replace(/r/g, 'right')
+        .replace(/l/g, 'left')
+        .replace(/c/g, 'center');
+    var item = parser.itemFactory.create('flalign', begin.getName(), numbered, padded, center, parser.stack);
+    item.arraydef = {
+        width: '100%',
+        displaystyle: true,
+        columnalign: align,
+        columnspacing: '0em',
+        columnwidth: width,
+        rowspacing: '3pt',
+        side: parser.options['tagSide'],
+        minlabelspacing: (zeroWidthLabel ? '0' : parser.options['tagIndent']),
+        'data-width-includes-label': true,
+    };
+    item.setProperty('zeroWidthLabel', zeroWidthLabel);
     return item;
 };
 exports.NEW_OPS = 'ams-declare-ops';
@@ -32219,6 +32787,7 @@ exports.AmsMethods.Array = BaseMethods_js_1.default.Array;
 exports.AmsMethods.Spacer = BaseMethods_js_1.default.Spacer;
 exports.AmsMethods.NamedOp = BaseMethods_js_1.default.NamedOp;
 exports.AmsMethods.EqnArray = BaseMethods_js_1.default.EqnArray;
+exports.AmsMethods.Equation = BaseMethods_js_1.default.Equation;
 //# sourceMappingURL=AmsMethods.js.map
 },{"../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../Symbol.js":"../node_modules/mathjax-full/js/input/tex/Symbol.js","../base/BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js","../../../core/MmlTree/MmlNode.js":"../node_modules/mathjax-full/js/core/MmlTree/MmlNode.js"}],"../node_modules/mathjax-full/js/input/tex/ams/AmsMappings.js":[function(require,module,exports) {
 "use strict";
@@ -32230,13 +32799,6 @@ var ParseMethods_js_1 = require("../ParseMethods.js");
 var ParseUtil_js_1 = require("../ParseUtil.js");
 var MmlNode_js_1 = require("../../../core/MmlTree/MmlNode.js");
 var lengths_js_1 = require("../../../util/lengths.js");
-var COLS = function (W) {
-    var WW = [];
-    for (var i = 0, m = W.length; i < m; i++) {
-        WW[i] = ParseUtil_js_1.default.Em(W[i]);
-    }
-    return WW.join(' ');
-};
 new sm.CharacterMap('AMSmath-mathchar0mo', ParseMethods_js_1.default.mathchar0mo, {
     iiiint: ['\u2A0C', { texClass: MmlNode_js_1.TEXCLASS.OP }]
 });
@@ -32274,29 +32836,32 @@ new sm.CommandMap('AMSmath-macros', {
     cfrac: 'CFrac',
     shoveleft: ['HandleShove', TexConstants_js_1.TexConstant.Align.LEFT],
     shoveright: ['HandleShove', TexConstants_js_1.TexConstant.Align.RIGHT],
-    xrightarrow: ['xArrow', 0x2192, 7, 12],
+    xrightarrow: ['xArrow', 0x2192, 5, 10],
     xleftarrow: ['xArrow', 0x2190, 10, 5]
 }, AmsMethods_js_1.AmsMethods);
 new sm.EnvironmentMap('AMSmath-environment', ParseMethods_js_1.default.environment, {
+    'equation*': ['Equation', null, false],
     'eqnarray*': ['EqnArray', null, false, true, 'rcl',
-        '0 ' + lengths_js_1.em(lengths_js_1.MATHSPACE.thickmathspace), '.5em'],
-    align: ['EqnArray', null, true, true, 'rlrlrlrlrlrl',
-        COLS([0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0])],
-    'align*': ['EqnArray', null, false, true, 'rlrlrlrlrlrl',
-        COLS([0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0])],
+        ParseUtil_js_1.default.cols(0, lengths_js_1.MATHSPACE.thickmathspace), '.5em'],
+    align: ['EqnArray', null, true, true, 'rl', ParseUtil_js_1.default.cols(0, 2)],
+    'align*': ['EqnArray', null, false, true, 'rl', ParseUtil_js_1.default.cols(0, 2)],
     multline: ['Multline', null, true],
     'multline*': ['Multline', null, false],
-    split: ['EqnArray', null, false, false, 'rl', COLS([0])],
+    split: ['EqnArray', null, false, false, 'rl', ParseUtil_js_1.default.cols(0)],
     gather: ['EqnArray', null, true, true, 'c'],
     'gather*': ['EqnArray', null, false, true, 'c'],
     alignat: ['AlignAt', null, true, true],
     'alignat*': ['AlignAt', null, false, true],
     alignedat: ['AlignAt', null, false, false],
-    aligned: ['AmsEqnArray', null, null, null, 'rlrlrlrlrlrl',
-        COLS([0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]), '.5em', 'D'],
+    aligned: ['AmsEqnArray', null, null, null, 'rl', ParseUtil_js_1.default.cols(0, 2), '.5em', 'D'],
     gathered: ['AmsEqnArray', null, null, null, 'c', null, '.5em', 'D'],
-    subarray: ['Array', null, null, null, null, COLS([0]), '0.1em', 'S', 1],
-    smallmatrix: ['Array', null, null, null, 'c', COLS([1 / 3]),
+    xalignat: ['XalignAt', null, true, true],
+    'xalignat*': ['XalignAt', null, false, true],
+    xxalignat: ['XalignAt', null, false, false],
+    flalign: ['FlalignArray', null, true, false, true, 'rlc', 'auto auto fit'],
+    'flalign*': ['FlalignArray', null, false, false, true, 'rlc', 'auto auto fit'],
+    subarray: ['Array', null, null, null, null, ParseUtil_js_1.default.cols(0), '0.1em', 'S', 1],
+    smallmatrix: ['Array', null, null, null, 'c', ParseUtil_js_1.default.cols(1 / 3),
         '.2em', 'S', 1],
     matrix: ['Array', null, null, null, 'c'],
     pmatrix: ['Array', null, '(', ')', 'c'],
@@ -32614,9 +33179,25 @@ exports.AmsConfiguration = Configuration_js_1.Configuration.create('ams', {
             'AMSmath-mathchar0mo', 'AMSmath-macros', 'AMSmath-delimiter'],
         environment: ['AMSmath-environment']
     },
-    items: (_a = {}, _a[AmsItems_js_1.MultlineItem.prototype.kind] = AmsItems_js_1.MultlineItem, _a),
+    items: (_a = {},
+        _a[AmsItems_js_1.MultlineItem.prototype.kind] = AmsItems_js_1.MultlineItem,
+        _a[AmsItems_js_1.FlalignItem.prototype.kind] = AmsItems_js_1.FlalignItem,
+        _a),
     tags: { 'ams': AmsTags },
-    init: init
+    init: init,
+    config: function (_config, jax) {
+        if (jax.parseOptions.options.multlineWidth) {
+            jax.parseOptions.options.ams.multlineWidth = jax.parseOptions.options.multlineWidth;
+        }
+        delete jax.parseOptions.options.multlineWidth;
+    },
+    options: {
+        multlineWidth: '',
+        ams: {
+            multlineWidth: '100%',
+            multlineIndent: '1em',
+        }
+    }
 });
 //# sourceMappingURL=AmsConfiguration.js.map
 },{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","./AmsItems.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsItems.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js","./AmsMethods.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsMethods.js","./AmsMappings.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsMappings.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js"}],"../node_modules/mathjax-full/js/input/tex/amscd/AmsCdMethods.js":[function(require,module,exports) {
@@ -33831,7 +34412,416 @@ new SymbolMap_js_1.CommandMap('cancel', {
 }, exports.CancelMethods);
 exports.CancelConfiguration = Configuration_js_1.Configuration.create('cancel', { handler: { macro: ['cancel'] } });
 //# sourceMappingURL=CancelConfiguration.js.map
-},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../enclose/EncloseConfiguration.js":"../node_modules/mathjax-full/js/input/tex/enclose/EncloseConfiguration.js"}],"../node_modules/mathjax-full/js/input/tex/color/ColorMethods.js":[function(require,module,exports) {
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../enclose/EncloseConfiguration.js":"../node_modules/mathjax-full/js/input/tex/enclose/EncloseConfiguration.js"}],"../node_modules/mathjax-full/js/input/tex/empheq/EmpheqUtil.js":[function(require,module,exports) {
+"use strict";
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EmpheqUtil = void 0;
+var ParseUtil_js_1 = require("../ParseUtil.js");
+var TexParser_js_1 = require("../TexParser.js");
+exports.EmpheqUtil = {
+    environment: function (parser, env, func, args) {
+        var name = args[0];
+        var item = parser.itemFactory.create(name + '-begin').setProperties({ name: env, end: name });
+        parser.Push(func.apply(void 0, __spreadArray([parser, item], __read(args.slice(1)))));
+    },
+    splitOptions: function (text, allowed) {
+        if (allowed === void 0) { allowed = null; }
+        return ParseUtil_js_1.default.keyvalOptions(text, allowed, true);
+    },
+    columnCount: function (table) {
+        var e_1, _a;
+        var m = 0;
+        try {
+            for (var _b = __values(table.childNodes), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var row = _c.value;
+                var n = row.childNodes.length - (row.isKind('mlabeledtr') ? 1 : 0);
+                if (n > m)
+                    m = n;
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        return m;
+    },
+    cellBlock: function (tex, table, parser, env) {
+        var e_2, _a;
+        var mpadded = parser.create('node', 'mpadded', [], { height: 0, depth: 0, voffset: '-1height' });
+        var result = new TexParser_js_1.default(tex, parser.stack.env, parser.configuration);
+        var mml = result.mml();
+        if (env && result.configuration.tags.label) {
+            result.configuration.tags.currentTag.env = env;
+            result.configuration.tags.getTag(true);
+        }
+        try {
+            for (var _b = __values((mml.isInferred ? mml.childNodes : [mml])), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var child = _c.value;
+                mpadded.appendChild(child);
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+        mpadded.appendChild(parser.create('node', 'mphantom', [
+            parser.create('node', 'mpadded', [table], { width: 0 })
+        ]));
+        return mpadded;
+    },
+    topRowTable: function (original, parser) {
+        var table = ParseUtil_js_1.default.copyNode(original, parser);
+        table.setChildren(table.childNodes.slice(0, 1));
+        table.attributes.set('align', 'baseline 1');
+        return original.factory.create('mphantom', {}, [parser.create('node', 'mpadded', [table], { width: 0 })]);
+    },
+    rowspanCell: function (mtd, tex, table, parser, env) {
+        mtd.appendChild(parser.create('node', 'mpadded', [
+            this.cellBlock(tex, ParseUtil_js_1.default.copyNode(table, parser), parser, env),
+            this.topRowTable(table, parser)
+        ], { height: 0, depth: 0, voffset: 'height' }));
+    },
+    left: function (table, original, left, parser, env) {
+        var e_3, _a;
+        if (env === void 0) { env = ''; }
+        table.attributes.set('columnalign', 'right ' + (table.attributes.get('columnalign') || ''));
+        table.attributes.set('columnspacing', '0em ' + (table.attributes.get('columnspacing') || ''));
+        var mtd;
+        try {
+            for (var _b = __values(table.childNodes.slice(0).reverse()), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var row = _c.value;
+                mtd = parser.create('node', 'mtd');
+                row.childNodes.unshift(mtd);
+                row.replaceChild(mtd, mtd);
+                if (row.isKind('mlabeledtr')) {
+                    row.childNodes[0] = row.childNodes[1];
+                    row.childNodes[1] = mtd;
+                }
+            }
+        }
+        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_3) throw e_3.error; }
+        }
+        this.rowspanCell(mtd, left, original, parser, env);
+    },
+    right: function (table, original, right, parser, env) {
+        if (env === void 0) { env = ''; }
+        if (table.childNodes.length === 0) {
+            table.appendChild(parser.create('node', 'mtr'));
+        }
+        var m = exports.EmpheqUtil.columnCount(table);
+        var row = table.childNodes[0];
+        while (row.childNodes.length < m)
+            row.appendChild(parser.create('node', 'mtd'));
+        var mtd = row.appendChild(parser.create('node', 'mtd'));
+        exports.EmpheqUtil.rowspanCell(mtd, right, original, parser, env);
+        table.attributes.set('columnalign', (table.attributes.get('columnalign') || '').split(/ /).slice(0, m).join(' ') + ' left');
+        table.attributes.set('columnspacing', (table.attributes.get('columnspacing') || '').split(/ /).slice(0, m - 1).join(' ') + ' 0em');
+    },
+    adjustTable: function (empheq, parser) {
+        var left = empheq.getProperty('left');
+        var right = empheq.getProperty('right');
+        if (left || right) {
+            var table = empheq.Last;
+            var original = ParseUtil_js_1.default.copyNode(table, parser);
+            if (left)
+                this.left(table, original, left, parser);
+            if (right)
+                this.right(table, original, right, parser);
+        }
+    },
+    allowEnv: {
+        equation: true,
+        align: true,
+        gather: true,
+        flalign: true,
+        alignat: true,
+        multline: true
+    },
+    checkEnv: function (env) {
+        return this.allowEnv.hasOwnProperty(env.replace(/\*$/, '')) || false;
+    }
+};
+//# sourceMappingURL=EmpheqUtil.js.map
+},{"../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js"}],"../node_modules/mathjax-full/js/input/tex/cases/CasesConfiguration.js":[function(require,module,exports) {
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CasesConfiguration = exports.CasesMethods = exports.CasesTags = exports.CasesBeginItem = void 0;
+var Configuration_js_1 = require("../Configuration.js");
+var SymbolMap_js_1 = require("../SymbolMap.js");
+var ParseUtil_js_1 = require("../ParseUtil.js");
+var BaseMethods_js_1 = require("../base/BaseMethods.js");
+var TexError_js_1 = require("../TexError.js");
+var BaseItems_js_1 = require("../base/BaseItems.js");
+var AmsConfiguration_js_1 = require("../ams/AmsConfiguration.js");
+var EmpheqUtil_js_1 = require("../empheq/EmpheqUtil.js");
+var CasesBeginItem = (function (_super) {
+    __extends(CasesBeginItem, _super);
+    function CasesBeginItem() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Object.defineProperty(CasesBeginItem.prototype, "kind", {
+        get: function () {
+            return 'cases-begin';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    CasesBeginItem.prototype.checkItem = function (item) {
+        if (item.isKind('end') && item.getName() === this.getName()) {
+            if (this.getProperty('end')) {
+                this.setProperty('end', false);
+                return [[], true];
+            }
+        }
+        return _super.prototype.checkItem.call(this, item);
+    };
+    return CasesBeginItem;
+}(BaseItems_js_1.BeginItem));
+exports.CasesBeginItem = CasesBeginItem;
+var CasesTags = (function (_super) {
+    __extends(CasesTags, _super);
+    function CasesTags() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.subcounter = 0;
+        return _this;
+    }
+    CasesTags.prototype.start = function (env, taggable, defaultTags) {
+        this.subcounter = 0;
+        _super.prototype.start.call(this, env, taggable, defaultTags);
+    };
+    CasesTags.prototype.autoTag = function () {
+        if (this.currentTag.tag != null)
+            return;
+        if (this.currentTag.env === 'subnumcases') {
+            if (this.subcounter === 0)
+                this.counter++;
+            this.subcounter++;
+            this.tag(this.formatNumber(this.counter, this.subcounter), false);
+        }
+        else {
+            if (this.subcounter === 0 || this.currentTag.env !== 'numcases-left')
+                this.counter++;
+            this.tag(this.formatNumber(this.counter), false);
+        }
+    };
+    CasesTags.prototype.formatNumber = function (n, m) {
+        if (m === void 0) { m = null; }
+        return n.toString() + (m === null ? '' : String.fromCharCode(0x60 + m));
+    };
+    return CasesTags;
+}(AmsConfiguration_js_1.AmsTags));
+exports.CasesTags = CasesTags;
+exports.CasesMethods = {
+    NumCases: function (parser, begin) {
+        if (parser.stack.env.closing === begin.getName()) {
+            delete parser.stack.env.closing;
+            parser.Push(parser.itemFactory.create('end').setProperty('name', begin.getName()));
+            var cases = parser.stack.Top();
+            var table = cases.Last;
+            var original = ParseUtil_js_1.default.copyNode(table, parser);
+            var left = cases.getProperty('left');
+            EmpheqUtil_js_1.EmpheqUtil.left(table, original, left + '\\empheqlbrace\\,', parser, 'numcases-left');
+            parser.Push(parser.itemFactory.create('end').setProperty('name', begin.getName()));
+            return null;
+        }
+        else {
+            var left = parser.GetArgument('\\begin{' + begin.getName() + '}');
+            begin.setProperty('left', left);
+            var array = BaseMethods_js_1.default.EqnArray(parser, begin, true, true, 'll');
+            array.arraydef.displaystyle = false;
+            array.arraydef.rowspacing = '.2em';
+            array.setProperty('numCases', true);
+            parser.Push(begin);
+            return array;
+        }
+    },
+    Entry: function (parser, name) {
+        if (!parser.stack.Top().getProperty('numCases')) {
+            return BaseMethods_js_1.default.Entry(parser, name);
+        }
+        parser.Push(parser.itemFactory.create('cell').setProperties({ isEntry: true, name: name }));
+        var tex = parser.string;
+        var braces = 0, i = parser.i, m = tex.length;
+        while (i < m) {
+            var c = tex.charAt(i);
+            if (c === '{') {
+                braces++;
+                i++;
+            }
+            else if (c === '}') {
+                if (braces === 0) {
+                    break;
+                }
+                else {
+                    braces--;
+                    i++;
+                }
+            }
+            else if (c === '&' && braces === 0) {
+                throw new TexError_js_1.default('ExtraCasesAlignTab', 'Extra alignment tab in text for numcase environment');
+            }
+            else if (c === '\\' && braces === 0) {
+                var cs = (tex.slice(i + 1).match(/^[a-z]+|./i) || [])[0];
+                if (cs === '\\' || cs === 'cr' || cs === 'end' || cs === 'label') {
+                    break;
+                }
+                else {
+                    i += cs.length;
+                }
+            }
+            else {
+                i++;
+            }
+        }
+        var text = tex.substr(parser.i, i - parser.i).replace(/^\s*/, '');
+        parser.PushAll(ParseUtil_js_1.default.internalMath(parser, text, 0));
+        parser.i = i;
+    }
+};
+new SymbolMap_js_1.EnvironmentMap('cases-env', EmpheqUtil_js_1.EmpheqUtil.environment, {
+    numcases: ['NumCases', 'cases'],
+    subnumcases: ['NumCases', 'cases']
+}, exports.CasesMethods);
+new SymbolMap_js_1.MacroMap('cases-macros', {
+    '&': 'Entry'
+}, exports.CasesMethods);
+exports.CasesConfiguration = Configuration_js_1.Configuration.create('cases', {
+    handler: {
+        environment: ['cases-env'],
+        character: ['cases-macros']
+    },
+    items: (_a = {},
+        _a[CasesBeginItem.prototype.kind] = CasesBeginItem,
+        _a),
+    tags: { 'cases': CasesTags }
+});
+//# sourceMappingURL=CasesConfiguration.js.map
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../base/BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../base/BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","../ams/AmsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsConfiguration.js","../empheq/EmpheqUtil.js":"../node_modules/mathjax-full/js/input/tex/empheq/EmpheqUtil.js"}],"../node_modules/mathjax-full/js/input/tex/centernot/CenternotConfiguration.js":[function(require,module,exports) {
+"use strict";
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CenternotConfiguration = exports.filterCenterOver = void 0;
+var Configuration_js_1 = require("../Configuration.js");
+var TexParser_js_1 = require("../TexParser.js");
+var NodeUtil_js_1 = require("../NodeUtil.js");
+var SymbolMap_js_1 = require("../SymbolMap.js");
+var BaseMethods_js_1 = require("../base/BaseMethods.js");
+new SymbolMap_js_1.CommandMap('centernot', {
+    centerOver: 'CenterOver',
+    centernot: ['Macro', '\\centerOver{#1}{{\u29F8}}', 1]
+}, {
+    CenterOver: function (parser, name) {
+        var arg = '{' + parser.GetArgument(name) + '}';
+        var over = parser.ParseArg(name);
+        var base = new TexParser_js_1.default(arg, parser.stack.env, parser.configuration).mml();
+        var mml = parser.create('node', 'TeXAtom', [
+            new TexParser_js_1.default(arg, parser.stack.env, parser.configuration).mml(),
+            parser.create('node', 'mpadded', [
+                parser.create('node', 'mpadded', [over], { width: 0, lspace: '-.5width' }),
+                parser.create('node', 'mphantom', [base])
+            ], { width: 0, lspace: '-.5width' })
+        ]);
+        parser.configuration.addNode('centerOver', base);
+        parser.Push(mml);
+    },
+    Macro: BaseMethods_js_1.default.Macro
+});
+function filterCenterOver(_a) {
+    var e_1, _b;
+    var data = _a.data;
+    try {
+        for (var _c = __values(data.getList('centerOver')), _d = _c.next(); !_d.done; _d = _c.next()) {
+            var base = _d.value;
+            var texClass = NodeUtil_js_1.default.getTexClass(base.childNodes[0].childNodes[0]);
+            if (texClass !== null) {
+                NodeUtil_js_1.default.setProperties(base.parent.parent.parent.parent.parent.parent, { texClass: texClass });
+            }
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (_d && !_d.done && (_b = _c.return)) _b.call(_c);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+}
+exports.filterCenterOver = filterCenterOver;
+exports.CenternotConfiguration = Configuration_js_1.Configuration.create('centernot', {
+    handler: { macro: ['centernot'] },
+    postprocessors: [filterCenterOver]
+});
+//# sourceMappingURL=CenternotConfiguration.js.map
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../base/BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js"}],"../node_modules/mathjax-full/js/input/tex/color/ColorMethods.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ColorMethods = void 0;
@@ -34173,7 +35163,112 @@ exports.ColorV2Methods = {
 new SymbolMap_js_1.CommandMap('colorv2', { color: 'Color' }, exports.ColorV2Methods);
 exports.ColorConfiguration = Configuration_js_1.Configuration.create('colorv2', { handler: { macro: ['colorv2'] } });
 //# sourceMappingURL=ColorV2Configuration.js.map
-},{"../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js"}],"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandUtil.js":[function(require,module,exports) {
+},{"../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js"}],"../node_modules/mathjax-full/js/input/tex/colortbl/ColortblConfiguration.js":[function(require,module,exports) {
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ColortblConfiguration = exports.ColorArrayItem = void 0;
+var BaseItems_js_1 = require("../base/BaseItems.js");
+var Configuration_js_1 = require("../Configuration.js");
+var SymbolMap_js_1 = require("../SymbolMap.js");
+var TexError_js_1 = require("../TexError.js");
+var ColorArrayItem = (function (_super) {
+    __extends(ColorArrayItem, _super);
+    function ColorArrayItem() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.color = {
+            cell: '',
+            row: '',
+            col: []
+        };
+        _this.hasColor = false;
+        return _this;
+    }
+    ColorArrayItem.prototype.EndEntry = function () {
+        _super.prototype.EndEntry.call(this);
+        var cell = this.row[this.row.length - 1];
+        var color = this.color.cell || this.color.row || this.color.col[this.row.length - 1];
+        if (color) {
+            cell.attributes.set('mathbackground', color);
+            this.color.cell = '';
+            this.hasColor = true;
+        }
+    };
+    ColorArrayItem.prototype.EndRow = function () {
+        _super.prototype.EndRow.call(this);
+        this.color.row = '';
+    };
+    ColorArrayItem.prototype.createMml = function () {
+        var mml = _super.prototype.createMml.call(this);
+        var table = (mml.isKind('mrow') ? mml.childNodes[1] : mml);
+        if (table.isKind('menclose')) {
+            table = table.childNodes[0].childNodes[0];
+        }
+        if (this.hasColor && table.attributes.get('frame') === 'none') {
+            table.attributes.set('frame', '');
+        }
+        return mml;
+    };
+    return ColorArrayItem;
+}(BaseItems_js_1.ArrayItem));
+exports.ColorArrayItem = ColorArrayItem;
+new SymbolMap_js_1.CommandMap('colortbl', {
+    cellcolor: ['TableColor', 'cell'],
+    rowcolor: ['TableColor', 'row'],
+    columncolor: ['TableColor', 'col']
+}, {
+    TableColor: function (parser, name, type) {
+        var lookup = parser.configuration.packageData.get('color').model;
+        var model = parser.GetBrackets(name, '');
+        var color = lookup.getColor(model, parser.GetArgument(name));
+        var top = parser.stack.Top();
+        if (!(top instanceof ColorArrayItem)) {
+            throw new TexError_js_1.default('UnsupportedTableColor', 'Unsupported use of %1', parser.currentCS);
+        }
+        if (type === 'col') {
+            if (top.table.length) {
+                throw new TexError_js_1.default('ColumnColorNotTop', '%1 must be in the top row', name);
+            }
+            top.color.col[top.row.length] = color;
+            if (parser.GetBrackets(name, '')) {
+                parser.GetBrackets(name, '');
+            }
+        }
+        else {
+            top.color[type] = color;
+            if (type === 'row' && (top.Size() || top.row.length)) {
+                throw new TexError_js_1.default('RowColorNotFirst', '%1 must be at the beginning of a row', name);
+            }
+        }
+    }
+});
+var config = function (config, jax) {
+    if (!jax.parseOptions.packageData.has('color')) {
+        Configuration_js_1.ConfigurationHandler.get('color').config(config, jax);
+    }
+};
+exports.ColortblConfiguration = Configuration_js_1.Configuration.create('colortbl', {
+    handler: { macro: ['colortbl'] },
+    items: { 'array': ColorArrayItem },
+    priority: 10,
+    config: [config, 10]
+});
+//# sourceMappingURL=ColortblConfiguration.js.map
+},{"../base/BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js"}],"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandUtil.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var ParseUtil_js_1 = require("../ParseUtil.js");
@@ -34211,6 +35306,28 @@ var NewcommandUtil;
         return cs.substr(1);
     }
     NewcommandUtil.GetCSname = GetCSname;
+    function GetCsNameArgument(parser, name) {
+        var cs = ParseUtil_js_1.default.trimSpaces(parser.GetArgument(name));
+        if (cs.charAt(0) === '\\') {
+            cs = cs.substr(1);
+        }
+        if (!cs.match(/^(.|[a-z]+)$/i)) {
+            throw new TexError_js_1.default('IllegalControlSequenceName', 'Illegal control sequence name for %1', name);
+        }
+        return cs;
+    }
+    NewcommandUtil.GetCsNameArgument = GetCsNameArgument;
+    function GetArgCount(parser, name) {
+        var n = parser.GetBrackets(name);
+        if (n) {
+            n = ParseUtil_js_1.default.trimSpaces(n);
+            if (!n.match(/^[0-9]+$/)) {
+                throw new TexError_js_1.default('IllegalParamNumber', 'Illegal number of parameters specified in %1', name);
+            }
+        }
+        return n;
+    }
+    NewcommandUtil.GetArgCount = GetArgCount;
     function GetTemplate(parser, cmd, cs) {
         var c = parser.GetNext();
         var params = [];
@@ -34336,36 +35453,18 @@ var ParseUtil_js_1 = require("../ParseUtil.js");
 var NewcommandUtil_js_1 = require("./NewcommandUtil.js");
 var NewcommandMethods = {};
 NewcommandMethods.NewCommand = function (parser, name) {
-    var cs = ParseUtil_js_1.default.trimSpaces(parser.GetArgument(name));
-    var n = parser.GetBrackets(name);
+    var cs = NewcommandUtil_js_1.default.GetCsNameArgument(parser, name);
+    var n = NewcommandUtil_js_1.default.GetArgCount(parser, name);
     var opt = parser.GetBrackets(name);
     var def = parser.GetArgument(name);
-    if (cs.charAt(0) === '\\') {
-        cs = cs.substr(1);
-    }
-    if (!cs.match(/^(.|[a-z]+)$/i)) {
-        throw new TexError_js_1.default('IllegalControlSequenceName', 'Illegal control sequence name for %1', name);
-    }
-    if (n) {
-        n = ParseUtil_js_1.default.trimSpaces(n);
-        if (!n.match(/^[0-9]+$/)) {
-            throw new TexError_js_1.default('IllegalParamNumber', 'Illegal number of parameters specified in %1', name);
-        }
-    }
     NewcommandUtil_js_1.default.addMacro(parser, cs, NewcommandMethods.Macro, [def, n, opt]);
 };
 NewcommandMethods.NewEnvironment = function (parser, name) {
     var env = ParseUtil_js_1.default.trimSpaces(parser.GetArgument(name));
-    var n = parser.GetBrackets(name);
+    var n = NewcommandUtil_js_1.default.GetArgCount(parser, name);
     var opt = parser.GetBrackets(name);
     var bdef = parser.GetArgument(name);
     var edef = parser.GetArgument(name);
-    if (n) {
-        n = ParseUtil_js_1.default.trimSpaces(n);
-        if (!n.match(/^[0-9]+$/)) {
-            throw new TexError_js_1.default('IllegalParamNumber', 'Illegal number of parameters specified in %1', name);
-        }
-    }
     NewcommandUtil_js_1.default.addEnvironment(parser, env, NewcommandMethods.BeginEnv, [true, bdef, edef, n, opt]);
 };
 NewcommandMethods.MacroDef = function (parser, name) {
@@ -34440,10 +35539,7 @@ NewcommandMethods.MacroWithTemplate = function (parser, name, text, n) {
     }
     parser.string = ParseUtil_js_1.default.addArgs(parser, text, parser.string.slice(parser.i));
     parser.i = 0;
-    if (++parser.macroCount > parser.configuration.options['maxMacros']) {
-        throw new TexError_js_1.default('MaxMacroSub1', 'MathJax maximum macro substitution count exceeded; ' +
-            'is here a recursive macro call?');
-    }
+    ParseUtil_js_1.default.checkMaxMacros(parser);
 };
 NewcommandMethods.BeginEnv = function (parser, begin, bdef, edef, n, def) {
     if (begin.getProperty('end') && parser.stack.env['closing'] === begin.getName()) {
@@ -34623,7 +35719,156 @@ exports.ConfigMacrosConfiguration = Configuration_js_1.Configuration.create('con
     }
 });
 //# sourceMappingURL=ConfigMacrosConfiguration.js.map
-},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../../../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../ParseMethods.js":"../node_modules/mathjax-full/js/input/tex/ParseMethods.js","../Symbol.js":"../node_modules/mathjax-full/js/input/tex/Symbol.js","../newcommand/NewcommandMethods.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandMethods.js","../newcommand/NewcommandItems.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandItems.js"}],"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandMappings.js":[function(require,module,exports) {
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../../../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../ParseMethods.js":"../node_modules/mathjax-full/js/input/tex/ParseMethods.js","../Symbol.js":"../node_modules/mathjax-full/js/input/tex/Symbol.js","../newcommand/NewcommandMethods.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandMethods.js","../newcommand/NewcommandItems.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandItems.js"}],"../node_modules/mathjax-full/js/input/tex/empheq/EmpheqConfiguration.js":[function(require,module,exports) {
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EmpheqConfiguration = exports.EmpheqMethods = exports.EmpheqBeginItem = void 0;
+var Configuration_js_1 = require("../Configuration.js");
+var SymbolMap_js_1 = require("../SymbolMap.js");
+var ParseUtil_js_1 = require("../ParseUtil.js");
+var TexError_js_1 = require("../TexError.js");
+var BaseItems_js_1 = require("../base/BaseItems.js");
+var EmpheqUtil_js_1 = require("./EmpheqUtil.js");
+var EmpheqBeginItem = (function (_super) {
+    __extends(EmpheqBeginItem, _super);
+    function EmpheqBeginItem() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Object.defineProperty(EmpheqBeginItem.prototype, "kind", {
+        get: function () {
+            return 'empheq-begin';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    EmpheqBeginItem.prototype.checkItem = function (item) {
+        if (item.isKind('end') && item.getName() === this.getName()) {
+            this.setProperty('end', false);
+        }
+        return _super.prototype.checkItem.call(this, item);
+    };
+    return EmpheqBeginItem;
+}(BaseItems_js_1.BeginItem));
+exports.EmpheqBeginItem = EmpheqBeginItem;
+exports.EmpheqMethods = {
+    Empheq: function (parser, begin) {
+        if (parser.stack.env.closing === begin.getName()) {
+            delete parser.stack.env.closing;
+            parser.Push(parser.itemFactory.create('end').setProperty('name', parser.stack.global.empheq));
+            parser.stack.global.empheq = '';
+            var empheq = parser.stack.Top();
+            EmpheqUtil_js_1.EmpheqUtil.adjustTable(empheq, parser);
+            parser.Push(parser.itemFactory.create('end').setProperty('name', 'empheq'));
+        }
+        else {
+            ParseUtil_js_1.default.checkEqnEnv(parser);
+            delete parser.stack.global.eqnenv;
+            var opts = parser.GetBrackets('\\begin{' + begin.getName() + '}') || '';
+            var _a = __read((parser.GetArgument('\\begin{' + begin.getName() + '}') || '').split(/=/), 2), env = _a[0], n = _a[1];
+            if (!EmpheqUtil_js_1.EmpheqUtil.checkEnv(env)) {
+                throw new TexError_js_1.default('UnknownEnv', 'Unknown environment "%1"', env);
+            }
+            if (opts) {
+                begin.setProperties(EmpheqUtil_js_1.EmpheqUtil.splitOptions(opts, { left: 1, right: 1 }));
+            }
+            parser.stack.global.empheq = env;
+            parser.string = '\\begin{' + env + '}' + (n ? '{' + n + '}' : '') + parser.string.slice(parser.i);
+            parser.i = 0;
+            parser.Push(begin);
+        }
+    },
+    EmpheqMO: function (parser, _name, c) {
+        parser.Push(parser.create('token', 'mo', {}, c));
+    },
+    EmpheqDelim: function (parser, name) {
+        var c = parser.GetDelimiter(name);
+        parser.Push(parser.create('token', 'mo', { stretchy: true, symmetric: true }, c));
+    }
+};
+new SymbolMap_js_1.EnvironmentMap('empheq-env', EmpheqUtil_js_1.EmpheqUtil.environment, {
+    empheq: ['Empheq', 'empheq'],
+}, exports.EmpheqMethods);
+new SymbolMap_js_1.CommandMap('empheq-macros', {
+    empheqlbrace: ['EmpheqMO', '{'],
+    empheqrbrace: ['EmpheqMO', '}'],
+    empheqlbrack: ['EmpheqMO', '['],
+    empheqrbrack: ['EmpheqMO', ']'],
+    empheqlangle: ['EmpheqMO', '\u27E8'],
+    empheqrangle: ['EmpheqMO', '\u27E9'],
+    empheqlparen: ['EmpheqMO', '('],
+    empheqrparen: ['EmpheqMO', ')'],
+    empheqlvert: ['EmpheqMO', '|'],
+    empheqrvert: ['EmpheqMO', '|'],
+    empheqlVert: ['EmpheqMO', '\u2016'],
+    empheqrVert: ['EmpheqMO', '\u2016'],
+    empheqlfloor: ['EmpheqMO', '\u230A'],
+    empheqrfloor: ['EmpheqMO', '\u230B'],
+    empheqlceil: ['EmpheqMO', '\u2308'],
+    empheqrceil: ['EmpheqMO', '\u2309'],
+    empheqbiglbrace: ['EmpheqMO', '{'],
+    empheqbigrbrace: ['EmpheqMO', '}'],
+    empheqbiglbrack: ['EmpheqMO', '['],
+    empheqbigrbrack: ['EmpheqMO', ']'],
+    empheqbiglangle: ['EmpheqMO', '\u27E8'],
+    empheqbigrangle: ['EmpheqMO', '\u27E9'],
+    empheqbiglparen: ['EmpheqMO', '('],
+    empheqbigrparen: ['EmpheqMO', ')'],
+    empheqbiglvert: ['EmpheqMO', '|'],
+    empheqbigrvert: ['EmpheqMO', '|'],
+    empheqbiglVert: ['EmpheqMO', '\u2016'],
+    empheqbigrVert: ['EmpheqMO', '\u2016'],
+    empheqbiglfloor: ['EmpheqMO', '\u230A'],
+    empheqbigrfloor: ['EmpheqMO', '\u230B'],
+    empheqbiglceil: ['EmpheqMO', '\u2308'],
+    empheqbigrceil: ['EmpheqMO', '\u2309'],
+    empheql: 'EmpheqDelim',
+    empheqr: 'EmpheqDelim',
+    empheqbigl: 'EmpheqDelim',
+    empheqbigr: 'EmpheqDelim'
+}, exports.EmpheqMethods);
+exports.EmpheqConfiguration = Configuration_js_1.Configuration.create('empheq', {
+    handler: {
+        macro: ['empheq-macros'],
+        environment: ['empheq-env'],
+    },
+    items: (_a = {},
+        _a[EmpheqBeginItem.prototype.kind] = EmpheqBeginItem,
+        _a)
+});
+//# sourceMappingURL=EmpheqConfiguration.js.map
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../base/BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","./EmpheqUtil.js":"../node_modules/mathjax-full/js/input/tex/empheq/EmpheqUtil.js"}],"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandMappings.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var NewcommandMethods_js_1 = require("./NewcommandMethods.js");
@@ -34716,7 +35961,32 @@ exports.ExtpfeilConfiguration = Configuration_js_1.Configuration.create('extpfei
     init: init
 });
 //# sourceMappingURL=ExtpfeilConfiguration.js.map
-},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../ams/AmsMethods.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsMethods.js","../newcommand/NewcommandUtil.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandUtil.js","../newcommand/NewcommandConfiguration.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js"}],"../node_modules/mathjax-full/js/input/tex/html/HtmlMethods.js":[function(require,module,exports) {
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../ams/AmsMethods.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsMethods.js","../newcommand/NewcommandUtil.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandUtil.js","../newcommand/NewcommandConfiguration.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js"}],"../node_modules/mathjax-full/js/input/tex/gensymb/GensymbConfiguration.js":[function(require,module,exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GensymbConfiguration = void 0;
+var Configuration_js_1 = require("../Configuration.js");
+var TexConstants_js_1 = require("../TexConstants.js");
+var SymbolMap_js_1 = require("../SymbolMap.js");
+function mathcharUnit(parser, mchar) {
+    var def = mchar.attributes || {};
+    def.mathvariant = TexConstants_js_1.TexConstant.Variant.NORMAL;
+    def.class = 'MathML-Unit';
+    var node = parser.create('token', 'mi', def, mchar.char);
+    parser.Push(node);
+}
+new SymbolMap_js_1.CharacterMap('gensymb-symbols', mathcharUnit, {
+    ohm: '\u2126',
+    degree: '\u00B0',
+    celsius: '\u2103',
+    perthousand: '\u2030',
+    micro: '\u00B5'
+});
+exports.GensymbConfiguration = Configuration_js_1.Configuration.create('gensymb', {
+    handler: { macro: ['gensymb-symbols'] },
+});
+//# sourceMappingURL=GensymbConfiguration.js.map
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js"}],"../node_modules/mathjax-full/js/input/tex/html/HtmlMethods.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var NodeUtil_js_1 = require("../NodeUtil.js");
@@ -34787,13 +36057,1015 @@ new SymbolMap_js_1.CommandMap('html_macros', {
 }, HtmlMethods_js_1.default);
 exports.HtmlConfiguration = Configuration_js_1.Configuration.create('html', { handler: { macro: ['html_macros'] } });
 //# sourceMappingURL=HtmlConfiguration.js.map
-},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","./HtmlMethods.js":"../node_modules/mathjax-full/js/input/tex/html/HtmlMethods.js"}],"../node_modules/mathjax-full/js/input/tex/mhchem/mhchemparser/mhchemParser.js":[function(require,module,exports) {
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","./HtmlMethods.js":"../node_modules/mathjax-full/js/input/tex/html/HtmlMethods.js"}],"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsUtil.js":[function(require,module,exports) {
+"use strict";
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MathtoolsUtil = void 0;
+var BaseItems_js_1 = require("../base/BaseItems.js");
+var ParseUtil_js_1 = require("../ParseUtil.js");
+var TexParser_js_1 = require("../TexParser.js");
+var TexError_js_1 = require("../TexError.js");
+var Symbol_js_1 = require("../Symbol.js");
+var Options_js_1 = require("../../../util/Options.js");
+var MathtoolsMethods_js_1 = require("./MathtoolsMethods.js");
+var MathtoolsConfiguration_js_1 = require("./MathtoolsConfiguration.js");
+exports.MathtoolsUtil = {
+    setDisplayLevel: function (mml, style) {
+        if (!style)
+            return;
+        var _a = __read(Options_js_1.lookup(style, {
+            '\\displaystyle': [true, 0],
+            '\\textstyle': [false, 0],
+            '\\scriptstyle': [false, 1],
+            '\\scriptscriptstyle': [false, 2]
+        }, [null, null]), 2), display = _a[0], script = _a[1];
+        if (display !== null) {
+            mml.attributes.set('displaystyle', display);
+            mml.attributes.set('scriptlevel', script);
+        }
+    },
+    checkAlignment: function (parser, name) {
+        var top = parser.stack.Top();
+        if (top.kind !== BaseItems_js_1.EqnArrayItem.prototype.kind) {
+            throw new TexError_js_1.default('NotInAlignment', '%1 can only be used in aligment environments', name);
+        }
+        return top;
+    },
+    addPairedDelims: function (config, cs, args) {
+        var delims = config.handlers.retrieve(MathtoolsConfiguration_js_1.PAIREDDELIMS);
+        delims.add(cs, new Symbol_js_1.Macro(cs, MathtoolsMethods_js_1.MathtoolsMethods.PairedDelimiters, args));
+    },
+    spreadLines: function (mtable, spread) {
+        if (!mtable.isKind('mtable'))
+            return;
+        var rowspacing = mtable.attributes.get('rowspacing');
+        if (rowspacing) {
+            var add_1 = ParseUtil_js_1.default.dimen2em(spread);
+            rowspacing = rowspacing
+                .split(/ /)
+                .map(function (s) { return ParseUtil_js_1.default.Em(Math.max(0, ParseUtil_js_1.default.dimen2em(s) + add_1)); })
+                .join(' ');
+        }
+        else {
+            rowspacing = spread;
+        }
+        mtable.attributes.set('rowspacing', rowspacing);
+    },
+    plusOrMinus: function (name, n) {
+        n = n.trim();
+        if (!n.match(/^[-+]?(?:\d+(?:\.\d*)?|\.\d+)$/)) {
+            throw new TexError_js_1.default('NotANumber', 'Argument to %1 is not a number', name);
+        }
+        return (n.match(/^[-+]/) ? n : '+' + n);
+    },
+    getScript: function (parser, name, pos) {
+        var arg = ParseUtil_js_1.default.trimSpaces(parser.GetArgument(name));
+        if (arg === '') {
+            return parser.create('node', 'none');
+        }
+        var format = parser.options.mathtools["prescript-" + pos + "-format"];
+        format && (arg = format + "{" + arg + "}");
+        return new TexParser_js_1.default(arg, parser.stack.env, parser.configuration).mml();
+    }
+};
+//# sourceMappingURL=MathtoolsUtil.js.map
+},{"../base/BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../Symbol.js":"../node_modules/mathjax-full/js/input/tex/Symbol.js","../../../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js","./MathtoolsMethods.js":"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsMethods.js","./MathtoolsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsConfiguration.js"}],"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsMethods.js":[function(require,module,exports) {
+"use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MathtoolsMethods = void 0;
+var ParseUtil_js_1 = require("../ParseUtil.js");
+var AmsMethods_js_1 = require("../ams/AmsMethods.js");
+var BaseMethods_js_1 = require("../base/BaseMethods.js");
+var TexParser_js_1 = require("../TexParser.js");
+var TexError_js_1 = require("../TexError.js");
+var NodeUtil_js_1 = require("../NodeUtil.js");
+var MmlNode_js_1 = require("../../../core/MmlTree/MmlNode.js");
+var lengths_js_1 = require("../../../util/lengths.js");
+var Options_js_1 = require("../../../util/Options.js");
+var NewcommandUtil_js_1 = require("../newcommand/NewcommandUtil.js");
+var NewcommandMethods_js_1 = require("../newcommand/NewcommandMethods.js");
+var MathtoolsUtil_js_1 = require("./MathtoolsUtil.js");
+exports.MathtoolsMethods = {
+    MtMatrix: function (parser, begin, open, close) {
+        var align = parser.GetBrackets("\\begin{" + begin.getName() + "}", 'c');
+        return exports.MathtoolsMethods.Array(parser, begin, open, close, align);
+    },
+    MtSmallMatrix: function (parser, begin, open, close, align) {
+        if (!align) {
+            align = parser.GetBrackets("\\begin{" + begin.getName() + "}", parser.options.mathtools['smallmatrix-align']);
+        }
+        return exports.MathtoolsMethods.Array(parser, begin, open, close, align, ParseUtil_js_1.default.Em(1 / 3), '.2em', 'S', 1);
+    },
+    MtMultlined: function (parser, begin) {
+        var _a;
+        var name = "\\begin{" + begin.getName() + "}";
+        var pos = parser.GetBrackets(name, parser.options.mathtools['multlined-pos'] || 'c');
+        var width = pos ? parser.GetBrackets(name, '') : '';
+        if (pos && !pos.match(/^[cbt]$/)) {
+            _a = __read([pos, width], 2), width = _a[0], pos = _a[1];
+        }
+        parser.Push(begin);
+        var item = parser.itemFactory.create('multlined', parser, begin);
+        item.arraydef = {
+            displaystyle: true,
+            rowspacing: '.5em',
+            width: width || 'auto',
+            columnwidth: '100%',
+        };
+        return ParseUtil_js_1.default.setArrayAlign(item, pos || 'c');
+    },
+    HandleShove: function (parser, name, shove) {
+        var top = parser.stack.Top();
+        if (top.kind !== 'multline' && top.kind !== 'multlined') {
+            throw new TexError_js_1.default('CommandInMultlined', '%1 can only appear within the multline or multlined environments', name);
+        }
+        if (top.Size()) {
+            throw new TexError_js_1.default('CommandAtTheBeginingOfLine', '%1 must come at the beginning of the line', name);
+        }
+        top.setProperty('shove', shove);
+        var shift = parser.GetBrackets(name);
+        var mml = parser.ParseArg(name);
+        if (shift) {
+            var mrow = parser.create('node', 'mrow', []);
+            var mspace = parser.create('node', 'mspace', [], { width: shift });
+            if (shove === 'left') {
+                mrow.appendChild(mspace);
+                mrow.appendChild(mml);
+            }
+            else {
+                mrow.appendChild(mml);
+                mrow.appendChild(mspace);
+            }
+            mml = mrow;
+        }
+        parser.Push(mml);
+    },
+    SpreadLines: function (parser, begin) {
+        var e_1, _a;
+        if (parser.stack.env.closing === begin.getName()) {
+            delete parser.stack.env.closing;
+            var top_1 = parser.stack.Pop();
+            var mml = top_1.toMml();
+            var spread = top_1.getProperty('spread');
+            if (mml.isInferred) {
+                try {
+                    for (var _b = __values(NodeUtil_js_1.default.getChildren(mml)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var child = _c.value;
+                        MathtoolsUtil_js_1.MathtoolsUtil.spreadLines(child, spread);
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+            }
+            else {
+                MathtoolsUtil_js_1.MathtoolsUtil.spreadLines(mml, spread);
+            }
+            parser.Push(mml);
+        }
+        else {
+            var spread = parser.GetDimen("\\begin{" + begin.getName() + "}");
+            begin.setProperty('spread', spread);
+            parser.Push(begin);
+        }
+    },
+    Cases: function (parser, begin, open, close, style) {
+        var array = parser.itemFactory.create('array').setProperty('casesEnv', begin.getName());
+        array.arraydef = {
+            rowspacing: '.2em',
+            columnspacing: '1em',
+            columnalign: 'left'
+        };
+        if (style === 'D') {
+            array.arraydef.displaystyle = true;
+        }
+        array.setProperties({ open: open, close: close });
+        parser.Push(begin);
+        return array;
+    },
+    MathLap: function (parser, name, pos, cramped) {
+        var style = parser.GetBrackets(name, '').trim();
+        var mml = parser.create('node', 'mstyle', [
+            parser.create('node', 'mpadded', [parser.ParseArg(name)], __assign({ width: 0 }, (pos === 'r' ? {} : { lspace: (pos === 'l' ? '-1width' : '-.5width') })))
+        ], { 'data-cramped': cramped });
+        MathtoolsUtil_js_1.MathtoolsUtil.setDisplayLevel(mml, style);
+        parser.Push(parser.create('node', 'TeXAtom', [mml]));
+    },
+    Cramped: function (parser, name) {
+        var style = parser.GetBrackets(name, '').trim();
+        var arg = parser.ParseArg(name);
+        var mml = parser.create('node', 'mstyle', [arg], { 'data-cramped': true });
+        MathtoolsUtil_js_1.MathtoolsUtil.setDisplayLevel(mml, style);
+        parser.Push(mml);
+    },
+    MtLap: function (parser, name, pos) {
+        var content = ParseUtil_js_1.default.internalMath(parser, parser.GetArgument(name), 0);
+        var mml = parser.create('node', 'mpadded', content, { width: 0 });
+        if (pos !== 'r') {
+            NodeUtil_js_1.default.setAttribute(mml, 'lspace', pos === 'l' ? '-1width' : '-.5width');
+        }
+        parser.Push(mml);
+    },
+    MathMakeBox: function (parser, name) {
+        var width = parser.GetBrackets(name);
+        var pos = parser.GetBrackets(name, 'c');
+        var mml = parser.create('node', 'mpadded', [parser.ParseArg(name)]);
+        if (width) {
+            NodeUtil_js_1.default.setAttribute(mml, 'width', width);
+        }
+        var align = Options_js_1.lookup(pos, { c: 'center', r: 'right' }, '');
+        if (align) {
+            NodeUtil_js_1.default.setAttribute(mml, 'data-align', align);
+        }
+        parser.Push(mml);
+    },
+    MathMBox: function (parser, name) {
+        parser.Push(parser.create('node', 'mrow', [parser.ParseArg(name)]));
+    },
+    UnderOverBracket: function (parser, name) {
+        var _a;
+        var thickness = lengths_js_1.length2em(parser.GetBrackets(name, '.1em'), .1);
+        var height = parser.GetBrackets(name, '.2em');
+        var arg = parser.GetArgument(name);
+        var _b = __read((name.charAt(1) === 'o' ?
+            ['over', 'accent', 'bottom', 'height'] :
+            ['under', 'accentunder', 'top', 'depth']), 4), pos = _b[0], accent = _b[1], border = _b[2], side = _b[3];
+        var t = lengths_js_1.em(thickness);
+        var t2 = lengths_js_1.em(2 * thickness);
+        var base = new TexParser_js_1.default(arg, parser.stack.env, parser.configuration).mml();
+        var copy = new TexParser_js_1.default(arg, parser.stack.env, parser.configuration).mml();
+        var script = parser.create('node', 'mpadded', [
+            parser.create('node', 'mpadded', [
+                parser.create('node', 'mphantom', [copy])
+            ], {
+                style: "border: " + t + " solid; border-" + border + ": none",
+                width: "-" + t2,
+                height: height,
+                depth: 0
+            })
+        ], (_a = {
+                width: "+" + t2
+            },
+            _a[side] = "+" + t,
+            _a));
+        var node = ParseUtil_js_1.default.underOver(parser, base, script, pos, true);
+        var munderover = NodeUtil_js_1.default.getChildAt(NodeUtil_js_1.default.getChildAt(node, 0), 0);
+        NodeUtil_js_1.default.setAttribute(munderover, accent, true);
+        parser.Push(node);
+    },
+    Aboxed: function (parser, name) {
+        var top = MathtoolsUtil_js_1.MathtoolsUtil.checkAlignment(parser, name);
+        if (top.row.length % 2 === 1) {
+            top.row.push(parser.create('node', 'mtd', []));
+        }
+        var arg = parser.GetArgument(name);
+        var rest = parser.string.substr(parser.i);
+        parser.string = arg + '&&\\endAboxed';
+        parser.i = 0;
+        var left = parser.GetUpTo(name, '&');
+        var right = parser.GetUpTo(name, '&');
+        parser.GetUpTo(name, '\\endAboxed');
+        var tex = ParseUtil_js_1.default.substituteArgs(parser, [left, right], '\\rlap{\\boxed{#1{}#2}}\\kern.267em\\phantom{#1}&\\phantom{{}#2}\\kern.267em');
+        parser.string = tex + rest;
+        parser.i = 0;
+    },
+    ArrowBetweenLines: function (parser, name) {
+        var top = MathtoolsUtil_js_1.MathtoolsUtil.checkAlignment(parser, name);
+        if (top.Size() || top.row.length) {
+            throw new TexError_js_1.default('BetweenLines', '%1 must be on a row by itself', name);
+        }
+        var star = parser.GetStar();
+        var symbol = parser.GetBrackets(name, '\\Updownarrow');
+        if (star) {
+            top.EndEntry();
+            top.EndEntry();
+        }
+        var tex = (star ? '\\quad' + symbol : symbol + '\\quad');
+        var mml = new TexParser_js_1.default(tex, parser.stack.env, parser.configuration).mml();
+        parser.Push(mml);
+        top.EndEntry();
+        top.EndRow();
+    },
+    VDotsWithin: function (parser, name) {
+        var top = parser.stack.Top();
+        var isFlush = (top.getProperty('flushspaceabove') === top.table.length);
+        var arg = '\\mmlToken{mi}{}' + parser.GetArgument(name) + '\\mmlToken{mi}{}';
+        var base = new TexParser_js_1.default(arg, parser.stack.env, parser.configuration).mml();
+        var mml = parser.create('node', 'mpadded', [
+            parser.create('node', 'mpadded', [
+                parser.create('node', 'mo', [
+                    parser.create('text', '\u22EE')
+                ])
+            ], __assign({ width: 0, lspace: '-.5width' }, (isFlush ? { height: '-.6em', voffset: '-.18em' } : {}))),
+            parser.create('node', 'mphantom', [base])
+        ], {
+            lspace: '.5width'
+        });
+        parser.Push(mml);
+    },
+    ShortVDotsWithin: function (parser, _name) {
+        var top = parser.stack.Top();
+        var star = parser.GetStar();
+        exports.MathtoolsMethods.FlushSpaceAbove(parser, '\\MTFlushSpaceAbove');
+        !star && top.EndEntry();
+        exports.MathtoolsMethods.VDotsWithin(parser, '\\vdotswithin');
+        star && top.EndEntry();
+        exports.MathtoolsMethods.FlushSpaceBelow(parser, '\\MTFlushSpaceBelow');
+    },
+    FlushSpaceAbove: function (parser, name) {
+        var top = MathtoolsUtil_js_1.MathtoolsUtil.checkAlignment(parser, name);
+        top.setProperty('flushspaceabove', top.table.length);
+        top.addRowSpacing('-' + parser.options.mathtools['shortvdotsadjustabove']);
+    },
+    FlushSpaceBelow: function (parser, name) {
+        var top = MathtoolsUtil_js_1.MathtoolsUtil.checkAlignment(parser, name);
+        top.Size() && top.EndEntry();
+        top.EndRow();
+        top.addRowSpacing('-' + parser.options.mathtools['shortvdotsadjustbelow']);
+    },
+    PairedDelimiters: function (parser, name, open, close, body, n, pre, post) {
+        if (body === void 0) { body = '#1'; }
+        if (n === void 0) { n = 1; }
+        if (pre === void 0) { pre = ''; }
+        if (post === void 0) { post = ''; }
+        var star = parser.GetStar();
+        var size = (star ? '' : parser.GetBrackets(name));
+        var _a = __read((star ? ['\\left', '\\right'] : size ? [size + 'l', size + 'r'] : ['', '']), 2), left = _a[0], right = _a[1];
+        var delim = (star ? '\\middle' : size || '');
+        if (n) {
+            var args = [];
+            for (var i = args.length; i < n; i++) {
+                args.push(parser.GetArgument(name));
+            }
+            body = ParseUtil_js_1.default.substituteArgs(parser, args, body);
+        }
+        body = body.replace(/\\delimsize/g, delim);
+        parser.string = [pre, left, open, body, right, close, post, parser.string.substr(parser.i)]
+            .reduce(function (s, part) { return ParseUtil_js_1.default.addArgs(parser, s, part); }, '');
+        parser.i = 0;
+        ParseUtil_js_1.default.checkMaxMacros(parser);
+    },
+    DeclarePairedDelimiters: function (parser, name) {
+        var cs = NewcommandUtil_js_1.default.GetCsNameArgument(parser, name);
+        var open = parser.GetArgument(name);
+        var close = parser.GetArgument(name);
+        MathtoolsUtil_js_1.MathtoolsUtil.addPairedDelims(parser.configuration, cs, [open, close]);
+    },
+    DeclarePairedDelimitersX: function (parser, name) {
+        var cs = NewcommandUtil_js_1.default.GetCsNameArgument(parser, name);
+        var n = NewcommandUtil_js_1.default.GetArgCount(parser, name);
+        var open = parser.GetArgument(name);
+        var close = parser.GetArgument(name);
+        var body = parser.GetArgument(name);
+        MathtoolsUtil_js_1.MathtoolsUtil.addPairedDelims(parser.configuration, cs, [open, close, body, n]);
+    },
+    DeclarePairedDelimitersXPP: function (parser, name) {
+        var cs = NewcommandUtil_js_1.default.GetCsNameArgument(parser, name);
+        var n = NewcommandUtil_js_1.default.GetArgCount(parser, name);
+        var pre = parser.GetArgument(name);
+        var open = parser.GetArgument(name);
+        var close = parser.GetArgument(name);
+        var post = parser.GetArgument(name);
+        var body = parser.GetArgument(name);
+        MathtoolsUtil_js_1.MathtoolsUtil.addPairedDelims(parser.configuration, cs, [open, close, body, n, pre, post]);
+    },
+    CenterColon: function (parser, _name, center, force, thin) {
+        if (force === void 0) { force = false; }
+        if (thin === void 0) { thin = false; }
+        var options = parser.options.mathtools;
+        var mml = parser.create('token', 'mo', {}, ':');
+        if (center && (options['centercolon'] || force)) {
+            var dy = options['centercolon-offset'];
+            mml = parser.create('node', 'mpadded', [mml], __assign({ voffset: dy, height: "+" + dy, depth: "-" + dy }, (thin ? { width: options['thincolon-dw'], lspace: options['thincolon-dx'] } : {})));
+        }
+        parser.Push(mml);
+    },
+    Relation: function (parser, _name, tex, unicode) {
+        var options = parser.options.mathtools;
+        if (options['use-unicode'] && unicode) {
+            parser.Push(parser.create('token', 'mo', { texClass: MmlNode_js_1.TEXCLASS.REL }, unicode));
+        }
+        else {
+            tex = '\\mathrel{' + tex.replace(/:/g, '\\MTThinColon').replace(/-/g, '\\mathrel{-}') + '}';
+            parser.string = ParseUtil_js_1.default.addArgs(parser, tex, parser.string.substr(parser.i));
+            parser.i = 0;
+        }
+    },
+    NArrow: function (parser, _name, c, dy) {
+        parser.Push(parser.create('node', 'TeXAtom', [
+            parser.create('token', 'mtext', {}, c),
+            parser.create('node', 'mpadded', [
+                parser.create('node', 'mpadded', [
+                    parser.create('node', 'menclose', [
+                        parser.create('node', 'mspace', [], { height: '.2em', depth: 0, width: '.4em' })
+                    ], { notation: 'updiagonalstrike', 'data-thickness': '.05em', 'data-padding': 0 })
+                ], { width: 0, lspace: '-.5width', voffset: dy }),
+                parser.create('node', 'mphantom', [
+                    parser.create('token', 'mtext', {}, c)
+                ])
+            ], { width: 0, lspace: '-.5width' })
+        ], { texClass: MmlNode_js_1.TEXCLASS.REL }));
+    },
+    SplitFrac: function (parser, name, display) {
+        var num = parser.ParseArg(name);
+        var den = parser.ParseArg(name);
+        parser.Push(parser.create('node', 'mstyle', [
+            parser.create('node', 'mfrac', [
+                parser.create('node', 'mstyle', [
+                    num,
+                    parser.create('token', 'mi'),
+                    parser.create('token', 'mspace', { width: '1em' })
+                ], { scriptlevel: 0 }),
+                parser.create('node', 'mstyle', [
+                    parser.create('token', 'mspace', { width: '1em' }),
+                    parser.create('token', 'mi'),
+                    den
+                ], { scriptlevel: 0 })
+            ], { linethickness: 0, numalign: 'left', denomalign: 'right' })
+        ], { displaystyle: display, scriptlevel: 0 }));
+    },
+    XMathStrut: function (parser, name) {
+        var dd = parser.GetBrackets(name);
+        var dh = parser.GetArgument(name);
+        dh = MathtoolsUtil_js_1.MathtoolsUtil.plusOrMinus(name, dh);
+        dd = MathtoolsUtil_js_1.MathtoolsUtil.plusOrMinus(name, dd || dh);
+        parser.Push(parser.create('node', 'TeXAtom', [
+            parser.create('node', 'mpadded', [
+                parser.create('node', 'mphantom', [
+                    parser.create('token', 'mo', { stretchy: false }, '(')
+                ])
+            ], { width: 0, height: dh + 'height', depth: dd + 'depth' })
+        ], { texClass: MmlNode_js_1.TEXCLASS.ORD }));
+    },
+    Prescript: function (parser, name) {
+        var sup = MathtoolsUtil_js_1.MathtoolsUtil.getScript(parser, name, 'sup');
+        var sub = MathtoolsUtil_js_1.MathtoolsUtil.getScript(parser, name, 'sub');
+        var base = MathtoolsUtil_js_1.MathtoolsUtil.getScript(parser, name, 'arg');
+        if (NodeUtil_js_1.default.isType(sup, 'none') && NodeUtil_js_1.default.isType(sub, 'none')) {
+            parser.Push(base);
+            return;
+        }
+        var mml = parser.create('node', 'mmultiscripts', [base]);
+        NodeUtil_js_1.default.getChildren(mml).push(null, null);
+        NodeUtil_js_1.default.appendChildren(mml, [parser.create('node', 'mprescripts'), sub, sup]);
+        mml.setProperty('fixPrescript', true);
+        parser.Push(mml);
+    },
+    NewTagForm: function (parser, name, renew) {
+        if (renew === void 0) { renew = false; }
+        var tags = parser.tags;
+        if (!('mtFormats' in tags)) {
+            throw new TexError_js_1.default('TagsNotMT', '%1 can only be used with ams or mathtools tags', name);
+        }
+        var id = parser.GetArgument(name).trim();
+        if (!id) {
+            throw new TexError_js_1.default('InvalidTagFormID', 'Tag form name can\'t be empty');
+        }
+        var format = parser.GetBrackets(name, '');
+        var left = parser.GetArgument(name);
+        var right = parser.GetArgument(name);
+        if (!renew && tags.mtFormats.has(id)) {
+            throw new TexError_js_1.default('DuplicateTagForm', 'Duplicate tag form: %1', id);
+        }
+        tags.mtFormats.set(id, [left, right, format]);
+    },
+    UseTagForm: function (parser, name) {
+        var tags = parser.tags;
+        if (!('mtFormats' in tags)) {
+            throw new TexError_js_1.default('TagsNotMT', '%1 can only be used with ams or mathtools tags', name);
+        }
+        var id = parser.GetArgument(name).trim();
+        if (!id) {
+            tags.mtCurrent = null;
+            return;
+        }
+        if (!tags.mtFormats.has(id)) {
+            throw new TexError_js_1.default('UndefinedTagForm', 'Undefined tag form: %1', id);
+        }
+        tags.mtCurrent = tags.mtFormats.get(id);
+    },
+    SetOptions: function (parser, name) {
+        var e_2, _a;
+        var options = parser.options.mathtools;
+        if (!options['allow-mathtoolsset']) {
+            throw new TexError_js_1.default('ForbiddenMathtoolsSet', '%1 is disabled', name);
+        }
+        var allowed = {};
+        Object.keys(options).forEach(function (id) {
+            if (id !== 'pariedDelimiters' && id !== 'tagforms' && id !== 'allow-mathtoolsset') {
+                allowed[id] = 1;
+            }
+        });
+        var args = parser.GetArgument(name);
+        var keys = ParseUtil_js_1.default.keyvalOptions(args, allowed, true);
+        try {
+            for (var _b = __values(Object.keys(keys)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var id = _c.value;
+                options[id] = keys[id];
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+    },
+    Array: BaseMethods_js_1.default.Array,
+    Macro: BaseMethods_js_1.default.Macro,
+    xArrow: AmsMethods_js_1.AmsMethods.xArrow,
+    HandleRef: AmsMethods_js_1.AmsMethods.HandleRef,
+    AmsEqnArray: AmsMethods_js_1.AmsMethods.AmsEqnArray,
+    MacroWithTemplate: NewcommandMethods_js_1.default.MacroWithTemplate,
+};
+//# sourceMappingURL=MathtoolsMethods.js.map
+},{"../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../ams/AmsMethods.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsMethods.js","../base/BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js","../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../../../core/MmlTree/MmlNode.js":"../node_modules/mathjax-full/js/core/MmlTree/MmlNode.js","../../../util/lengths.js":"../node_modules/mathjax-full/js/util/lengths.js","../../../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js","../newcommand/NewcommandUtil.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandUtil.js","../newcommand/NewcommandMethods.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandMethods.js","./MathtoolsUtil.js":"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsUtil.js"}],"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsMappings.js":[function(require,module,exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var ParseMethods_js_1 = require("../ParseMethods.js");
+var SymbolMap_js_1 = require("../SymbolMap.js");
+var TexConstants_js_1 = require("../TexConstants.js");
+var MathtoolsMethods_js_1 = require("./MathtoolsMethods.js");
+new SymbolMap_js_1.CommandMap('mathtools-macros', {
+    shoveleft: ['HandleShove', TexConstants_js_1.TexConstant.Align.LEFT],
+    shoveright: ['HandleShove', TexConstants_js_1.TexConstant.Align.RIGHT],
+    xleftrightarrow: ['xArrow', 0x2194, 10, 10],
+    xLeftarrow: ['xArrow', 0x21D0, 12, 7],
+    xRightarrow: ['xArrow', 0x21D2, 7, 12],
+    xLeftrightarrow: ['xArrow', 0x21D4, 12, 12],
+    xhookleftarrow: ['xArrow', 0x21A9, 10, 5],
+    xhookrightarrow: ['xArrow', 0x21AA, 5, 10],
+    xmapsto: ['xArrow', 0x21A6, 10, 10],
+    xrightharpoondown: ['xArrow', 0x21C1, 5, 10],
+    xleftharpoondown: ['xArrow', 0x21BD, 10, 5],
+    xrightleftharpoons: ['xArrow', 0x21CC, 10, 10],
+    xrightharpoonup: ['xArrow', 0x21C0, 5, 10],
+    xleftharpoonup: ['xArrow', 0x21BC, 10, 5],
+    xleftrightharpoons: ['xArrow', 0x21CB, 10, 10],
+    mathllap: ['MathLap', 'l', false],
+    mathrlap: ['MathLap', 'r', false],
+    mathclap: ['MathLap', 'c', false],
+    clap: ['MtLap', 'c'],
+    textllap: ['MtLap', 'l'],
+    textrlap: ['MtLap', 'r'],
+    textclap: ['MtLap', 'c'],
+    cramped: 'Cramped',
+    crampedllap: ['MathLap', 'l', true],
+    crampedrlap: ['MathLap', 'r', true],
+    crampedclap: ['MathLap', 'c', true],
+    crampedsubstack: ['Macro', '\\begin{crampedsubarray}{c}#1\\end{crampedsubarray}', 1],
+    mathmbox: 'MathMBox',
+    mathmakebox: 'MathMakeBox',
+    overbracket: 'UnderOverBracket',
+    underbracket: 'UnderOverBracket',
+    refeq: 'HandleRef',
+    MoveEqLeft: ['Macro', '\\hspace{#1em}&\\hspace{-#1em}', 1, '2'],
+    Aboxed: 'Aboxed',
+    ArrowBetweenLines: 'ArrowBetweenLines',
+    vdotswithin: 'VDotsWithin',
+    shortvdotswithin: 'ShortVDotsWithin',
+    MTFlushSpaceAbove: 'FlushSpaceAbove',
+    MTFlushSpaceBelow: 'FlushSpaceBelow',
+    DeclarePairedDelimiters: 'DeclarePairedDelimiters',
+    DeclarePairedDelimitersX: 'DeclarePairedDelimitersX',
+    DeclarePairedDelimitersXPP: 'DeclarePairedDelimitersXPP',
+    centercolon: ['CenterColon', true, true],
+    ordinarycolon: ['CenterColon', false],
+    MTThinColon: ['CenterColon', true, true, true],
+    coloneqq: ['Relation', ':=', '\u2254'],
+    Coloneqq: ['Relation', '::=', '\u2A74'],
+    coloneq: ['Relation', ':-'],
+    Coloneq: ['Relation', '::-'],
+    eqqcolon: ['Relation', '=:', '\u2255'],
+    Eqqcolon: ['Relation', '=::'],
+    eqcolon: ['Relation', '-:', '\u2239'],
+    Eqcolon: ['Relation', '-::'],
+    colonapprox: ['Relation', ':\\approx'],
+    Colonapprox: ['Relation', '::\\approx'],
+    colonsim: ['Relation', ':\\sim'],
+    Colonsim: ['Relation', '::\\sim'],
+    dblcolon: ['Relation', '::', '\u2237'],
+    nuparrow: ['NArrow', '\u2191', '.06em'],
+    ndownarrow: ['NArrow', '\u2193', '.25em'],
+    bigtimes: ['Macro', '\\mathop{\\Large\\kern-.1em\\boldsymbol{\\times}\\kern-.1em}'],
+    splitfrac: ['SplitFrac', false],
+    splitdfrac: ['SplitFrac', true],
+    xmathstrut: 'XMathStrut',
+    prescript: 'Prescript',
+    newtagform: ['NewTagForm', false],
+    renewtagform: ['NewTagForm', true],
+    usetagform: 'UseTagForm',
+    adjustlimits: [
+        'MacroWithTemplate',
+        '\\mathop{{#1}\\vphantom{{#3}}}_{{#2}\\vphantom{{#4}}}\\mathop{{#3}\\vphantom{{#1}}}_{{#4}\\vphantom{{#2}}}',
+        4, , '_', , '_'
+    ],
+    mathtoolsset: 'SetOptions'
+}, MathtoolsMethods_js_1.MathtoolsMethods);
+new SymbolMap_js_1.EnvironmentMap('mathtools-environments', ParseMethods_js_1.default.environment, {
+    dcases: ['Array', null, '\\{', '', 'll', null, '.2em', 'D'],
+    rcases: ['Array', null, '', '\\}', 'll', null, '.2em'],
+    drcases: ['Array', null, '', '\\}', 'll', null, '.2em', 'D'],
+    'dcases*': ['Cases', null, '{', '', 'D'],
+    'rcases*': ['Cases', null, '', '}'],
+    'drcases*': ['Cases', null, '', '}', 'D'],
+    'cases*': ['Cases', null, '{', ''],
+    'matrix*': ['MtMatrix', null, null, null],
+    'pmatrix*': ['MtMatrix', null, '(', ')'],
+    'bmatrix*': ['MtMatrix', null, '[', ']'],
+    'Bmatrix*': ['MtMatrix', null, '\\{', '\\}'],
+    'vmatrix*': ['MtMatrix', null, '\\vert', '\\vert'],
+    'Vmatrix*': ['MtMatrix', null, '\\Vert', '\\Vert'],
+    'smallmatrix*': ['MtSmallMatrix', null, null, null],
+    psmallmatrix: ['MtSmallMatrix', null, '(', ')', 'c'],
+    'psmallmatrix*': ['MtSmallMatrix', null, '(', ')'],
+    bsmallmatrix: ['MtSmallMatrix', null, '[', ']', 'c'],
+    'bsmallmatrix*': ['MtSmallMatrix', null, '[', ']'],
+    Bsmallmatrix: ['MtSmallMatrix', null, '\\{', '\\}', 'c'],
+    'Bsmallmatrix*': ['MtSmallMatrix', null, '\\{', '\\}'],
+    vsmallmatrix: ['MtSmallMatrix', null, '\\vert', '\\vert', 'c'],
+    'vsmallmatrix*': ['MtSmallMatrix', null, '\\vert', '\\vert'],
+    Vsmallmatrix: ['MtSmallMatrix', null, '\\Vert', '\\Vert', 'c'],
+    'Vsmallmatrix*': ['MtSmallMatrix', null, '\\Vert', '\\Vert'],
+    crampedsubarray: ['Array', null, null, null, null, '0em', '0.1em', 'S\'', 1],
+    multlined: 'MtMultlined',
+    spreadlines: ['SpreadLines', true],
+    lgathered: ['AmsEqnArray', null, null, null, 'l', null, '.5em', 'D'],
+    rgathered: ['AmsEqnArray', null, null, null, 'r', null, '.5em', 'D'],
+}, MathtoolsMethods_js_1.MathtoolsMethods);
+new SymbolMap_js_1.DelimiterMap('mathtools-delimiters', ParseMethods_js_1.default.delimiter, {
+    '\\lparen': '(',
+    '\\rparen': ')'
+});
+new SymbolMap_js_1.CommandMap('mathtools-characters', {
+    ':': ['CenterColon', true]
+}, MathtoolsMethods_js_1.MathtoolsMethods);
+//# sourceMappingURL=MathtoolsMappings.js.map
+},{"../ParseMethods.js":"../node_modules/mathjax-full/js/input/tex/ParseMethods.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","./MathtoolsMethods.js":"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsMethods.js"}],"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsTags.js":[function(require,module,exports) {
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MathtoolsTagFormat = void 0;
+var TexError_js_1 = require("../TexError.js");
+var Tags_js_1 = require("../Tags.js");
+var tagID = 0;
+function MathtoolsTagFormat(config, jax) {
+    var tags = jax.parseOptions.options.tags;
+    if (tags !== 'base' && config.tags.hasOwnProperty(tags)) {
+        Tags_js_1.TagsFactory.add(tags, config.tags[tags]);
+    }
+    var TagClass = Tags_js_1.TagsFactory.create(jax.parseOptions.options.tags).constructor;
+    var TagFormat = (function (_super) {
+        __extends(TagFormat, _super);
+        function TagFormat() {
+            var e_1, _a;
+            var _this = _super.call(this) || this;
+            _this.mtFormats = new Map();
+            _this.mtCurrent = null;
+            var forms = jax.parseOptions.options.mathtools.tagforms;
+            try {
+                for (var _b = __values(Object.keys(forms)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var form = _c.value;
+                    if (!Array.isArray(forms[form]) || forms[form].length !== 3) {
+                        throw new TexError_js_1.default('InvalidTagFormDef', 'The tag form definition for "%1" should be an array fo three strings', form);
+                    }
+                    _this.mtFormats.set(form, forms[form]);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return _this;
+        }
+        TagFormat.prototype.formatTag = function (tag) {
+            if (this.mtCurrent) {
+                var _a = __read(this.mtCurrent, 3), left = _a[0], right = _a[1], format = _a[2];
+                return (format ? "" + left + format + "{" + tag + "}" + right : "" + left + tag + right);
+            }
+            return _super.prototype.formatTag.call(this, tag);
+        };
+        return TagFormat;
+    }(TagClass));
+    tagID++;
+    var tagName = 'MathtoolsTags-' + tagID;
+    Tags_js_1.TagsFactory.add(tagName, TagFormat);
+    jax.parseOptions.options.tags = tagName;
+}
+exports.MathtoolsTagFormat = MathtoolsTagFormat;
+//# sourceMappingURL=MathtoolsTags.js.map
+},{"../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js"}],"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsItems.js":[function(require,module,exports) {
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MultlinedItem = void 0;
+var AmsItems_js_1 = require("../ams/AmsItems.js");
+var NodeUtil_js_1 = require("../NodeUtil.js");
+var TexConstants_js_1 = require("../TexConstants.js");
+var MultlinedItem = (function (_super) {
+    __extends(MultlinedItem, _super);
+    function MultlinedItem() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Object.defineProperty(MultlinedItem.prototype, "kind", {
+        get: function () {
+            return 'multlined';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    MultlinedItem.prototype.EndTable = function () {
+        if (this.Size() || this.row.length) {
+            this.EndEntry();
+            this.EndRow();
+        }
+        if (this.table.length > 1) {
+            var options = this.factory.configuration.options.mathtools;
+            var gap = options.multlinegap;
+            var firstskip = options['firstline-afterskip'] || gap;
+            var lastskip = options['lastline-preskip'] || gap;
+            var first = NodeUtil_js_1.default.getChildren(this.table[0])[0];
+            if (NodeUtil_js_1.default.getAttribute(first, 'columnalign') !== TexConstants_js_1.TexConstant.Align.RIGHT) {
+                first.appendChild(this.create('node', 'mspace', [], { width: firstskip }));
+            }
+            var last = NodeUtil_js_1.default.getChildren(this.table[this.table.length - 1])[0];
+            if (NodeUtil_js_1.default.getAttribute(last, 'columnalign') !== TexConstants_js_1.TexConstant.Align.LEFT) {
+                var top_1 = NodeUtil_js_1.default.getChildren(last)[0];
+                top_1.childNodes.unshift(null);
+                var space = this.create('node', 'mspace', [], { width: lastskip });
+                NodeUtil_js_1.default.setChild(top_1, 0, space);
+            }
+        }
+        _super.prototype.EndTable.call(this);
+    };
+    return MultlinedItem;
+}(AmsItems_js_1.MultlineItem));
+exports.MultlinedItem = MultlinedItem;
+//# sourceMappingURL=MathtoolsItems.js.map
+},{"../ams/AmsItems.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsItems.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js"}],"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsConfiguration.js":[function(require,module,exports) {
+"use strict";
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MathtoolsConfiguration = exports.fixPrescripts = exports.PAIREDDELIMS = void 0;
+var Configuration_js_1 = require("../Configuration.js");
+var SymbolMap_js_1 = require("../SymbolMap.js");
+var NodeUtil_js_1 = require("../NodeUtil.js");
+var Options_js_1 = require("../../../util/Options.js");
+require("./MathtoolsMappings.js");
+var MathtoolsUtil_js_1 = require("./MathtoolsUtil.js");
+var MathtoolsTags_js_1 = require("./MathtoolsTags.js");
+var MathtoolsItems_js_1 = require("./MathtoolsItems.js");
+exports.PAIREDDELIMS = 'mathtools-paired-delims';
+function initMathtools(config) {
+    new SymbolMap_js_1.CommandMap(exports.PAIREDDELIMS, {}, {});
+    config.append(Configuration_js_1.Configuration.local({ handler: { macro: [exports.PAIREDDELIMS] }, priority: -5 }));
+}
+function configMathtools(config, jax) {
+    var e_1, _a;
+    var parser = jax.parseOptions;
+    var pairedDelims = parser.options.mathtools.pairedDelimiters;
+    try {
+        for (var _b = __values(Object.keys(pairedDelims)), _c = _b.next(); !_c.done; _c = _b.next()) {
+            var cs = _c.value;
+            MathtoolsUtil_js_1.MathtoolsUtil.addPairedDelims(parser, cs, pairedDelims[cs]);
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+    MathtoolsTags_js_1.MathtoolsTagFormat(config, jax);
+}
+function fixPrescripts(_a) {
+    var e_2, _b, e_3, _c, e_4, _d;
+    var data = _a.data;
+    try {
+        for (var _e = __values(data.getList('mmultiscripts')), _f = _e.next(); !_f.done; _f = _e.next()) {
+            var node = _f.value;
+            if (!node.getProperty('fixPrescript'))
+                continue;
+            var childNodes = NodeUtil_js_1.default.getChildren(node);
+            var n = 0;
+            try {
+                for (var _g = (e_3 = void 0, __values([1, 2])), _h = _g.next(); !_h.done; _h = _g.next()) {
+                    var i = _h.value;
+                    if (!childNodes[i]) {
+                        NodeUtil_js_1.default.setChild(node, i, data.nodeFactory.create('node', 'none'));
+                        n++;
+                    }
+                }
+            }
+            catch (e_3_1) { e_3 = { error: e_3_1 }; }
+            finally {
+                try {
+                    if (_h && !_h.done && (_c = _g.return)) _c.call(_g);
+                }
+                finally { if (e_3) throw e_3.error; }
+            }
+            try {
+                for (var _j = (e_4 = void 0, __values([4, 5])), _k = _j.next(); !_k.done; _k = _j.next()) {
+                    var i = _k.value;
+                    if (NodeUtil_js_1.default.isType(childNodes[i], 'mrow') && NodeUtil_js_1.default.getChildren(childNodes[i]).length === 0) {
+                        NodeUtil_js_1.default.setChild(node, i, data.nodeFactory.create('node', 'none'));
+                    }
+                }
+            }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
+            finally {
+                try {
+                    if (_k && !_k.done && (_d = _j.return)) _d.call(_j);
+                }
+                finally { if (e_4) throw e_4.error; }
+            }
+            if (n === 2) {
+                childNodes.splice(1, 2);
+            }
+        }
+    }
+    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+    finally {
+        try {
+            if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
+        }
+        finally { if (e_2) throw e_2.error; }
+    }
+}
+exports.fixPrescripts = fixPrescripts;
+exports.MathtoolsConfiguration = Configuration_js_1.Configuration.create('mathtools', {
+    handler: {
+        macro: ['mathtools-macros', 'mathtools-delimiters'],
+        environment: ['mathtools-environments'],
+        delimiter: ['mathtools-delimiters'],
+        character: ['mathtools-characters']
+    },
+    items: (_a = {},
+        _a[MathtoolsItems_js_1.MultlinedItem.prototype.kind] = MathtoolsItems_js_1.MultlinedItem,
+        _a),
+    init: initMathtools,
+    config: configMathtools,
+    postprocessors: [[fixPrescripts, -6]],
+    options: {
+        mathtools: {
+            'multlinegap': '1em',
+            'multlined-pos': 'c',
+            'firstline-afterskip': '',
+            'lastline-preskip': '',
+            'smallmatrix-align': 'c',
+            'shortvdotsadjustabove': '.2em',
+            'shortvdotsadjustbelow': '.2em',
+            'centercolon': false,
+            'centercolon-offset': '.04em',
+            'thincolon-dx': '-.04em',
+            'thincolon-dw': '-.08em',
+            'use-unicode': false,
+            'prescript-sub-format': '',
+            'prescript-sup-format': '',
+            'prescript-arg-format': '',
+            'allow-mathtoolsset': true,
+            pairedDelimiters: Options_js_1.expandable({}),
+            tagforms: Options_js_1.expandable({}),
+        }
+    }
+});
+//# sourceMappingURL=MathtoolsConfiguration.js.map
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../../../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js","./MathtoolsMappings.js":"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsMappings.js","./MathtoolsUtil.js":"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsUtil.js","./MathtoolsTags.js":"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsTags.js","./MathtoolsItems.js":"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsItems.js"}],"../node_modules/mhchemparser/dist/mhchemParser.js":[function(require,module,exports) {
 "use strict";
 /*!
  *************************************************************************
  *
  *  mhchemParser.ts
- *  4.0.0
+ *  4.1.1
  *
  *  Parser for the \ce command and \pu command for MathJax and Co.
  *
@@ -34832,7 +37104,7 @@ var mhchemParser = (function () {
     return mhchemParser;
 }());
 exports.mhchemParser = mhchemParser;
-function mhchemCreateTransitions(o) {
+function _mhchemCreateTransitions(o) {
     var pattern, state;
     var transitions = {};
     for (pattern in o) {
@@ -35010,6 +37282,7 @@ var _mhchemParser = {
             '_\\x{}': function (input) { return _mhchemParser.patterns.findObserveGroups(input, "_", /^\\[a-zA-Z]+\{/, "}", ""); },
             '_\\x': /^_(\\[a-zA-Z]+)\s*/,
             '^_': /^(?:\^(?=_)|\_(?=\^)|[\^_]$)/,
+            '{}^': /^\{\}(?=\^)/,
             '{}': /^\{\}/,
             '{...}': function (input) { return _mhchemParser.patterns.findObserveGroups(input, "", "{", "}", ""); },
             '{(...)}': function (input) { return _mhchemParser.patterns.findObserveGroups(input, "{", "", "", "}"); },
@@ -35223,7 +37496,7 @@ var _mhchemParser = {
     },
     stateMachines: {
         'tex': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '0': { action_: 'copy' }
                 },
@@ -35240,7 +37513,7 @@ var _mhchemParser = {
             actions: {}
         },
         'ce': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: 'output' }
                 },
@@ -35399,6 +37672,9 @@ var _mhchemParser = {
                 '#': {
                     '0|1|2|3|a|as|o': { action_: [{ type_: 'output', option: 2 }, { type_: 'bond', option: "#" }], nextState: '3' }
                 },
+                '{}^': {
+                    '*': { action_: [{ type_: 'output', option: 1 }, { type_: 'insert', option: 'tinySkip' }], nextState: '1' }
+                },
                 '{}': {
                     '*': { action_: { type_: 'output', option: 1 }, nextState: '1' }
                 },
@@ -35459,10 +37735,11 @@ var _mhchemParser = {
             actions: {
                 'o after d': function (buffer, m) {
                     var ret;
-                    if ((buffer.d || "").match(/^[0-9]+$/)) {
+                    if ((buffer.d || "").match(/^[1-9][0-9]*$/)) {
                         var tmp = buffer.d;
                         buffer.d = undefined;
                         ret = this['output'](buffer);
+                        ret.push({ type_: 'tinySkip' });
                         buffer.b = tmp;
                     }
                     else {
@@ -35644,7 +37921,7 @@ var _mhchemParser = {
             }
         },
         'a': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: [] }
                 },
@@ -35667,7 +37944,7 @@ var _mhchemParser = {
             actions: {}
         },
         'o': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: [] }
                 },
@@ -35702,7 +37979,7 @@ var _mhchemParser = {
             actions: {}
         },
         'text': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: 'output' }
                 },
@@ -35739,7 +38016,7 @@ var _mhchemParser = {
             }
         },
         'pq': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: [] }
                 },
@@ -35808,7 +38085,7 @@ var _mhchemParser = {
             }
         },
         'bd': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: [] }
                 },
@@ -35871,7 +38148,7 @@ var _mhchemParser = {
             }
         },
         'oxidation': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: [] }
                 },
@@ -35890,7 +38167,7 @@ var _mhchemParser = {
             }
         },
         'tex-math': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: 'output' }
                 },
@@ -35921,7 +38198,7 @@ var _mhchemParser = {
             }
         },
         'tex-math tight': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: 'output' }
                 },
@@ -35956,7 +38233,7 @@ var _mhchemParser = {
             }
         },
         '9,9': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: [] }
                 },
@@ -35972,7 +38249,7 @@ var _mhchemParser = {
             }
         },
         'pu': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: 'output' }
                 },
@@ -36102,7 +38379,7 @@ var _mhchemParser = {
             }
         },
         'pu-2': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '*': { action_: 'output' }
                 },
@@ -36149,7 +38426,7 @@ var _mhchemParser = {
             }
         },
         'pu-9,9': {
-            transitions: mhchemCreateTransitions({
+            transitions: _mhchemCreateTransitions({
                 'empty': {
                     '0': { action_: 'output-0' },
                     'o': { action_: 'output-o' }
@@ -36260,9 +38537,10 @@ var _mhchemTexify = {
                     res += b5.a + "\\,";
                 }
                 if (b5.b || b5.p) {
-                    res += "{\\vphantom{X}}";
+                    res += "{\\vphantom{A}}";
                     res += "^{\\hphantom{" + (b5.b || "") + "}}_{\\hphantom{" + (b5.p || "") + "}}";
-                    res += "{\\vphantom{X}}";
+                    res += "\\mkern-1.5mu";
+                    res += "{\\vphantom{A}}";
                     res += "^{\\smash[t]{\\vphantom{2}}\\llap{" + (b5.b || "") + "}}";
                     res += "_{\\vphantom{2}\\llap{\\smash[t]{" + (b5.p || "") + "}}}";
                 }
@@ -36274,7 +38552,7 @@ var _mhchemTexify = {
                 }
                 if (buf.dType === 'kv') {
                     if (b5.d || b5.q) {
-                        res += "{\\vphantom{X}}";
+                        res += "{\\vphantom{A}}";
                     }
                     if (b5.d) {
                         res += "^{" + b5.d + "}";
@@ -36285,21 +38563,21 @@ var _mhchemTexify = {
                 }
                 else if (buf.dType === 'oxidation') {
                     if (b5.d) {
-                        res += "{\\vphantom{X}}";
+                        res += "{\\vphantom{A}}";
                         res += "^{" + b5.d + "}";
                     }
                     if (b5.q) {
-                        res += "{\\vphantom{X}}";
+                        res += "{\\vphantom{A}}";
                         res += "_{\\smash[t]{" + b5.q + "}}";
                     }
                 }
                 else {
                     if (b5.q) {
-                        res += "{\\vphantom{X}}";
+                        res += "{\\vphantom{A}}";
                         res += "_{\\smash[t]{" + b5.q + "}}";
                     }
                     if (b5.d) {
-                        res += "{\\vphantom{X}}";
+                        res += "{\\vphantom{A}}";
                         res += "^{" + b5.d + "}";
                     }
                 }
@@ -36403,6 +38681,9 @@ var _mhchemTexify = {
                 break;
             case 'space':
                 res = " ";
+                break;
+            case 'tinySkip':
+                res = '\\mkern2mu';
                 break;
             case 'entitySkip':
                 res = "~";
@@ -36540,7 +38821,7 @@ var _mhchemTexify = {
     }
 };
 function assertNever(a) { }
-//# sourceMappingURL=mhchemParser.js.map
+
 },{}],"../node_modules/mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -36550,7 +38831,7 @@ var SymbolMap_js_1 = require("../SymbolMap.js");
 var TexError_js_1 = require("../TexError.js");
 var BaseMethods_js_1 = require("../base/BaseMethods.js");
 var AmsMethods_js_1 = require("../ams/AmsMethods.js");
-var mhchemParser_js_1 = require("./mhchemparser/mhchemParser.js");
+var mhchemParser_js_1 = require("mhchemparser/dist/mhchemParser.js");
 var MhchemMethods = {};
 MhchemMethods.Macro = BaseMethods_js_1.default.Macro;
 MhchemMethods.xArrow = AmsMethods_js_1.AmsMethods.xArrow;
@@ -36588,8 +38869,6 @@ new SymbolMap_js_1.CommandMap('mhchem', {
         'Macro',
         '\\vphantom{-}\\raise2mu{\\kern2mu\\tiny\\text{-}\\kern1mu\\text{-}\\kern1mu\\text{-}\\kern2mu}'
     ],
-    xrightarrow: ['xArrow', 0x2192, 5, 6],
-    xleftarrow: ['xArrow', 0x2190, 7, 3],
     xleftrightarrow: ['xArrow', 0x2194, 6, 6],
     xrightleftharpoons: ['xArrow', 0x21CC, 5, 7],
     xRightleftharpoons: ['xArrow', 0x21CC, 5, 7],
@@ -36597,7 +38876,7 @@ new SymbolMap_js_1.CommandMap('mhchem', {
 }, MhchemMethods);
 exports.MhchemConfiguration = Configuration_js_1.Configuration.create('mhchem', { handler: { macro: ['mhchem'] } });
 //# sourceMappingURL=MhchemConfiguration.js.map
-},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../base/BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js","../ams/AmsMethods.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsMethods.js","./mhchemparser/mhchemParser.js":"../node_modules/mathjax-full/js/input/tex/mhchem/mhchemparser/mhchemParser.js"}],"../node_modules/mathjax-full/js/input/tex/noerrors/NoErrorsConfiguration.js":[function(require,module,exports) {
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../base/BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js","../ams/AmsMethods.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsMethods.js","mhchemparser/dist/mhchemParser.js":"../node_modules/mhchemparser/dist/mhchemParser.js"}],"../node_modules/mathjax-full/js/input/tex/noerrors/NoErrorsConfiguration.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NoErrorsConfiguration = void 0;
@@ -36924,10 +39203,7 @@ PhysicsMethods.StarMacro = function (parser, name, argcount) {
     macro = ParseUtil_js_1.default.substituteArgs(parser, args, macro);
     parser.string = ParseUtil_js_1.default.addArgs(parser, macro, parser.string.slice(parser.i));
     parser.i = 0;
-    if (++parser.macroCount > parser.configuration.options['maxMacros']) {
-        throw new TexError_js_1.default('MaxMacroSub1', 'MathJax maximum macro substitution count exceeded; ' +
-            'is there a recursive macro call?');
-    }
+    ParseUtil_js_1.default.checkMaxMacros(parser);
 };
 var vectorApplication = function (parser, kind, name, operator, fences) {
     var op = new TexParser_js_1.default(operator, parser.stack.env, parser.configuration).mml();
@@ -37354,6 +39630,15 @@ PhysicsMethods.AutoClose = function (parser, fence, _texclass) {
         setProperties({ autoclose: fence });
     parser.Push(item);
 };
+PhysicsMethods.Vnabla = function (parser, _name) {
+    var argument = parser.options.physics.arrowdel ?
+        '\\vec{\\gradientnabla}' : '{\\gradientnabla}';
+    return parser.Push(new TexParser_js_1.default(argument, parser.stack.env, parser.configuration).mml());
+};
+PhysicsMethods.DiffD = function (parser, _name) {
+    var argument = parser.options.physics.italicdiff ? 'd' : '{\\rm d}';
+    return parser.Push(new TexParser_js_1.default(argument, parser.stack.env, parser.configuration).mml());
+};
 PhysicsMethods.Macro = BaseMethods_js_1.default.Macro;
 PhysicsMethods.NamedFn = BaseMethods_js_1.default.NamedFn;
 PhysicsMethods.Array = BaseMethods_js_1.default.Array;
@@ -37373,7 +39658,7 @@ new SymbolMap_js_1.CommandMap('Physics-automatic-bracing-macros', {
     'pqty': ['Quantity', '(', ')', true],
     'bqty': ['Quantity', '[', ']', true],
     'vqty': ['Quantity', '|', '|', true],
-    'Bqty': ['Quantity', '{', '}', true],
+    'Bqty': ['Quantity', '\\{', '\\}', true],
     'absolutevalue': ['Quantity', '|', '|', true],
     'abs': ['Quantity', '|', '|', true],
     'norm': ['Quantity', '\\|', '\\|', true],
@@ -37399,18 +39684,18 @@ new SymbolMap_js_1.CharacterMap('Physics-vector-chars', ParseMethods_js_1.defaul
     imaginary: ['\u2111', { mathvariant: TexConstants_js_1.TexConstant.Variant.NORMAL }]
 });
 new SymbolMap_js_1.CommandMap('Physics-vector-macros', {
+    'vnabla': 'Vnabla',
     'vectorbold': 'VectorBold',
     'vb': 'VectorBold',
     'vectorarrow': ['StarMacro', 1, '\\vec{\\vb', '{#1}}'],
     'va': ['StarMacro', 1, '\\vec{\\vb', '{#1}}'],
     'vectorunit': ['StarMacro', 1, '\\hat{\\vb', '{#1}}'],
     'vu': ['StarMacro', 1, '\\hat{\\vb', '{#1}}'],
-    'gradient': ['OperatorApplication', '\\gradientnabla', '(', '['],
-    'grad': ['OperatorApplication', '\\gradientnabla', '(', '['],
-    'divergence': ['VectorOperator', '\\gradientnabla\\vdot', '(', '['],
-    'div': ['VectorOperator', '\\gradientnabla\\vdot', '(', '['],
-    'curl': ['VectorOperator',
-        '\\gradientnabla\\crossproduct', '(', '['],
+    'gradient': ['OperatorApplication', '\\vnabla', '(', '['],
+    'grad': ['OperatorApplication', '\\vnabla', '(', '['],
+    'divergence': ['VectorOperator', '\\vnabla\\vdot', '(', '['],
+    'div': ['VectorOperator', '\\vnabla\\vdot', '(', '['],
+    'curl': ['VectorOperator', '\\vnabla\\crossproduct', '(', '['],
     'laplacian': ['OperatorApplication', '\\nabla^2', '(', '['],
 }, PhysicsMethods_js_1.default);
 new SymbolMap_js_1.CommandMap('Physics-expressions-macros', {
@@ -37449,12 +39734,13 @@ new SymbolMap_js_1.CommandMap('Physics-expressions-macros', {
     'Trace': ['Expression', false, 'Tr'],
     'rank': 'NamedFn',
     'erf': ['Expression', false],
-    'Res': ['OperatorApplication', '{\\rm Res}', '(', '[', '{'],
+    'Residue': ['Macro', '\\mathrm{Res}'],
+    'Res': ['OperatorApplication', '\\Residue', '(', '[', '{'],
     'principalvalue': ['OperatorApplication', '{\\cal P}'],
     'pv': ['OperatorApplication', '{\\cal P}'],
     'PV': ['OperatorApplication', '{\\rm P.V.}'],
-    'Re': ['OperatorApplication', '{\\rm Re}', '{'],
-    'Im': ['OperatorApplication', '{\\rm Im}', '{'],
+    'Re': ['OperatorApplication', '\\mathrm{Re}', '{'],
+    'Im': ['OperatorApplication', '\\mathrm{Im}', '{'],
     'sine': ['NamedFn', 'sin'],
     'hypsine': ['NamedFn', 'sinh'],
     'arcsine': ['NamedFn', 'arcsin'],
@@ -37499,7 +39785,7 @@ new SymbolMap_js_1.CommandMap('Physics-quick-quad-macros', {
     'qgiven': ['Qqtext', 'given'],
     'qusing': ['Qqtext', 'using'],
     'qassume': ['Qqtext', 'assume'],
-    'qsince,': ['Qqtext', 'since,'],
+    'qsince': ['Qqtext', 'since'],
     'qlet': ['Qqtext', 'let'],
     'qfor': ['Qqtext', 'for'],
     'qall': ['Qqtext', 'all'],
@@ -37512,13 +39798,14 @@ new SymbolMap_js_1.CommandMap('Physics-quick-quad-macros', {
     'qin': ['Qqtext', 'in'],
 }, PhysicsMethods_js_1.default);
 new SymbolMap_js_1.CommandMap('Physics-derivative-macros', {
+    'diffd': 'DiffD',
     'flatfrac': ['Macro', '\\left.#1\\middle/#2\\right.', 2],
-    'differential': ['Differential', '{\\rm d}'],
-    'dd': ['Differential', '{\\rm d}'],
+    'differential': ['Differential', '\\diffd'],
+    'dd': ['Differential', '\\diffd'],
     'variation': ['Differential', '\\delta'],
     'var': ['Differential', '\\delta'],
-    'derivative': ['Derivative', 2, '{\\rm d}'],
-    'dv': ['Derivative', 2, '{\\rm d}'],
+    'derivative': ['Derivative', 2, '\\diffd'],
+    'dv': ['Derivative', 2, '\\diffd'],
     'partialderivative': ['Derivative', 3, '\\partial'],
     'pderivative': ['Derivative', 3, '\\partial'],
     'pdv': ['Derivative', 3, '\\partial'],
@@ -37530,6 +39817,7 @@ new SymbolMap_js_1.CommandMap('Physics-bra-ket-macros', {
     'bra': 'Bra',
     'ket': 'Ket',
     'innerproduct': 'BraKet',
+    'ip': 'BraKet',
     'braket': 'BraKet',
     'outerproduct': 'KetBra',
     'dyad': 'KetBra',
@@ -37605,10 +39893,140 @@ exports.PhysicsConfiguration = Configuration_js_1.Configuration.create('physics'
     },
     items: (_a = {},
         _a[PhysicsItems_js_1.AutoOpen.prototype.kind] = PhysicsItems_js_1.AutoOpen,
-        _a)
+        _a),
+    options: {
+        physics: {
+            italicdiff: false,
+            arrowdel: false
+        }
+    }
 });
 //# sourceMappingURL=PhysicsConfiguration.js.map
-},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","./PhysicsItems.js":"../node_modules/mathjax-full/js/input/tex/physics/PhysicsItems.js","./PhysicsMappings.js":"../node_modules/mathjax-full/js/input/tex/physics/PhysicsMappings.js"}],"../node_modules/mathjax-full/js/input/tex/tagformat/TagFormatConfiguration.js":[function(require,module,exports) {
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","./PhysicsItems.js":"../node_modules/mathjax-full/js/input/tex/physics/PhysicsItems.js","./PhysicsMappings.js":"../node_modules/mathjax-full/js/input/tex/physics/PhysicsMappings.js"}],"../node_modules/mathjax-full/js/input/tex/setoptions/SetOptionsConfiguration.js":[function(require,module,exports) {
+"use strict";
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SetOptionsConfiguration = exports.SetOptionsUtil = void 0;
+var Configuration_js_1 = require("../Configuration.js");
+var SymbolMap_js_1 = require("../SymbolMap.js");
+var TexError_js_1 = require("../TexError.js");
+var ParseUtil_js_1 = require("../ParseUtil.js");
+var Symbol_js_1 = require("../Symbol.js");
+var BaseMethods_js_1 = require("../base/BaseMethods.js");
+var Options_js_1 = require("../../../util/Options.js");
+exports.SetOptionsUtil = {
+    filterPackage: function (parser, extension) {
+        if (extension !== 'tex' && !Configuration_js_1.ConfigurationHandler.get(extension)) {
+            throw new TexError_js_1.default('NotAPackage', 'Not a defined package: %1', extension);
+        }
+        var config = parser.options.setoptions;
+        var options = config.allowOptions[extension];
+        if ((options === undefined && !config.allowPackageDefault) || options === false) {
+            throw new TexError_js_1.default('PackageNotSettable', 'Options can\'t be set for package "%1"', extension);
+        }
+        return true;
+    },
+    filterOption: function (parser, extension, option) {
+        var _a;
+        var config = parser.options.setoptions;
+        var options = config.allowOptions[extension] || {};
+        var allow = (options.hasOwnProperty(option) && !Options_js_1.isObject(options[option]) ? options[option] : null);
+        if (allow === false || (allow === null && !config.allowOptionsDefault)) {
+            throw new TexError_js_1.default('OptionNotSettable', 'Option "%1" is not allowed to be set', option);
+        }
+        if (!((_a = (extension === 'tex' ? parser.options : parser.options[extension])) === null || _a === void 0 ? void 0 : _a.hasOwnProperty(option))) {
+            if (extension === 'tex') {
+                throw new TexError_js_1.default('InvalidTexOption', 'Invalid TeX option "%1"', option);
+            }
+            else {
+                throw new TexError_js_1.default('InvalidOptionKey', 'Invalid option "%1" for package "%2"', option, extension);
+            }
+        }
+        return true;
+    },
+    filterValue: function (_parser, _extension, _option, value) {
+        return value;
+    }
+};
+var setOptionsMap = new SymbolMap_js_1.CommandMap('setoptions', {
+    setOptions: 'SetOptions'
+}, {
+    SetOptions: function (parser, name) {
+        var e_1, _a;
+        var extension = parser.GetBrackets(name) || 'tex';
+        var options = ParseUtil_js_1.default.keyvalOptions(parser.GetArgument(name));
+        var config = parser.options.setoptions;
+        if (!config.filterPackage(parser, extension))
+            return;
+        try {
+            for (var _b = __values(Object.keys(options)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var key = _c.value;
+                if (config.filterOption(parser, extension, key)) {
+                    (extension === 'tex' ? parser.options : parser.options[extension])[key] =
+                        config.filterValue(parser, extension, key, options[key]);
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+    }
+});
+function setoptionsConfig(_config, jax) {
+    var require = jax.parseOptions.handlers.get('macro').lookup('require');
+    if (require) {
+        setOptionsMap.add('Require', new Symbol_js_1.Macro('Require', require._func));
+        setOptionsMap.add('require', new Symbol_js_1.Macro('require', BaseMethods_js_1.default.Macro, ['\\Require{#2}\\setOptions[#2]{#1}', 2, '']));
+    }
+}
+exports.SetOptionsConfiguration = Configuration_js_1.Configuration.create('setoptions', {
+    handler: { macro: ['setoptions'] },
+    config: setoptionsConfig,
+    priority: 3,
+    options: {
+        setoptions: {
+            filterPackage: exports.SetOptionsUtil.filterPackage,
+            filterOption: exports.SetOptionsUtil.filterOption,
+            filterValue: exports.SetOptionsUtil.filterValue,
+            allowPackageDefault: true,
+            allowOptionsDefault: true,
+            allowOptions: Options_js_1.expandable({
+                tex: {
+                    FindTeX: false,
+                    formatError: false,
+                    package: false,
+                    baseURL: false,
+                    tags: false,
+                    maxBuffer: false,
+                    maxMaxros: false,
+                    macros: false,
+                    environments: false
+                },
+                setoptions: false,
+                autoload: false,
+                require: false,
+                configmacros: false,
+                tagformat: false
+            })
+        }
+    }
+});
+//# sourceMappingURL=SetOptionsConfiguration.js.map
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../Symbol.js":"../node_modules/mathjax-full/js/input/tex/Symbol.js","../base/BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js","../../../util/Options.js":"../node_modules/mathjax-full/js/util/Options.js"}],"../node_modules/mathjax-full/js/input/tex/tagformat/TagFormatConfiguration.js":[function(require,module,exports) {
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -37673,7 +40091,145 @@ exports.TagFormatConfiguration = Configuration_js_1.Configuration.create('tagfor
     }
 });
 //# sourceMappingURL=TagFormatConfiguration.js.map
-},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js"}],"../node_modules/mathjax-full/js/input/tex/textmacros/TextParser.js":[function(require,module,exports) {
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js"}],"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosMethods.js":[function(require,module,exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TextMacrosMethods = void 0;
+var TexParser_js_1 = require("../TexParser.js");
+var Retries_js_1 = require("../../../util/Retries.js");
+var BaseMethods_js_1 = require("../base/BaseMethods.js");
+exports.TextMacrosMethods = {
+    Comment: function (parser, _c) {
+        while (parser.i < parser.string.length && parser.string.charAt(parser.i) !== '\n') {
+            parser.i++;
+        }
+        parser.i++;
+    },
+    Math: function (parser, open) {
+        parser.saveText();
+        var i = parser.i;
+        var j, c;
+        var braces = 0;
+        while ((c = parser.GetNext())) {
+            j = parser.i++;
+            switch (c) {
+                case '\\':
+                    var cs = parser.GetCS();
+                    if (cs === ')')
+                        c = '\\(';
+                case '$':
+                    if (braces === 0 && open === c) {
+                        var config = parser.texParser.configuration;
+                        var mml = (new TexParser_js_1.default(parser.string.substr(i, j - i), parser.stack.env, config)).mml();
+                        parser.PushMath(mml);
+                        return;
+                    }
+                    break;
+                case '{':
+                    braces++;
+                    break;
+                case '}':
+                    if (braces === 0) {
+                        parser.Error('ExtraCloseMissingOpen', 'Extra close brace or missing open brace');
+                    }
+                    braces--;
+                    break;
+            }
+        }
+        parser.Error('MathNotTerminated', 'Math-mode is not properly terminated');
+    },
+    MathModeOnly: function (parser, c) {
+        parser.Error('MathModeOnly', '\'%1\' allowed only in math mode', c);
+    },
+    Misplaced: function (parser, c) {
+        parser.Error('Misplaced', '\'%1\' can not be used here', c);
+    },
+    OpenBrace: function (parser, _c) {
+        var env = parser.stack.env;
+        parser.envStack.push(env);
+        parser.stack.env = Object.assign({}, env);
+    },
+    CloseBrace: function (parser, _c) {
+        if (parser.envStack.length) {
+            parser.saveText();
+            parser.stack.env = parser.envStack.pop();
+        }
+        else {
+            parser.Error('ExtraCloseMissingOpen', 'Extra close brace or missing open brace');
+        }
+    },
+    OpenQuote: function (parser, c) {
+        if (parser.string.charAt(parser.i) === c) {
+            parser.text += '\u201C';
+            parser.i++;
+        }
+        else {
+            parser.text += '\u2018';
+        }
+    },
+    CloseQuote: function (parser, c) {
+        if (parser.string.charAt(parser.i) === c) {
+            parser.text += '\u201D';
+            parser.i++;
+        }
+        else {
+            parser.text += '\u2019';
+        }
+    },
+    Tilde: function (parser, _c) {
+        parser.text += '\u00A0';
+    },
+    Space: function (parser, _c) {
+        parser.text += ' ';
+        while (parser.GetNext().match(/\s/))
+            parser.i++;
+    },
+    SelfQuote: function (parser, name) {
+        parser.text += name.substr(1);
+    },
+    Insert: function (parser, _name, c) {
+        parser.text += c;
+    },
+    Accent: function (parser, name, c) {
+        var base = parser.ParseArg(name);
+        var accent = parser.create('token', 'mo', {}, c);
+        parser.addAttributes(accent);
+        parser.Push(parser.create('node', 'mover', [base, accent]));
+    },
+    Emph: function (parser, name) {
+        var variant = (parser.stack.env.mathvariant === '-tex-mathit' ? 'normal' : '-tex-mathit');
+        parser.Push(parser.ParseTextArg(name, { mathvariant: variant }));
+    },
+    SetFont: function (parser, _name, variant) {
+        parser.saveText();
+        parser.stack.env.mathvariant = variant;
+    },
+    SetSize: function (parser, _name, size) {
+        parser.saveText();
+        parser.stack.env.mathsize = size;
+    },
+    CheckAutoload: function (parser, name) {
+        var autoload = parser.configuration.packageData.get('autoload');
+        var texParser = parser.texParser;
+        name = name.slice(1);
+        var macro = texParser.lookup('macro', name);
+        if (!macro || (autoload && macro._func === autoload.Autoload)) {
+            texParser.parse('macro', [texParser, name]);
+            if (!macro)
+                return;
+            Retries_js_1.retryAfter(Promise.resolve());
+        }
+        texParser.parse('macro', [parser, name]);
+    },
+    Macro: BaseMethods_js_1.default.Macro,
+    Spacer: BaseMethods_js_1.default.Spacer,
+    Hskip: BaseMethods_js_1.default.Hskip,
+    rule: BaseMethods_js_1.default.rule,
+    Rule: BaseMethods_js_1.default.Rule,
+    HandleRef: BaseMethods_js_1.default.HandleRef
+};
+//# sourceMappingURL=TextMacrosMethods.js.map
+},{"../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../../../util/Retries.js":"../node_modules/mathjax-full/js/util/Retries.js","../base/BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js"}],"../node_modules/mathjax-full/js/input/tex/textmacros/TextParser.js":[function(require,module,exports) {
 "use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -37852,145 +40408,156 @@ var TextParser = (function (_super) {
 }(TexParser_js_1.default));
 exports.TextParser = TextParser;
 //# sourceMappingURL=TextParser.js.map
-},{"../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../../../core/MmlTree/MmlNode.js":"../node_modules/mathjax-full/js/core/MmlTree/MmlNode.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../base/BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js"}],"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosMethods.js":[function(require,module,exports) {
+},{"../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../TexError.js":"../node_modules/mathjax-full/js/input/tex/TexError.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../../../core/MmlTree/MmlNode.js":"../node_modules/mathjax-full/js/core/MmlTree/MmlNode.js","../NodeUtil.js":"../node_modules/mathjax-full/js/input/tex/NodeUtil.js","../base/BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js"}],"../node_modules/mathjax-full/js/input/tex/textcomp/TextcompMappings.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TextMacrosMethods = void 0;
-var TexParser_js_1 = require("../TexParser.js");
-var Retries_js_1 = require("../../../util/Retries.js");
-var BaseMethods_js_1 = require("../base/BaseMethods.js");
-exports.TextMacrosMethods = {
-    Comment: function (parser, _c) {
-        while (parser.i < parser.string.length && parser.string.charAt(parser.i) !== '\n') {
-            parser.i++;
-        }
-        parser.i++;
-    },
-    Math: function (parser, open) {
-        parser.saveText();
-        var i = parser.i;
-        var j, c;
-        var braces = 0;
-        while ((c = parser.GetNext())) {
-            j = parser.i++;
-            switch (c) {
-                case '\\':
-                    var cs = parser.GetCS();
-                    if (cs === ')')
-                        c = '\\(';
-                case '$':
-                    if (braces === 0 && open === c) {
-                        var config = parser.texParser.configuration;
-                        var mml = (new TexParser_js_1.default(parser.string.substr(i, j - i), parser.stack.env, config)).mml();
-                        parser.PushMath(mml);
-                        return;
-                    }
-                    break;
-                case '{':
-                    braces++;
-                    break;
-                case '}':
-                    if (braces === 0) {
-                        parser.Error('ExtraCloseMissingOpen', 'Extra close brace or missing open brace');
-                    }
-                    braces--;
-                    break;
-            }
-        }
-        parser.Error('MathNotTerminated', 'Math-mode is not properly terminated');
-    },
-    MathModeOnly: function (parser, c) {
-        parser.Error('MathModeOnly', '\'%1\' allowed only in math mode', c);
-    },
-    Misplaced: function (parser, c) {
-        parser.Error('Misplaced', '\'%1\' can not be used here', c);
-    },
-    OpenBrace: function (parser, _c) {
-        var env = parser.stack.env;
-        parser.envStack.push(env);
-        parser.stack.env = Object.assign({}, env);
-    },
-    CloseBrace: function (parser, _c) {
-        if (parser.envStack.length) {
-            parser.saveText();
-            parser.stack.env = parser.envStack.pop();
-        }
-        else {
-            parser.Error('ExtraCloseMissingOpen', 'Extra close brace or missing open brace');
-        }
-    },
-    OpenQuote: function (parser, c) {
-        if (parser.string.charAt(parser.i) === c) {
-            parser.text += '\u201C';
-            parser.i++;
-        }
-        else {
-            parser.text += '\u2018';
-        }
-    },
-    CloseQuote: function (parser, c) {
-        if (parser.string.charAt(parser.i) === c) {
-            parser.text += '\u201D';
-            parser.i++;
-        }
-        else {
-            parser.text += '\u2019';
-        }
-    },
-    Tilde: function (parser, _c) {
-        parser.text += '\u00A0';
-    },
-    Space: function (parser, _c) {
-        parser.text += ' ';
-        while (parser.GetNext().match(/\s/))
-            parser.i++;
-    },
-    SelfQuote: function (parser, name) {
-        parser.text += name.substr(1);
-    },
-    Insert: function (parser, _name, c) {
-        parser.text += c;
-    },
-    Accent: function (parser, name, c) {
-        var base = parser.ParseArg(name);
-        var accent = parser.create('token', 'mo', {}, c);
-        parser.addAttributes(accent);
-        parser.Push(parser.create('node', 'mover', [base, accent]));
-    },
-    Emph: function (parser, name) {
-        var variant = (parser.stack.env.mathvariant === '-tex-mathit' ? 'normal' : '-tex-mathit');
-        parser.Push(parser.ParseTextArg(name, { mathvariant: variant }));
-    },
-    SetFont: function (parser, _name, variant) {
-        parser.saveText();
-        parser.stack.env.mathvariant = variant;
-    },
-    SetSize: function (parser, _name, size) {
-        parser.saveText();
-        parser.stack.env.mathsize = size;
-    },
-    CheckAutoload: function (parser, name) {
-        var autoload = parser.configuration.packageData.get('autoload');
-        var texParser = parser.texParser;
-        name = name.slice(1);
-        var macro = texParser.lookup('macro', name);
-        if (!macro || (autoload && macro._func === autoload.Autoload)) {
-            texParser.parse('macro', [texParser, name]);
-            if (!macro)
+var SymbolMap_js_1 = require("../SymbolMap.js");
+var TexConstants_js_1 = require("../TexConstants.js");
+var TextMacrosMethods_js_1 = require("../textmacros/TextMacrosMethods.js");
+var ParseUtil_js_1 = require("../ParseUtil.js");
+var TextParser_js_1 = require("../textmacros/TextParser.js");
+new SymbolMap_js_1.CommandMap('textcomp-macros', {
+    'textasciicircum': ['Insert', '\u005E'],
+    'textasciitilde': ['Insert', '\u007E'],
+    'textasteriskcentered': ['Insert', '\u002A'],
+    'textbackslash': ['Insert', '\u005C'],
+    'textbar': ['Insert', '\u007C'],
+    'textbraceleft': ['Insert', '\u007B'],
+    'textbraceright': ['Insert', '\u007D'],
+    'textbullet': ['Insert', '\u2022'],
+    'textdagger': ['Insert', '\u2020'],
+    'textdaggerdbl': ['Insert', '\u2021'],
+    'textellipsis': ['Insert', '\u2026'],
+    'textemdash': ['Insert', '\u2014'],
+    'textendash': ['Insert', '\u2013'],
+    'textexclamdown': ['Insert', '\u00A1'],
+    'textgreater': ['Insert', '\u003E'],
+    'textless': ['Insert', '\u003C'],
+    'textordfeminine': ['Insert', '\u00AA'],
+    'textordmasculine': ['Insert', '\u00BA'],
+    'textparagraph': ['Insert', '\u00B6'],
+    'textperiodcentered': ['Insert', '\u00B7'],
+    'textquestiondown': ['Insert', '\u00BF'],
+    'textquotedblleft': ['Insert', '\u201C'],
+    'textquotedblright': ['Insert', '\u201D'],
+    'textquoteleft': ['Insert', '\u2018'],
+    'textquoteright': ['Insert', '\u2019'],
+    'textsection': ['Insert', '\u00A7'],
+    'textunderscore': ['Insert', '\u005F'],
+    'textvisiblespace': ['Insert', '\u2423'],
+    'textacutedbl': ['Insert', '\u02DD'],
+    'textasciiacute': ['Insert', '\u00B4'],
+    'textasciibreve': ['Insert', '\u02D8'],
+    'textasciicaron': ['Insert', '\u02C7'],
+    'textasciidieresis': ['Insert', '\u00A8'],
+    'textasciimacron': ['Insert', '\u00AF'],
+    'textgravedbl': ['Insert', '\u02F5'],
+    'texttildelow': ['Insert', '\u02F7'],
+    'textbaht': ['Insert', '\u0E3F'],
+    'textcent': ['Insert', '\u00A2'],
+    'textcolonmonetary': ['Insert', '\u20A1'],
+    'textcurrency': ['Insert', '\u00A4'],
+    'textdollar': ['Insert', '\u0024'],
+    'textdong': ['Insert', '\u20AB'],
+    'texteuro': ['Insert', '\u20AC'],
+    'textflorin': ['Insert', '\u0192'],
+    'textguarani': ['Insert', '\u20B2'],
+    'textlira': ['Insert', '\u20A4'],
+    'textnaira': ['Insert', '\u20A6'],
+    'textpeso': ['Insert', '\u20B1'],
+    'textsterling': ['Insert', '\u00A3'],
+    'textwon': ['Insert', '\u20A9'],
+    'textyen': ['Insert', '\u00A5'],
+    'textcircledP': ['Insert', '\u2117'],
+    'textcompwordmark': ['Insert', '\u200C'],
+    'textcopyleft': ['Insert', "\uD83C\uDD2F"],
+    'textcopyright': ['Insert', '\u00A9'],
+    'textregistered': ['Insert', '\u00AE'],
+    'textservicemark': ['Insert', '\u2120'],
+    'texttrademark': ['Insert', '\u2122'],
+    'textbardbl': ['Insert', '\u2016'],
+    'textbigcircle': ['Insert', '\u25EF'],
+    'textblank': ['Insert', '\u2422'],
+    'textbrokenbar': ['Insert', '\u00A6'],
+    'textdiscount': ['Insert', '\u2052'],
+    'textestimated': ['Insert', '\u212E'],
+    'textinterrobang': ['Insert', '\u203D'],
+    'textinterrobangdown': ['Insert', '\u2E18'],
+    'textmusicalnote': ['Insert', '\u266A'],
+    'textnumero': ['Insert', '\u2116'],
+    'textopenbullet': ['Insert', '\u25E6'],
+    'textpertenthousand': ['Insert', '\u2031'],
+    'textperthousand': ['Insert', '\u2030'],
+    'textrecipe': ['Insert', '\u211E'],
+    'textreferencemark': ['Insert', '\u203B'],
+    'textlangle': ['Insert', '\u2329'],
+    'textrangle': ['Insert', '\u232A'],
+    'textlbrackdbl': ['Insert', '\u27E6'],
+    'textrbrackdbl': ['Insert', '\u27E7'],
+    'textlquill': ['Insert', '\u2045'],
+    'textrquill': ['Insert', '\u2046'],
+    'textcelsius': ['Insert', '\u2103'],
+    'textdegree': ['Insert', '\u00B0'],
+    'textdiv': ['Insert', '\u00F7'],
+    'textdownarrow': ['Insert', '\u2193'],
+    'textfractionsolidus': ['Insert', '\u2044'],
+    'textleftarrow': ['Insert', '\u2190'],
+    'textlnot': ['Insert', '\u00AC'],
+    'textmho': ['Insert', '\u2127'],
+    'textminus': ['Insert', '\u2212'],
+    'textmu': ['Insert', '\u00B5'],
+    'textohm': ['Insert', '\u2126'],
+    'textonehalf': ['Insert', '\u00BD'],
+    'textonequarter': ['Insert', '\u00BC'],
+    'textonesuperior': ['Insert', '\u00B9'],
+    'textpm': ['Insert', '\u00B1'],
+    'textrightarrow': ['Insert', '\u2192'],
+    'textsurd': ['Insert', '\u221A'],
+    'textthreequarters': ['Insert', '\u00BE'],
+    'textthreesuperior': ['Insert', '\u00B3'],
+    'texttimes': ['Insert', '\u00D7'],
+    'texttwosuperior': ['Insert', '\u00B2'],
+    'textuparrow': ['Insert', '\u2191'],
+    'textborn': ['Insert', '\u002A'],
+    'textdied': ['Insert', '\u2020'],
+    'textdivorced': ['Insert', '\u26AE'],
+    'textmarried': ['Insert', '\u26AD'],
+    'textcentoldstyle': ['Insert', '\u00A2', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'textdollaroldstyle': ['Insert', '\u0024', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'textzerooldstyle': ['Insert', '0', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'textoneoldstyle': ['Insert', '1', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'texttwooldstyle': ['Insert', '2', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'textthreeoldstyle': ['Insert', '3', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'textfouroldstyle': ['Insert', '4', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'textfiveoldstyle': ['Insert', '5', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'textsixoldstyle': ['Insert', '6', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'textsevenoldstyle': ['Insert', '7', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'texteightoldstyle': ['Insert', '8', TexConstants_js_1.TexConstant.Variant.OLDSTYLE],
+    'textnineoldstyle': ['Insert', '9', TexConstants_js_1.TexConstant.Variant.OLDSTYLE]
+}, {
+    Insert: function (parser, name, c, font) {
+        if (parser instanceof TextParser_js_1.TextParser) {
+            if (!font) {
+                TextMacrosMethods_js_1.TextMacrosMethods.Insert(parser, name, c);
                 return;
-            Retries_js_1.retryAfter(Promise.resolve());
+            }
+            parser.saveText();
         }
-        texParser.parse('macro', [parser, name]);
-    },
-    Macro: BaseMethods_js_1.default.Macro,
-    Spacer: BaseMethods_js_1.default.Spacer,
-    Hskip: BaseMethods_js_1.default.Hskip,
-    rule: BaseMethods_js_1.default.rule,
-    Rule: BaseMethods_js_1.default.Rule,
-    HandleRef: BaseMethods_js_1.default.HandleRef
-};
-//# sourceMappingURL=TextMacrosMethods.js.map
-},{"../TexParser.js":"../node_modules/mathjax-full/js/input/tex/TexParser.js","../../../util/Retries.js":"../node_modules/mathjax-full/js/util/Retries.js","../base/BaseMethods.js":"../node_modules/mathjax-full/js/input/tex/base/BaseMethods.js"}],"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosMappings.js":[function(require,module,exports) {
+        parser.Push(ParseUtil_js_1.default.internalText(parser, c, font ? { mathvariant: font } : {}));
+    }
+});
+//# sourceMappingURL=TextcompMappings.js.map
+},{"../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js","../textmacros/TextMacrosMethods.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosMethods.js","../ParseUtil.js":"../node_modules/mathjax-full/js/input/tex/ParseUtil.js","../textmacros/TextParser.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextParser.js"}],"../node_modules/mathjax-full/js/input/tex/textcomp/TextcompConfiguration.js":[function(require,module,exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TextcompConfiguration = void 0;
+var Configuration_js_1 = require("../Configuration.js");
+require("./TextcompMappings.js");
+exports.TextcompConfiguration = Configuration_js_1.Configuration.create('textcomp', {
+    handler: { macro: ['textcomp-macros'] }
+});
+//# sourceMappingURL=TextcompConfiguration.js.map
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","./TextcompMappings.js":"../node_modules/mathjax-full/js/input/tex/textcomp/TextcompMappings.js"}],"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosMappings.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var SymbolMap_js_1 = require("../SymbolMap.js");
@@ -38104,7 +40671,7 @@ new SymbolMap_js_1.CommandMap('text-macros', {
 "use strict";
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TextMacrosConfiguration = exports.textBase = void 0;
+exports.TextMacrosConfiguration = exports.TextBaseConfiguration = void 0;
 var Configuration_js_1 = require("../Configuration.js");
 var ParseOptions_js_1 = require("../ParseOptions.js");
 var Tags_js_1 = require("../Tags.js");
@@ -38112,7 +40679,8 @@ var BaseItems_js_1 = require("../base/BaseItems.js");
 var TextParser_js_1 = require("./TextParser.js");
 var TextMacrosMethods_js_1 = require("./TextMacrosMethods.js");
 require("./TextMacrosMappings.js");
-exports.textBase = Configuration_js_1.Configuration.local({
+exports.TextBaseConfiguration = Configuration_js_1.Configuration.create('text-base', {
+    parser: 'text',
     handler: {
         character: ['command', 'text-special'],
         macro: ['text-macros']
@@ -38146,8 +40714,7 @@ function internalMath(parser, text, level, mathvariant) {
 }
 exports.TextMacrosConfiguration = Configuration_js_1.Configuration.create('textmacros', {
     config: function (_config, jax) {
-        var textConf = new Configuration_js_1.ParserConfiguration([]);
-        textConf.append(exports.textBase);
+        var textConf = new Configuration_js_1.ParserConfiguration(jax.parseOptions.options.textmacros.packages, ['tex', 'text']);
         textConf.init();
         var parseOptions = new ParseOptions_js_1.default(textConf, []);
         parseOptions.options = jax.parseOptions.options;
@@ -38162,10 +40729,75 @@ exports.TextMacrosConfiguration = Configuration_js_1.Configuration.create('textm
     preprocessors: [function (data) {
             var config = data.data.packageData.get('textmacros');
             config.parseOptions.nodeFactory.setMmlFactory(config.jax.mmlFactory);
-        }]
+        }],
+    options: {
+        textmacros: {
+            packages: ['text-base']
+        }
+    }
 });
 //# sourceMappingURL=TextMacrosConfiguration.js.map
-},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../ParseOptions.js":"../node_modules/mathjax-full/js/input/tex/ParseOptions.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js","../base/BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","./TextParser.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextParser.js","./TextMacrosMethods.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosMethods.js","./TextMacrosMappings.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosMappings.js"}],"../node_modules/mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js":[function(require,module,exports) {
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../ParseOptions.js":"../node_modules/mathjax-full/js/input/tex/ParseOptions.js","../Tags.js":"../node_modules/mathjax-full/js/input/tex/Tags.js","../base/BaseItems.js":"../node_modules/mathjax-full/js/input/tex/base/BaseItems.js","./TextParser.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextParser.js","./TextMacrosMethods.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosMethods.js","./TextMacrosMappings.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosMappings.js"}],"../node_modules/mathjax-full/js/input/tex/upgreek/UpgreekConfiguration.js":[function(require,module,exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UpgreekConfiguration = void 0;
+var Configuration_js_1 = require("../Configuration.js");
+var SymbolMap_js_1 = require("../SymbolMap.js");
+var TexConstants_js_1 = require("../TexConstants.js");
+function mathchar0miNormal(parser, mchar) {
+    var def = mchar.attributes || {};
+    def.mathvariant = TexConstants_js_1.TexConstant.Variant.NORMAL;
+    var node = parser.create('token', 'mi', def, mchar.char);
+    parser.Push(node);
+}
+new SymbolMap_js_1.CharacterMap('upgreek', mathchar0miNormal, {
+    upalpha: '\u03B1',
+    upbeta: '\u03B2',
+    upgamma: '\u03B3',
+    updelta: '\u03B4',
+    upepsilon: '\u03F5',
+    upzeta: '\u03B6',
+    upeta: '\u03B7',
+    uptheta: '\u03B8',
+    upiota: '\u03B9',
+    upkappa: '\u03BA',
+    uplambda: '\u03BB',
+    upmu: '\u03BC',
+    upnu: '\u03BD',
+    upxi: '\u03BE',
+    upomicron: '\u03BF',
+    uppi: '\u03C0',
+    uprho: '\u03C1',
+    upsigma: '\u03C3',
+    uptau: '\u03C4',
+    upupsilon: '\u03C5',
+    upphi: '\u03D5',
+    upchi: '\u03C7',
+    uppsi: '\u03C8',
+    upomega: '\u03C9',
+    upvarepsilon: '\u03B5',
+    upvartheta: '\u03D1',
+    upvarpi: '\u03D6',
+    upvarrho: '\u03F1',
+    upvarsigma: '\u03C2',
+    upvarphi: '\u03C6',
+    Upgamma: '\u0393',
+    Updelta: '\u0394',
+    Uptheta: '\u0398',
+    Uplambda: '\u039B',
+    Upxi: '\u039E',
+    Uppi: '\u03A0',
+    Upsigma: '\u03A3',
+    Upupsilon: '\u03A5',
+    Upphi: '\u03A6',
+    Uppsi: '\u03A8',
+    Upomega: '\u03A9'
+});
+exports.UpgreekConfiguration = Configuration_js_1.Configuration.create('upgreek', {
+    handler: { macro: ['upgreek'] },
+});
+//# sourceMappingURL=UpgreekConfiguration.js.map
+},{"../Configuration.js":"../node_modules/mathjax-full/js/input/tex/Configuration.js","../SymbolMap.js":"../node_modules/mathjax-full/js/input/tex/SymbolMap.js","../TexConstants.js":"../node_modules/mathjax-full/js/input/tex/TexConstants.js"}],"../node_modules/mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js":[function(require,module,exports) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UnicodeConfiguration = exports.UnicodeMethods = void 0;
@@ -38271,23 +40903,32 @@ require("./boldsymbol/BoldsymbolConfiguration.js");
 require("./braket/BraketConfiguration.js");
 require("./bussproofs/BussproofsConfiguration.js");
 require("./cancel/CancelConfiguration.js");
+require("./cases/CasesConfiguration.js");
+require("./centernot/CenternotConfiguration.js");
 require("./color/ColorConfiguration.js");
 require("./colorv2/ColorV2Configuration.js");
+require("./colortbl/ColortblConfiguration.js");
 require("./configmacros/ConfigMacrosConfiguration.js");
+require("./empheq/EmpheqConfiguration.js");
 require("./enclose/EncloseConfiguration.js");
 require("./extpfeil/ExtpfeilConfiguration.js");
+require("./gensymb/GensymbConfiguration.js");
 require("./html/HtmlConfiguration.js");
+require("./mathtools/MathtoolsConfiguration.js");
 require("./mhchem/MhchemConfiguration.js");
 require("./newcommand/NewcommandConfiguration.js");
 require("./noerrors/NoErrorsConfiguration.js");
 require("./noundefined/NoUndefinedConfiguration.js");
 require("./physics/PhysicsConfiguration.js");
+require("./setoptions/SetOptionsConfiguration.js");
 require("./tagformat/TagFormatConfiguration.js");
+require("./textcomp/TextcompConfiguration.js");
 require("./textmacros/TextMacrosConfiguration.js");
+require("./upgreek/UpgreekConfiguration.js");
 require("./unicode/UnicodeConfiguration.js");
 require("./verb/VerbConfiguration.js");
 if (typeof MathJax !== 'undefined' && MathJax.loader) {
-    MathJax.loader.preLoad('[tex]/action', '[tex]/ams', '[tex]/amscd', '[tex]/bbox', '[tex]/boldsymbol', '[tex]/braket', '[tex]/bussproofs', '[tex]/cancel', '[tex]/color', '[tex]/colorv2', '[tex]/enclose', '[tex]/extpfeil', '[tex]/html', '[tex]/mhchem', '[tex]/newcommand', '[tex]/noerrors', '[tex]/noundefined', '[tex]/physics', '[tex]/unicode', '[tex]/verb', '[tex]/configmacros', '[tex]/tagformat', '[tex]/textmacros');
+    MathJax.loader.preLoad('[tex]/action', '[tex]/ams', '[tex]/amscd', '[tex]/bbox', '[tex]/boldsymbol', '[tex]/braket', '[tex]/bussproofs', '[tex]/cancel', '[tex]/cases', '[tex]/centernot', '[tex]/color', '[tex]/colorv2', '[tex]/colortbl', '[tex]/empheq', '[tex]/enclose', '[tex]/extpfeil', '[tex]/gensymb', '[tex]/html', '[tex]/mathtools', '[tex]/mhchem', '[tex]/newcommand', '[tex]/noerrors', '[tex]/noundefined', '[tex]/physics', '[tex]/upgreek', '[tex]/unicode', '[tex]/verb', '[tex]/configmacros', '[tex]/tagformat', '[tex]/textcomp', '[tex]/textmacros', '[tex]/setoptions');
 }
 exports.AllPackages = [
     'base',
@@ -38299,22 +40940,30 @@ exports.AllPackages = [
     'braket',
     'bussproofs',
     'cancel',
+    'cases',
+    'centernot',
     'color',
+    'colortbl',
+    'empheq',
     'enclose',
     'extpfeil',
+    'gensymb',
     'html',
+    'mathtools',
     'mhchem',
     'newcommand',
     'noerrors',
     'noundefined',
+    'upgreek',
     'unicode',
     'verb',
     'configmacros',
     'tagformat',
+    'textcomp',
     'textmacros'
 ];
 //# sourceMappingURL=AllPackages.js.map
-},{"./base/BaseConfiguration.js":"../node_modules/mathjax-full/js/input/tex/base/BaseConfiguration.js","./action/ActionConfiguration.js":"../node_modules/mathjax-full/js/input/tex/action/ActionConfiguration.js","./ams/AmsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsConfiguration.js","./amscd/AmsCdConfiguration.js":"../node_modules/mathjax-full/js/input/tex/amscd/AmsCdConfiguration.js","./bbox/BboxConfiguration.js":"../node_modules/mathjax-full/js/input/tex/bbox/BboxConfiguration.js","./boldsymbol/BoldsymbolConfiguration.js":"../node_modules/mathjax-full/js/input/tex/boldsymbol/BoldsymbolConfiguration.js","./braket/BraketConfiguration.js":"../node_modules/mathjax-full/js/input/tex/braket/BraketConfiguration.js","./bussproofs/BussproofsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/bussproofs/BussproofsConfiguration.js","./cancel/CancelConfiguration.js":"../node_modules/mathjax-full/js/input/tex/cancel/CancelConfiguration.js","./color/ColorConfiguration.js":"../node_modules/mathjax-full/js/input/tex/color/ColorConfiguration.js","./colorv2/ColorV2Configuration.js":"../node_modules/mathjax-full/js/input/tex/colorv2/ColorV2Configuration.js","./configmacros/ConfigMacrosConfiguration.js":"../node_modules/mathjax-full/js/input/tex/configmacros/ConfigMacrosConfiguration.js","./enclose/EncloseConfiguration.js":"../node_modules/mathjax-full/js/input/tex/enclose/EncloseConfiguration.js","./extpfeil/ExtpfeilConfiguration.js":"../node_modules/mathjax-full/js/input/tex/extpfeil/ExtpfeilConfiguration.js","./html/HtmlConfiguration.js":"../node_modules/mathjax-full/js/input/tex/html/HtmlConfiguration.js","./mhchem/MhchemConfiguration.js":"../node_modules/mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js","./newcommand/NewcommandConfiguration.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js","./noerrors/NoErrorsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/noerrors/NoErrorsConfiguration.js","./noundefined/NoUndefinedConfiguration.js":"../node_modules/mathjax-full/js/input/tex/noundefined/NoUndefinedConfiguration.js","./physics/PhysicsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/physics/PhysicsConfiguration.js","./tagformat/TagFormatConfiguration.js":"../node_modules/mathjax-full/js/input/tex/tagformat/TagFormatConfiguration.js","./textmacros/TextMacrosConfiguration.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosConfiguration.js","./unicode/UnicodeConfiguration.js":"../node_modules/mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js","./verb/VerbConfiguration.js":"../node_modules/mathjax-full/js/input/tex/verb/VerbConfiguration.js"}],"../node_modules/tex-to-svg/TeXToSVG.js":[function(require,module,exports) {
+},{"./base/BaseConfiguration.js":"../node_modules/mathjax-full/js/input/tex/base/BaseConfiguration.js","./action/ActionConfiguration.js":"../node_modules/mathjax-full/js/input/tex/action/ActionConfiguration.js","./ams/AmsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/ams/AmsConfiguration.js","./amscd/AmsCdConfiguration.js":"../node_modules/mathjax-full/js/input/tex/amscd/AmsCdConfiguration.js","./bbox/BboxConfiguration.js":"../node_modules/mathjax-full/js/input/tex/bbox/BboxConfiguration.js","./boldsymbol/BoldsymbolConfiguration.js":"../node_modules/mathjax-full/js/input/tex/boldsymbol/BoldsymbolConfiguration.js","./braket/BraketConfiguration.js":"../node_modules/mathjax-full/js/input/tex/braket/BraketConfiguration.js","./bussproofs/BussproofsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/bussproofs/BussproofsConfiguration.js","./cancel/CancelConfiguration.js":"../node_modules/mathjax-full/js/input/tex/cancel/CancelConfiguration.js","./cases/CasesConfiguration.js":"../node_modules/mathjax-full/js/input/tex/cases/CasesConfiguration.js","./centernot/CenternotConfiguration.js":"../node_modules/mathjax-full/js/input/tex/centernot/CenternotConfiguration.js","./color/ColorConfiguration.js":"../node_modules/mathjax-full/js/input/tex/color/ColorConfiguration.js","./colorv2/ColorV2Configuration.js":"../node_modules/mathjax-full/js/input/tex/colorv2/ColorV2Configuration.js","./colortbl/ColortblConfiguration.js":"../node_modules/mathjax-full/js/input/tex/colortbl/ColortblConfiguration.js","./configmacros/ConfigMacrosConfiguration.js":"../node_modules/mathjax-full/js/input/tex/configmacros/ConfigMacrosConfiguration.js","./empheq/EmpheqConfiguration.js":"../node_modules/mathjax-full/js/input/tex/empheq/EmpheqConfiguration.js","./enclose/EncloseConfiguration.js":"../node_modules/mathjax-full/js/input/tex/enclose/EncloseConfiguration.js","./extpfeil/ExtpfeilConfiguration.js":"../node_modules/mathjax-full/js/input/tex/extpfeil/ExtpfeilConfiguration.js","./gensymb/GensymbConfiguration.js":"../node_modules/mathjax-full/js/input/tex/gensymb/GensymbConfiguration.js","./html/HtmlConfiguration.js":"../node_modules/mathjax-full/js/input/tex/html/HtmlConfiguration.js","./mathtools/MathtoolsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/mathtools/MathtoolsConfiguration.js","./mhchem/MhchemConfiguration.js":"../node_modules/mathjax-full/js/input/tex/mhchem/MhchemConfiguration.js","./newcommand/NewcommandConfiguration.js":"../node_modules/mathjax-full/js/input/tex/newcommand/NewcommandConfiguration.js","./noerrors/NoErrorsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/noerrors/NoErrorsConfiguration.js","./noundefined/NoUndefinedConfiguration.js":"../node_modules/mathjax-full/js/input/tex/noundefined/NoUndefinedConfiguration.js","./physics/PhysicsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/physics/PhysicsConfiguration.js","./setoptions/SetOptionsConfiguration.js":"../node_modules/mathjax-full/js/input/tex/setoptions/SetOptionsConfiguration.js","./tagformat/TagFormatConfiguration.js":"../node_modules/mathjax-full/js/input/tex/tagformat/TagFormatConfiguration.js","./textcomp/TextcompConfiguration.js":"../node_modules/mathjax-full/js/input/tex/textcomp/TextcompConfiguration.js","./textmacros/TextMacrosConfiguration.js":"../node_modules/mathjax-full/js/input/tex/textmacros/TextMacrosConfiguration.js","./upgreek/UpgreekConfiguration.js":"../node_modules/mathjax-full/js/input/tex/upgreek/UpgreekConfiguration.js","./unicode/UnicodeConfiguration.js":"../node_modules/mathjax-full/js/input/tex/unicode/UnicodeConfiguration.js","./verb/VerbConfiguration.js":"../node_modules/mathjax-full/js/input/tex/verb/VerbConfiguration.js"}],"../node_modules/tex-to-svg/TeXToSVG.js":[function(require,module,exports) {
 const { mathjax } = require('mathjax-full/js/mathjax.js');
 const { TeX } = require('mathjax-full/js/input/tex.js');
 const { SVG } = require('mathjax-full/js/output/svg.js');
@@ -40994,13 +43643,13 @@ function (_super) {
 
   TeX.prototype.stroke = function (strokeColor) {
     if (strokeColor === void 0) {
-      strokeColor = color('black');
+      strokeColor = 'black';
     }
 
     if (arguments.length === 0) {
       return this.strokeColor;
     } else {
-      this.strokeColor = color(strokeColor);
+      this.strokeColor = strokeColor;
     }
   };
 
@@ -41018,13 +43667,13 @@ function (_super) {
 
   TeX.prototype.fill = function (fillColor) {
     if (fillColor === void 0) {
-      fillColor = color('black');
+      fillColor = 'black';
     }
 
     if (arguments.length === 0) {
       return this.fillColor;
     } else {
-      this.fillColor = color(fillColor);
+      this.fillColor = fillColor;
     }
   };
 
@@ -41048,10 +43697,10 @@ function (_super) {
     var g = this.writeElement.elt.querySelectorAll('g'); //svg[0].setAttribute('width', `${object.svgWidth}px`);
     //svg[0].setAttribute('height', `${object.svgHeight}px`);
 
-    g[0].setAttribute('stroke', this.strokeColor.toString());
+    g[0].setAttribute('stroke', this.strokeColor);
     g[0].setAttribute('stroke-width', this._strokeWidth);
-    g[0].setAttribute('fill', this.fillColor.toString());
-    svg[0].setAttribute('fill', this.fillColor.toString());
+    g[0].setAttribute('fill', this.fillColor);
+    svg[0].setAttribute('fill', this.fillColor);
   };
 
   TeX.prototype.play = function (animationType, startTime, endTime) {
@@ -41745,7 +44394,8 @@ function (_super) {
       tickY: 'true',
       tickColor: ULTRAMARINE40,
       tickMarginX: -0.5,
-      tickMarginY: -0.5
+      tickMarginY: -0.5,
+      pathElements: 1000
     };
     _this.eqn = eqn; // this.x = x;
     // this.y = y;
@@ -41823,7 +44473,8 @@ function (_super) {
       tickY: config.tickY ? config.tickY : this.config.tickY,
       tickColor: config.tickColor ? config.tickColor : this.config.tickColor,
       tickMarginX: config.tickMarginX ? config.tickMarginX : this.config.tickMarginX,
-      tickMarginY: config.tickMarginY ? config.tickMarginY : this.config.tickMarginY
+      tickMarginY: config.tickMarginY ? config.tickMarginY : this.config.tickMarginY,
+      pathElements: config.pathElements ? config.pathElements : this.config.pathElements
     }; //console.log(this.config);
   };
   /**
@@ -41901,6 +44552,7 @@ function (_super) {
     this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     this.plotting.setAttribute('id', 'plot');
     this.linePath.setAttribute('stroke', "" + this.config.graphColor);
+    this.linePath.setAttribute('stroke-width', "" + this.config.graphStrokeWidth);
     this.linePath.setAttribute('d', this.pathData);
     this.plotting.appendChild(this.linePath); // <g id="plot">
 
@@ -42081,17 +44733,17 @@ exports.Graph2D = Graph2D;
  */
 
 function createSVGPath(eqn, config) {
-  var pathElements = 1000; // const scaleX = 9;
+  //const pathElements = 1000;
+  // const scaleX = 9;
   // const scaleY = 0.5;
   // scaleX = width/(maxX - minX);
+  var stepSize = (config.maxX - config.minX) / config.pathElements; //minX = 0;
 
-  var stepSize = (config.maxX - config.minX) / pathElements; //minX = 0;
-
-  var SVG_path = "M" + (config.scaleX * config.minX + config.originX * config.scaleX) + "," + (config.scaleY * -eqn(config.minX + config.originX * config.scaleX) - config.originY * config.scaleY);
+  var SVG_path = "M" + config.stepX * (config.scaleX * config.minX + config.originX * config.scaleX) + "," + config.stepY * (config.scaleY * -eqn(config.minX + config.originX * config.scaleX) - config.originY * config.scaleY);
 
   for (var x = config.minX; x < config.maxX; x += stepSize) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-    SVG_path = SVG_path.concat(" L" + (config.scaleX * x + config.originX * config.scaleX) + ", " + (config.scaleY * -eqn(x) - config.originY * config.scaleY));
+    SVG_path = SVG_path.concat(" L" + config.stepX * (config.scaleX * x + config.originX * config.scaleX) + ", " + config.stepY * (config.scaleY * -eqn(x) - config.originY * config.scaleY));
   }
 
   return SVG_path;
@@ -42174,9 +44826,19 @@ exports.create2DParametricGraph = exports.createParametricSVGPath = exports.Grap
 
 var animejs_1 = __importDefault(require("animejs"));
 
+var controls_1 = require("../Scene/controls");
+
+var scene_1 = require("../Scene/scene");
+
 var transform_1 = require("../Scene/transform");
 
 var GObject_1 = require("./GObject");
+
+var ULTRAMARINE40 = '#648fff';
+var MAGENTA50 = '#dc267f';
+var GOLD20 = '#ffb000';
+var INDIGO50 = '#785ef0';
+var ORANGE40 = '#fe6100';
 
 var GraphParametric2D =
 /** @class */
@@ -42214,24 +44876,67 @@ function (_super) {
 
     var _this = _super.call(this, x, y, svgWidth, svgHeight) || this;
 
+    _this.config = {
+      graphColor: GOLD20,
+      graphStrokeWidth: 1,
+      arrowSize: 3,
+      xAxis: 'true',
+      yAxis: 'true',
+      minX: -5,
+      maxX: 5,
+      minY: -5,
+      maxY: 5,
+      scaleX: 1,
+      scaleY: 1,
+      axisColor: INDIGO50,
+      smallGridColor: MAGENTA50,
+      gridColor: ORANGE40,
+      stepX: 1,
+      stepY: 1,
+      originX: 0,
+      originY: 0,
+      tickX: 'true',
+      tickY: 'true',
+      tickColor: ULTRAMARINE40,
+      tickMarginX: -0.5,
+      tickMarginY: -0.5,
+      arrowFollowerColor: MAGENTA50
+    };
     _this.xeqn = xeqn;
     _this.yeqn = yeqn;
-    _this.parameterRange = parameterRange; // this.x = x;
+    _this.parameterRange = parameterRange;
+    _this.config.scaleX = abs(_this.svgWidth / (_this.config.maxX - _this.config.minX));
+    _this.config.scaleY = abs(_this.svgHeight / (_this.config.maxY - _this.config.minY)); // this.x = x;
     // this.y = y;
     // this.svgWidth = svgWidth;
     // this.svgHeight = svgHeight;
+    //this.pathData = createParametricSVGPath(this.xeqn, this.yeqn, this.parameterRange, this.config);
 
-    _this.pathData = createParametricSVGPath(xeqn, yeqn, parameterRange);
     _this.graphContainer = createElement('div');
+
+    _this.graphContainer.parent(scene_1.sceneContainer);
+
     _this.linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
     _this.linePath.setAttribute('fill', 'none');
 
     _this.linePath.setAttribute('stroke', 'black');
 
-    _this.linePath.setAttribute('stroke-width', '40');
+    _this.linePath.setAttribute('stroke-width', "" + _this.config.graphStrokeWidth);
 
     _this.graphContainer.position(_this.x, _this.y);
+
+    _this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+    _this.graphObject.setAttribute('width', "" + _this.svgWidth);
+
+    _this.graphObject.setAttribute('height', "" + _this.svgHeight);
+
+    _this.graphObject.setAttribute('viewBox', -_this.svgWidth / 2 + " " + -_this.svgHeight / 2 + " " + _this.svgWidth + " " + _this.svgHeight);
+
+    _this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+    _this.graphContainer.elt.appendChild(_this.graphObject);
 
     return _this;
   }
@@ -42246,17 +44951,45 @@ function (_super) {
     this.graphContainer.position(this.x, this.y);
   };
 
-  GraphParametric2D.prototype.size = function (svgWidth, svgHeight) {
-    if (svgWidth === void 0) {
-      svgWidth = 300;
-    }
+  GraphParametric2D.prototype.configure = function (config) {
+    this.config = {
+      graphColor: config.graphColor ? config.graphColor : this.config.graphColor,
+      graphStrokeWidth: config.graphStrokeWidth ? config.graphStrokeWidth : this.config.graphStrokeWidth,
+      arrowSize: config.arrowSize ? config.arrowSize : this.config.arrowSize,
+      xAxis: config.xAxis ? config.xAxis : this.config.xAxis,
+      yAxis: config.yAxis ? config.yAxis : this.config.yAxis,
+      minX: config.minX ? config.minX : this.config.minX,
+      maxX: config.maxX ? config.maxX : this.config.maxX,
+      minY: config.minY ? config.minY : this.config.minY,
+      maxY: config.maxY ? config.maxY : this.config.maxY,
+      scaleX: config.scaleX ? config.scaleX : this.config.scaleX,
+      scaleY: config.scaleY ? config.scaleY : this.config.scaleY,
+      axisColor: config.axisColor ? config.axisColor : this.config.axisColor,
+      smallGridColor: config.smallGridColor ? config.smallGridColor : this.config.smallGridColor,
+      gridColor: config.gridColor ? config.gridColor : this.config.gridColor,
+      stepX: config.stepX ? config.stepX : this.config.stepX,
+      stepY: config.stepY ? config.stepY : this.config.stepY,
+      originX: config.originX ? config.originX : this.config.originX,
+      originY: config.originY ? config.originY : this.config.originY,
+      tickX: config.tickX ? config.tickX : this.config.tickX,
+      tickY: config.tickY ? config.tickY : this.config.tickY,
+      tickColor: config.tickColor ? config.tickColor : this.config.tickColor,
+      tickMarginX: config.tickMarginX ? config.tickMarginX : this.config.tickMarginX,
+      tickMarginY: config.tickMarginY ? config.tickMarginY : this.config.tickMarginY,
+      arrowFollowerColor: config.arrowFollowerColor ? config.arrowFollowerColor : this.config.arrowFollowerColor
+    }; //console.log(this.config);
+  };
 
-    if (svgHeight === void 0) {
-      svgHeight = 300;
+  GraphParametric2D.prototype.size = function (width, height) {
+    if (arguments.length === 0) {
+      return [this.svgWidth, this.svgHeight];
+    } else {
+      this.svgWidth = width;
+      this.svgHeight = height;
+      this.graphObject.setAttribute('width', "" + this.svgWidth);
+      this.graphObject.setAttribute('height', "" + this.svgHeight);
+      this.graphObject.setAttribute('viewBox', -this.svgWidth / 2 + " " + -this.svgHeight / 2 + " " + this.svgWidth + " " + this.svgHeight);
     }
-
-    this.svgWidth = svgWidth;
-    this.svgHeight = svgHeight;
   };
 
   GraphParametric2D.prototype.stroke = function (_stroke) {
@@ -42264,15 +44997,18 @@ function (_super) {
   };
 
   GraphParametric2D.prototype.plot = function () {
-    this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); //this.graphObject.setAttribute('style', `translate(-50%, -50%)`);
+    this.pathData = createParametricSVGPath(this.xeqn, this.yeqn, this.parameterRange, this.config); // this.graphObject = document.createElementNS(
+    //   'http://www.w3.org/2000/svg',
+    //   'svg'
+    // );
 
-    this.graphObject.setAttribute('width', "" + this.svgWidth);
-    this.graphObject.setAttribute('height', "" + this.svgHeight);
-    this.graphObject.setAttribute('viewBox', '-8500 -2000 18000 4000');
-    this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    this.plotting.setAttribute('id', 'plot');
+    this.linePath.setAttribute('stroke', "" + this.config.graphColor);
     this.linePath.setAttribute('d', this.pathData);
-    this.graphObject.appendChild(this.linePath);
-    this.graphContainer.elt.appendChild(this.graphObject);
+    this.plotting.appendChild(this.linePath); // <g id="plot">
+
+    this.graphObject.appendChild(this.plotting); // attaching to graphContainer
   };
 
   GraphParametric2D.prototype.remove = function () {
@@ -42280,7 +45016,7 @@ function (_super) {
   };
 
   GraphParametric2D.prototype.update = function (xeqn, yeqn) {
-    this.pathData = createParametricSVGPath(xeqn, yeqn);
+    this.pathData = createParametricSVGPath(this.xeqn, this.yeqn, this.parameterRange, this.config);
     this.linePath.setAttribute('d', this.pathData);
   };
 
@@ -42296,21 +45032,164 @@ function (_super) {
     transform_1.transform(this, object_finl, startTime, endTime);
   };
 
-  GraphParametric2D.prototype.play = function () {
-    var pathElement = this.graphContainer.elt.querySelectorAll('path');
-    var lineDrawing = animejs_1.default({
-      targets: this.graphContainer.elt.querySelectorAll('path'),
+  GraphParametric2D.prototype.axis = function () {
+    // coordinate system
+    if (this.coordinate) {
+      this.coordinate.remove();
+    }
+
+    this.coordinate = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    this.coordinate.setAttribute('id', 'coordinateSystem');
+    var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML += "<marker refX=\"" + 2 * this.config.arrowSize + "\" refY=\"" + this.config.arrowSize + "\" markerWidth=\"" + 2 * this.config.arrowSize + "\" markerHeight=\"" + 2 * this.config.arrowSize + "\" id=\"marker-arrow\" class=\"marker\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L " + 2 * this.config.arrowSize + " " + this.config.arrowSize + " L 0 " + 2 * this.config.arrowSize + " z\" style=\"fill: " + this.config.axisColor + "\"></path></marker>";
+    this.coordinate.appendChild(defs); // this.graphObject.appendChild(arrowPath);
+    // let frame = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    // frame.setAttribute('x', `${-this.svgWidth / 2}`);
+    // frame.setAttribute('y', `${-this.svgHeight / 2}`);
+    // frame.setAttribute('width', `${this.svgWidth}`);
+    // frame.setAttribute('height', `${this.svgHeight}`);
+    // frame.setAttribute('fill', `rgba(0,0,0,0)`);
+    // frame.setAttribute('stroke', `white`);
+    //grid
+
+    defs.innerHTML += "<pattern id=\"smallGrid\" width=\"" + this.config.stepX * this.config.scaleX + "\" height=\"" + this.config.stepY * this.config.scaleY + "\" patternUnits=\"userSpaceOnUse\">\n     <path d=\"M " + this.config.stepX * this.config.scaleX + " 0 L 0 0 0 " + this.config.stepY * this.config.scaleY + "\" fill=\"none\" stroke=\"" + this.config.smallGridColor + "\" stroke-width=\"0.5\"/>\n    </pattern>\n    <pattern x = " + this.config.originX * this.config.scaleX + " y = " + this.config.originY * this.config.scaleY + " id=\"grid\" width=\"" + 4 * this.config.stepX * this.config.scaleX + "\" height=\"" + 4 * this.config.stepY * this.config.scaleY + "\" patternUnits=\"userSpaceOnUse\">\n     <rect width=\"" + 4 * this.config.stepX * this.config.scaleX + "\" height=\"" + 4 * this.config.stepY * this.config.scaleY + "\" fill=\"url(#smallGrid)\"/>\n     <path d=\"M " + 4 * this.config.stepX * this.config.scaleX + " 0 L 0 0 0 " + 4 * this.config.stepY * this.config.scaleY + "\" fill=\"none\" stroke=\"" + this.config.gridColor + "\" stroke-width=\"1\"/>\n    </pattern>";
+    var grid = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    grid.setAttribute('x', "" + -this.svgWidth / 2);
+    grid.setAttribute('y', "" + -this.svgHeight / 2);
+    grid.setAttribute('width', "100%");
+    grid.setAttribute('height', "100%");
+    grid.setAttribute('fill', "url(#grid)");
+    grid.setAttribute('stroke', "white"); //this.coordinate.appendChild(frame);
+
+    this.coordinate.appendChild(grid); //axes
+    //console.log(this.config.axisX);
+    // console.log(this.config.tickX);
+
+    if (this.config.xAxis === 'true') {
+      var xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      xAxis.setAttribute('x1', "" + -this.svgWidth / 2);
+      xAxis.setAttribute('y1', "" + -this.config.originY * this.config.scaleY);
+      xAxis.setAttribute('x2', "" + this.svgWidth / 2);
+      xAxis.setAttribute('y2', "" + -this.config.originY * this.config.scaleY);
+      xAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      xAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      xAxis.setAttribute('stroke', "" + this.config.axisColor);
+      xAxis.setAttribute('fill', "none");
+      this.coordinate.appendChild(xAxis);
+
+      if (this.config.tickX === 'true') {
+        var tick = void 0; //x axis
+        //+ve axis
+
+        for (var i = 0; i < abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) / this.config.stepX; i++) {
+          var x = this.config.originX * this.config.scaleX + (i + 1) * this.config.stepX * this.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + x);
+          tick.setAttribute('y', "" + (-this.config.originY * this.config.scaleY - this.config.tickMarginX * this.config.scaleY));
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + this.config.tickColor;
+          this.coordinate.appendChild(tick);
+        } //console.log(int(this.svgWidth / (2*this.config.scaleX)) + this.config.originX);
+        //-ve axis
+
+
+        for (var i = abs(int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX); i >= 0; i--) {
+          var x = this.config.originX * this.config.scaleX - (i + 1) * this.config.stepX * this.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + x);
+          tick.setAttribute('y', "" + (-this.config.originY * this.config.scaleY - this.config.tickMarginX * this.config.scaleY));
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + this.config.tickColor;
+          this.coordinate.appendChild(tick);
+        }
+      }
+    }
+
+    if (this.config.yAxis === 'true') {
+      var yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      yAxis.setAttribute('x1', "" + this.config.originX * this.config.scaleX);
+      yAxis.setAttribute('y1', "" + -this.svgHeight / 2);
+      yAxis.setAttribute('x2', "" + this.config.originX * this.config.scaleX);
+      yAxis.setAttribute('y2', "" + this.svgHeight / 2);
+      yAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      yAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      yAxis.setAttribute('stroke', "" + this.config.axisColor);
+      yAxis.setAttribute('fill', "none");
+      this.coordinate.appendChild(yAxis);
+
+      if (this.config.tickY === 'true') {
+        var tick = void 0; //y axis
+        //+ve axis
+
+        for (var i = 0; i <= abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY); i++) {
+          var y = -this.config.originY * this.config.scaleY - (i + 1) * this.config.stepY * this.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + (this.config.originX * this.config.scaleX + this.config.tickMarginY * this.config.scaleX));
+          tick.setAttribute('y', "" + y);
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + this.config.tickColor;
+          this.coordinate.appendChild(tick);
+        } //-ve axis
+
+
+        for (var i = abs(-int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY); i >= 0; i--) {
+          var y = -this.config.originY * this.config.scaleY + (i + 1) * this.config.stepY * this.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + (this.config.originX * this.config.scaleX + this.config.tickMarginY * this.config.scaleX));
+          tick.setAttribute('y', "" + y);
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + this.config.tickColor;
+          this.coordinate.appendChild(tick);
+        }
+      }
+    } //xAxis.setAttribute('stroke', color);
+    //xAxis.setAttribute('stroke-width', w);
+    //ticks
+    //this.plotting.appendChild(this.linePath);
+
+
+    this.graphObject.appendChild(this.coordinate); // <g id="coordinateSystem">
+  };
+
+  GraphParametric2D.prototype.play = function (timeDuration, delayDuration, element) {
+    if (delayDuration === void 0) {
+      delayDuration = 0;
+    }
+
+    if (element === void 0) {
+      element = 'coordinateSystem';
+    }
+
+    var elementToAnimate = this.graphContainer.elt.querySelectorAll("" + element);
+    var pathElement = [];
+    var it = elementToAnimate; //console.log(it);
+
+    it.forEach(function (currentElement) {
+      //console.log(currentElement);
+      pathElement.push(currentElement.querySelectorAll('path, line, rect, circle, marker'));
+    }); //console.log(pathElement);
+
+    controls_1.animationTimeline.add({
+      targets: pathElement,
       strokeDashoffset: [animejs_1.default.setDashoffset, 0],
-      easing: 'easeOutSine',
-      duration: 50000,
-      begin: function begin(anim) {
-        //pathElement[0].setAttribute('stroke', 'black');
-        pathElement[0].setAttribute('fill', 'none');
-      },
-      complete: function complete(anim) {//document.querySelector('path').setAttribute("fill", "yellow");
-      },
+      opacity: [0, 1],
+      // fill : ['currentColor'],
+      easing: 'easeInOutCubic',
+      duration: timeDuration,
       autoplay: true
-    });
+    }, delayDuration);
   }; //TODO : arrow follower
 
 
@@ -42354,25 +45233,21 @@ function (_super) {
 
 exports.GraphParametric2D = GraphParametric2D;
 
-function createParametricSVGPath(xeqn, yeqn, parameterRange, stepSize) {
+function createParametricSVGPath(xeqn, yeqn, parameterRange, config) {
   if (parameterRange === void 0) {
     parameterRange = [0, 2 * Math.PI];
   }
 
-  if (stepSize === void 0) {
-    stepSize = 0.001;
-  }
-
   var pathElements = 1000;
-  stepSize = (parameterRange[1] - parameterRange[0]) / pathElements;
-  var minX = parameterRange[0];
-  var scaleX = 100;
-  var scaleY = 100;
-  var SVG_path = "M" + scaleX * xeqn(minX) + "," + scaleY * yeqn(minX);
+  var stepSize = (parameterRange[1] - parameterRange[0]) / pathElements; //let minX = parameterRange[0];
+  // let scaleX = 100;
+  // let scaleY = 100;
 
-  for (var parameter = parameterRange[0]; parameter < parameterRange[1]; parameter += stepSize) {
+  var SVG_path = "M" + (config.scaleX * xeqn(parameterRange[0]) + config.originX * config.scaleX) + "," + (-config.scaleY * yeqn(parameterRange[0]) - config.originY * config.scaleY);
+
+  for (var parameter = parameterRange[0]; parameter <= parameterRange[1]; parameter += stepSize) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-    SVG_path = SVG_path.concat(" L" + scaleX * xeqn(parameter) + "," + scaleY * yeqn(parameter));
+    SVG_path = SVG_path.concat(" L" + (config.scaleX * xeqn(parameter) + config.originX * config.scaleX) + "," + (-config.scaleY * yeqn(parameter) - config.originY * config.scaleY));
   }
 
   return SVG_path;
@@ -42401,13 +45276,11 @@ function create2DParametricGraph(xeqn, yeqn, parameterRange, x, y, svgWidth, svg
     svgHeight = 300;
   }
 
-  var _object = new GraphParametric2D(xeqn, yeqn, parameterRange, x, y, svgWidth, svgHeight);
-
-  return _object;
+  return new GraphParametric2D(xeqn, yeqn, parameterRange, x, y, svgWidth, svgHeight);
 }
 
 exports.create2DParametricGraph = create2DParametricGraph;
-},{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/transform":"lib/Scene/transform.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
+},{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -42982,7 +45855,7 @@ function transform(objectInit, objectFinl, startTime, endTime) {
   } else if (objectInit.writeTextElement && objectFinl.writeTextElement) {} else if (objectInit.graphObject && objectFinl.graphContainer) {
     if (objectFinl.thetaRange) {
       //console.log('polar');
-      var svgPath = polar_1.createPolarSVGPath(objectFinl.eqn, objectFinl.thetaRange);
+      var svgPath = polar_1.createPolarSVGPath(objectFinl.eqn, objectFinl.thetaRange, objectFinl.config);
       controls_1.animationTimeline.add({
         targets: objectInit.graphContainer.elt.querySelectorAll('path'),
         d: [//{value: shapes[0].d},
@@ -42998,13 +45871,39 @@ function transform(objectInit, objectFinl, startTime, endTime) {
       }, delayDuration);
     } else if (objectFinl.parameterRange) {
       //console.log('parametric');
-      var svgPath = parametric_1.createParametricSVGPath(objectFinl.xeqn, objectFinl.yeqn, objectFinl.parameterRange);
+      var svgPath = parametric_1.createParametricSVGPath(objectFinl.xeqn, objectFinl.yeqn, objectFinl.parameterRange, objectFinl.config); //console.log(objectFinl.config);
+      // objectInit.configure(objectInit.config);
+      // // console.log(objectInit);
+      // objectInit.axis();
+
+      var plot = objectInit.graphContainer.elt.querySelectorAll("#plot"); //console.log(tar);
+
       controls_1.animationTimeline.add({
-        targets: objectInit.graphContainer.elt.querySelectorAll('path'),
+        targets: plot[0].querySelectorAll('path'),
         d: [//{value: shapes[0].d},
         {
           value: "" + svgPath
         }],
+        complete: function complete(anime) {
+          objectInit.configure(objectFinl.config);
+          objectInit.axis();
+        },
+        duration: timeDuration,
+        //direction: 'alternate',
+        autoplay: true,
+        easing: 'easeInOutCubic' //elasticity: 1
+        //loop: true
+
+      }, delayDuration).add({
+        targets: plot[0].querySelectorAll('path'),
+        d: [//{value: shapes[0].d},
+        {
+          value: "" + svgPath
+        }],
+        // begin: function (anime) {
+        //   // objectInit.configure(objectFinl.config);
+        //   // objectInit.axis();
+        // },
         duration: timeDuration,
         //direction: 'alternate',
         autoplay: true,
@@ -43018,7 +45917,7 @@ function transform(objectInit, objectFinl, startTime, endTime) {
         targets: objectInit.graphContainer.elt.querySelectorAll('path'),
         d: [//{value: shapes[0].d},
         {
-          value: "" + graph_1.createSVGPath(objectFinl.eqn)
+          value: "" + graph_1.createSVGPath(objectFinl.eqn, objectFinl.config)
         }],
         duration: timeDuration,
         //direction: 'alternate',
@@ -43120,7 +46019,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52767" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58001" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

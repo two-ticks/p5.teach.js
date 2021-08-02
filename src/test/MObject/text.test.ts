@@ -5,9 +5,7 @@ import { createText } from '../../lib/MObject/Text';
 global.color = require('color');
 global.createElement = jest.fn();
 
-
 it('createText should return a object of class Text', () => {
-
   expect(createText('text')).toEqual({
     x: 10,
     y: 10,

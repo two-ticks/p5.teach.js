@@ -241,6 +241,10 @@ export class GraphParametric2D extends GObject {
 
   axis() {
     // coordinate system
+
+    if (this.coordinate) {
+      this.coordinate.remove();
+    }
     this.coordinate = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'g'
