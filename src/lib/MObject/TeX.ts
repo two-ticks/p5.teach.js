@@ -12,8 +12,7 @@ import { MObject } from './MObject';
  * @param    {String} - escaped TeX input
  * @param    {number} - x
  * @param    {number} - y
- * @param    {number} - width
- * @param    {number} - height
+ * @param    {number} - font-size
  *
  * @example
  *
