@@ -1,71 +1,68 @@
+let freq = 10;
+let amp = 4;
+
 let ULTRAMARINE40 = '#648fff';
 let MAGENTA50 = '#dc267f';
 let GOLD20 = '#ffb000';
-
+let parentDiv;
 function setup() {
-  createCanvas(400, 400);
+  canvas = createCanvas(600, 600);
+  //canvas.style("z-index", 100)
   scene = new Scene();
-  background(ULTRAMARINE40);
-  drawTriangle();
-  drawTitle();
-  drawEquation();
+  background(20);
   drawGraph();
 }
 
-function drawTriangle() {
-  noFill();
-  stroke(MAGENTA50);
-  triangle(170, 205, 170, 150, 250, 205);
-  square(170, 195, 10);
-  let a = createTeX('a');
-  a.position(205, 215);
-  a.size(30);
-  a.stroke(MAGENTA50);
-  a.strokeWidth(20);
-  a.fill(MAGENTA50);
-  a.play('write', 0, 2);
-
-  let b = createTeX('b');
-  b.position(155, 175);
-  b.size(30);
-  b.stroke(MAGENTA50);
-  b.strokeWidth(20);
-  b.fill(MAGENTA50);
-  b.play('write', 0, 2);
-
-  let c = createTeX('c');
-  c.position(215, 150);
-  c.size(30);
-  c.stroke(MAGENTA50);
-  c.strokeWidth(20);
-  c.fill(MAGENTA50);
-  c.play('write', 0, 2);
-}
-
-function drawTitle() {
-  let title = createText("Pythagoras' Theorem");
-  title.position(50, 50);
-  title.fill(GOLD20);
-  title.size(35);
-  title.play('growFromCenter', 1, 2);
-}
-
-function drawEquation() {
-  let equation = createTeX('a^2 + b^2 = c^2');
-  equation.position(135, 315);
-  equation.size(40);
-  equation.stroke(MAGENTA50);
-  equation.strokeWidth(30);
-  equation.fill(MAGENTA50);
-  equation.play('createFill', 2, 12);
+let g = 0;
+function draw() {
+  // g += 0.2;
+  // sampler(g);
 }
 
 function drawGraph() {
-  grp = create2DGraph(
-    (t) =>
-      800 * Math.cos(2 * t) + 1000 * Math.sin(4 * t) + 800 * Math.sin(6 * t)
-  );
+  grp = create2DGraph((t) => amp * Math.cos(freq * t));
+  grp.size(490, 490);
+  config = {
+    stepX: 1.5,
+    stepY: 0.75,
+    minX: -5,
+    maxX: 5,
+
+    graphColor: GOLD20,
+    graphStrokeWidth: 1,
+    tickX: 'false',
+    tickY: 'false',
+    tickColor: 'yellow',
+    smallGridColor: ULTRAMARINE40,
+    gridColor: MAGENTA50,
+    originX: 0,
+    originY: 0
+    //pathElements: 3000
+  };
+  grp.configure(config);
+  grp.axis();
   grp.plot();
-  grp.position(40, 120);
-  grp.play();
+  //grp.position(5, 5);
+}
+
+function sampler(time) {
+  const gap = 0.5;
+  const gapWidth = 16;
+  fill(255, 0, 0);
+  if (parentDiv) {
+    parentDiv.remove();
+  }
+  parentDiv = createDiv();
+  parentDiv.position(0, 0);
+  parentDiv.size(width, height);
+  parentDiv.style('overflow: hidden');
+  for (i = 0; i < 10; i++) {
+    div = createDiv();
+    div.position(time + (gap + gapWidth) * i, 0);
+    div.style('width', gapWidth + 'px');
+    div.style('height', height + 'px');
+    div.style('background-color: black');
+    div.style('z-index : 10');
+    div.parent(parentDiv);
+  }
 }

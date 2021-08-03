@@ -117,9 +117,27 @@ export class Text extends MObject {
     this.writeElement.style('opacity', '1');
   }
 
+  /**
+   * Sets the given style (css) property (1st arg) of the element with the
+   * given value (2nd arg). If a single argument is given, .style()
+   * returns the value of the given property; however, if the single argument
+   * is given in css syntax ('text-align:center'), .style() sets the css
+   * appropriately.
+   *
+   * @param  {String} property   property to be set
+   * @param {String} value value
+   */
+
   style(property, value) {
     this.writeElement.style(property, value);
   }
+
+  /**
+   * play text animation
+   * @param {String} animationType type of animation to be played
+   * @param {Number} timeDuration duration of animation
+   * @param {Number} delayDuration delay
+   */
 
   play(
     animationType: string = 'write',

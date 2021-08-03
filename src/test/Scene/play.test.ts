@@ -7,6 +7,7 @@ import * as Play from '../../lib/Scene/play';
 import { createText, Text } from '../../lib/MObject/Text';
 import { play } from '../../lib/Scene/play';
 global.color = require('color');
+global.createElement = jest.fn();
 
 it('check if play is called with an object of type Text', () => {
   jest.spyOn(Play, 'play').mockImplementation(() => {});

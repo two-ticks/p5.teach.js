@@ -7,6 +7,7 @@ import * as Add from '../../lib/Scene/add';
 import { createText, Text } from '../../lib/MObject/Text';
 import { add } from '../../lib/Scene/add';
 global.color = require('color');
+global.createElement = jest.fn();
 
 it('check if add is called with an object of type Text', () => {
   jest.spyOn(Add, 'add').mockImplementation(() => {});

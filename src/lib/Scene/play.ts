@@ -470,7 +470,10 @@ function createFillAnimatorTeX(
   animationTimeline
     .add(
       {
-        targets: [object.writeElement.elt.querySelectorAll('path'),object.writeElement.elt.querySelectorAll('rect')],
+        targets: [
+          object.writeElement.elt.querySelectorAll('path'),
+          object.writeElement.elt.querySelectorAll('rect')
+        ],
         //scale: [4, 1],
         //fill: [`${object.fillColor.toString('#rgb')}0` , object.fillColor.toString()], //TODO : fill is black by default can be customised through set fill methods
         //stroke : "black",     //TODO : customisable through config
@@ -493,7 +496,7 @@ function createFillAnimatorTeX(
     )
     .add(
       {
-        targets: [use,g],
+        targets: [use, g],
         //scale: [4, 1],
         fill: [
           `${object.fillColor.toString('#rgb')}0`,

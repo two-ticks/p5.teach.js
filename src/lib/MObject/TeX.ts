@@ -12,8 +12,7 @@ import { MObject } from './MObject';
  * @param    {String} - escaped TeX input
  * @param    {number} - x
  * @param    {number} - y
- * @param    {number} - width
- * @param    {number} - height
+ * @param    {number} - font-size
  *
  * @example
  *
@@ -68,11 +67,11 @@ export class TeX extends MObject {
     }
   }
 
-  stroke(strokeColor: any = color('black')) {
+  stroke(strokeColor: any = 'black') {
     if (arguments.length === 0) {
       return this.strokeColor;
     } else {
-      this.strokeColor = color(strokeColor);
+      this.strokeColor = strokeColor;
     }
   }
   strokeWidth(_strokeWidth: number = 8) {
@@ -83,11 +82,11 @@ export class TeX extends MObject {
     }
   }
 
-  fill(fillColor: any = color('black')) {
+  fill(fillColor: any = 'black') {
     if (arguments.length === 0) {
       return this.fillColor;
     } else {
-      this.fillColor = color(fillColor);
+      this.fillColor = fillColor;
     }
   }
 
@@ -103,6 +102,19 @@ export class TeX extends MObject {
 
   style(property, value) {
     this.writeElement.style(property, value);
+  }
+
+  update(_tex) {
+    this.svgEquation = TeXToSVG(_tex);
+    this.writeElement.html(this.svgEquation);
+    let svg = this.writeElement.elt.querySelectorAll('svg');
+    let g = this.writeElement.elt.querySelectorAll('g');
+    //svg[0].setAttribute('width', `${object.svgWidth}px`);
+    //svg[0].setAttribute('height', `${object.svgHeight}px`);
+    g[0].setAttribute('stroke', this.strokeColor);
+    g[0].setAttribute('stroke-width', this._strokeWidth);
+    g[0].setAttribute('fill', this.fillColor);
+    svg[0].setAttribute('fill', this.fillColor);
   }
 
   play(
