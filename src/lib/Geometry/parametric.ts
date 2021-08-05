@@ -197,6 +197,7 @@ export class GraphParametric2D extends GObject {
   }
 
   stroke(_stroke: any) {
+    this.config.graphColor = _stroke;
     this.linePath.setAttribute('stroke', `${_stroke}`);
   }
 
@@ -207,32 +208,53 @@ export class GraphParametric2D extends GObject {
       this.parameterRange,
       this.config
     );
-    // this.graphObject = document.createElementNS(
-    //   'http://www.w3.org/2000/svg',
-    //   'svg'
-    // );
+
     this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     this.plotting.setAttribute('id', 'plot');
     this.linePath.setAttribute('stroke', `${this.config.graphColor}`);
+    this.linePath.setAttribute(
+      'stroke-width',
+      `${this.config.graphStrokeWidth}`
+    );
     this.linePath.setAttribute('d', this.pathData);
     this.plotting.appendChild(this.linePath); // <g id="plot">
+
     this.graphObject.appendChild(this.plotting);
 
     // attaching to graphContainer
+    this.graphContainer.elt.appendChild(this.graphObject);
   }
 
   remove() {
     this.graphContainer.elt.removeChild(this.graphObject);
   }
 
+  //TODO : only update linePath to increase performance
   update(xeqn: any, yeqn: any) {
+    
+    const plot = this.graphObject.getElementById('plot');
+
+    this.xeqn = xeqn;
+    this.yeqn = yeqn;
     this.pathData = createParametricSVGPath(
       this.xeqn,
       this.yeqn,
       this.parameterRange,
       this.config
     );
-    this.linePath.setAttribute('d', this.pathData);
+    plot.getElementsByTagName('path')[0].setAttribute('d', this.pathData);
+
+    //this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    //this.plotting.setAttribute('id', 'plot');
+    //console.log(this.plotting);
+
+    //this.linePath.setAttribute('stroke', `${this.config.graphColor}`);
+    // this.linePath.setAttribute(
+    //   'stroke-width',
+    //   `${this.config.graphStrokeWidth}`
+    // );
+    //this.plotting.appendChild(this.linePath); // <g id="plot">
+    //this.graphObject.appendChild(this.plotting);
   }
 
   transform(object_finl: any, startTime: number = 0, endTime: number = 2) {
