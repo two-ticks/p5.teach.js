@@ -1,4 +1,12 @@
 export let sceneContainer: HTMLDivElement;
+export let sceneVariables = {
+  isGraph: 'false',
+  currentSVG: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+  currStrokeColor: 'black',
+  currStrokeWidth: '1'
+};
+//export
+
 export class Scene {
   constructor() {
     let p5Canvas = document
