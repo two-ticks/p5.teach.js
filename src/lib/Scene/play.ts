@@ -32,7 +32,7 @@ export function play(
   startTime: number = 0, //seconds // start time
   endTime: number = 0 //seconds // end time
 ) {
-  if (!(typeof startTime == 'number' || typeof endTime == 'number')) {
+  if (!(typeof startTime === 'number' || typeof endTime === 'number')) {
     //size
     throw new Error('startTime and endTime must be passed as number');
   } else if (endTime - startTime < 0) {
@@ -134,33 +134,33 @@ export function play(
     ////console.log('Text');
     object.writeElement.style('opacity', '1'); //make it visible else it will not appear
 
-    if (animationType == 'write') {
+    if (animationType === 'write') {
       //console.log(object);
       writeAnimatorText(object, timeDuration, delayDuration);
     } else if (animationType === 'growFromCenter') {
       //console.log('growFromCenter');
       growFromCenterAnimatorText(object, timeDuration, delayDuration);
-    } else if (animationType == 'allAtOnce') {
+    } else if (animationType === 'allAtOnce') {
       //console.log('all at once');
-    } else if (animationType == 'fadeIn') {
+    } else if (animationType === 'fadeIn') {
       //console.log('fadeIn');
       fadeInAnimatorText(object, timeDuration, delayDuration);
-    } else if (animationType == 'fadeOut') {
+    } else if (animationType === 'fadeOut') {
       //console.log('fadeOut');
       fadeOutAnimatorText(object, timeDuration, delayDuration);
-    } else if (animationType == 'erase') {
+    } else if (animationType === 'erase') {
       //console.log('erase');
       eraseAnimatorText(object, timeDuration, delayDuration);
-    } else if (animationType == 'dissolve') {
+    } else if (animationType === 'dissolve') {
       //console.log('dissolve');
       dissolveAnimatorText(object, timeDuration, delayDuration);
-    } else if (animationType == 'waveIn') {
+    } else if (animationType === 'waveIn') {
       //console.log('waveIn');
       waveInAnimatorText(object, timeDuration, delayDuration);
-    } else if (animationType == 'waveOut') {
+    } else if (animationType === 'waveOut') {
       //console.log('waveOut');
       waveOutAnimatorText(object, timeDuration, delayDuration);
-    } else if (animationType == 'spinOut') {
+    } else if (animationType === 'spinOut') {
       //console.log('spinOut');
       spinOutAnimatorText(object, timeDuration, delayDuration);
     }
@@ -530,9 +530,8 @@ function allAtOnceAnimatorTeX(
   const g = object.writeElement.elt.querySelectorAll('g');
   const pathEls = object.writeElement.elt.querySelectorAll('path'); //nodelist
 
-  for (var i = 0; i < pathEls.length; i++) {
-    var pathEl = pathEls[i];
-    var offset: any = anime.setDashoffset(pathEl);
+  for (let pathEl of pathEls) {
+    let offset: any = anime.setDashoffset(pathEl);
     pathEl.setAttribute('stroke-dashoffset', offset);
     anime({
       targets: pathEl,
