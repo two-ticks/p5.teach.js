@@ -178,8 +178,7 @@ async function reel() {
 [ ] : optional arguments
 
 ```js
-curve = create2DGraph((t) => 400 + 1500 * Math.cos(2 * t));
-);
+let curve = create2DGraph((t) => 400 + 1500 * cos(2 * t));
 ```
 
 | Method                     | Description                           |
@@ -211,29 +210,28 @@ function draw() {
 }
 
 function reel() {
-  grp = create2DGraph(
+  let graph1 = create2DGraph(
     (t) =>
-      800 * Math.cos(2 * t) + 1000 * Math.sin(4 * t) + 800 * Math.sin(6 * t)
+      800 * cos(2 * t) + 1000 * sin(4 * t) + 800 * sin(6 * t)
   );
+  graph1.plot();
+  graph1.position(10, 200);
+  graph1.play();
 
-  grp.plot();
-  grp.position(10, 200);
-  grp.play();
+  let graph2 = create2DGraph((t) => 800 * cos(2 * t));
+  graph2.plot();
+  graph2.position(10, 0);
+  graph2.play();
 
-  grp1 = create2DGraph((t) => 800 * Math.cos(2 * t));
-  grp1.plot();
-  grp1.position(10, 0);
-  grp1.play();
+  let graph3 = create2DGraph((t) => 1000 * sin(4 * t));
+  graph3.plot();
+  graph3.position(10, 50);
+  graph3.play();
 
-  grp2 = create2DGraph((t) => 1000 * Math.sin(4 * t));
-  grp2.plot();
-  grp2.position(10, 50);
-  grp2.play();
-
-  grp3 = create2DGraph((t) => 800 * Math.sin(6 * t));
-  grp3.plot();
-  grp3.position(10, 100);
-  grp3.play();
+  let graph4 = create2DGraph((t) => 800 * sin(6 * t));
+  graph4.plot();
+  graph4.position(10, 100);
+  graph4.play();
 }
 ```
 
@@ -255,13 +253,13 @@ function reel() {
 [ ] : optional arguments
 
 ```js
-curve = create2DPolarGraph(
+let curve = create2DPolarGraph(
   (t) =>
     15 *
-    (Math.pow(Math.E, Math.cos(t)) -
-      2 * Math.cos(4 * t) -
-      Math.pow(Math.sin(t / 12), 5)),
-  [0, 12 * Math.PI]
+    (pow(Math.E, cos(t)) -
+      2 * cos(4 * t) -
+      pow(sin(t / 12), 5)),
+  [0, 12 * PI]
 );
 ```
 
@@ -294,18 +292,18 @@ function draw() {
 }
 
 function reel() {
-  grp1 = create2DPolarGraph(
+  let graph = create2DPolarGraph(
     (t) =>
       15 *
-      (Math.pow(Math.E, Math.cos(t)) -
-        2 * Math.cos(4 * t) -
-        Math.pow(Math.sin(t / 12), 5)),
-    [0, 12 * Math.PI]
+      (pow(Math.E, cos(t)) -
+        2 * cos(4 * t) -
+        pow(sin(t / 12), 5)),
+    [0, 12 * PI]
   );
-  grp1.plot();
-  grp1.size(400, 400);
-  grp1.position(50, 50);
-  grp1.play();
+  graph.plot();
+  graph.size(400, 400);
+  graph.position(50, 50);
+  graph.play();
 }
 ```
 
@@ -324,9 +322,9 @@ function reel() {
 [ ] : optional arguments
 
 ```js
-curve = create2DParametricGraph(
-  (t) => 40 * Math.sin(4 * t + Math.PI / 4),
-  (t) => 40 * Math.cos(5 * t)
+let curve = create2DParametricGraph(
+  (t) => 40 * sin(4 * t + QUARTER_PI),
+  (t) => 40 * cos(5 * t)
 );
 ```
 
@@ -355,35 +353,35 @@ let b = 2;
 let d = Math.PI / 4;
 
 function setup() {
-createCanvas(400, 400);
-background(0);
-scene = new Scene();
-createControls();
-reel();
+  createCanvas(400, 400);
+  background(0);
+  scene = new Scene();
+  createControls();
+  reel();
 }
 
 function reel() {
-curve1 = create2DParametricGraph(
-(t) => A _ Math.sin(a _ t + d),
-(t) => B _ Math.cos(b _ t)
-);
+  let curve1 = create2DParametricGraph(
+    (t) => A * sin(a * t + d),
+    (t) => B * cos(b * t)
+  );
 
-curve1.plot();
-curve1.stroke('blue');
-curve1.position(50, 50);
-a = 5;
-b = 4;
-d = Math.PI / 8;
+  curve1.plot();
+  curve1.stroke('blue');
+  curve1.position(50, 50);
+  a = 5;
+  b = 4;
+  d = PI / 8;
 
-curve2 = create2DParametricGraph(
-(t) => A _ Math.sin(a _ t + d),
-(t) => B _ Math.cos(b _ t)
-);
-curve2.stroke('blue');
-// curve2.plot();
-curve2.size(400, 400);
-curve2.position(50, 150);
-curve1.transform(curve2, 0, 10);
+  let curve2 = create2DParametricGraph(
+    (t) => A * sin(a * t + d),
+    (t) => B * cos(b * t)
+  );
+  curve2.stroke('blue');
+  // curve2.plot();
+  curve2.size(400, 400);
+  curve2.position(50, 150);
+  curve1.transform(curve2, 0, 10);
 }
 
 ```
@@ -416,7 +414,10 @@ createControls();
   <summary>Code</summary>
 
 ```js
+let t = 0;
+let i = 0;
 let MAGENTA50 = '#dc267f';
+
 function setup() {
   createCanvas(400, 400);
   scene = new Scene();
@@ -424,11 +425,9 @@ function setup() {
   reel();
 }
 
-let t = 0;
-let i = 0;
 function draw() {
   background(220);
-  t = clock(); //sets t = time of animation timeline
+  t = clock(); // sets t = time of animation timeline
 
   if (t < 1000) i = t;
 
@@ -522,7 +521,10 @@ clock();
   <summary>Code</summary>
 
 ```js
+let t = 0;
+let i = 0;
 let MAGENTA50 = '#dc267f';
+
 function setup() {
   createCanvas(400, 400);
   scene = new Scene();
@@ -530,11 +532,9 @@ function setup() {
   reel();
 }
 
-let t = 0;
-let i = 0;
 function draw() {
   background(220);
-  t = clock(); //sets t = time of animation timeline
+  t = clock(); // sets t = time of animation timeline
 
   if (t < 1000) i = t;
 
@@ -590,7 +590,10 @@ addDuration(timeDuration);
   <summary>Code</summary>
 
 ```js
+let t = 0;
+let i = 0;
 let MAGENTA50 = '#dc267f';
+
 function setup() {
   createCanvas(400, 400);
   scene = new Scene();
@@ -598,34 +601,31 @@ function setup() {
   reel();
 }
 
-let t = 0;
-let i = 0;
 function draw() {
-background(220);
-t = clock(); //sets t = time of animation timeline
+  background(220);
+  t = clock(); // sets t = time of animation timeline
 
-if (t < 1000) i = t;
+  if (t < 1000) i = t;
 
-fill(255, 0, 0);
+  fill(255, 0, 0);
 
-rect(30 + 0.25 \* i, 20, 75, 10);
+  rect(30 + 0.25 \* i, 20, 75, 10);
 }
 
 function reel() {
-let title = createText('Lorentz Transformation', 30, 75, 35);
-title.fill('red');
-title.play('growFromCenter', 1, 4);
-let equation = createTeX(
-'\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
-);
-equation.position(45, 175);
-equation.size(50);
-equation.stroke(MAGENTA50);
-equation.strokeWidth(20);
-equation.fill(MAGENTA50);
-equation.play('createFill', 1, 6);
+  let title = createText('Lorentz Transformation', 30, 75, 35);
+  title.fill('red');
+  title.play('growFromCenter', 1, 4);
+  let equation = createTeX(
+    '\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
+  );
+  equation.position(45, 175);
+  equation.size(50);
+  equation.stroke(MAGENTA50);
+  equation.strokeWidth(20);
+  equation.fill(MAGENTA50);
+  equation.play('createFill', 1, 6);
 }
-
 ```
 
 </details>
@@ -656,7 +656,10 @@ add();
   <summary>Code</summary>
 
 ```js
+let t = 0;
+let i = 0;
 let MAGENTA50 = '#dc267f';
+
 function setup() {
   createCanvas(400, 400);
   scene = new Scene();
@@ -664,34 +667,31 @@ function setup() {
   reel();
 }
 
-let t = 0;
-let i = 0;
 function draw() {
-background(220);
-t = clock(); //sets t = time of animation timeline
+  background(220);
+  t = clock(); // sets t = time of animation timeline
 
-if (t < 1000) i = t;
+  if (t < 1000) i = t;
 
-fill(255, 0, 0);
+  fill(255, 0, 0);
 
-rect(30 + 0.25 \* i, 20, 75, 10);
+  rect(30 + 0.25 \* i, 20, 75, 10);
 }
 
 function reel() {
-let title = createText('Lorentz Transformation', 30, 75, 35);
-title.fill('red');
-title.play('growFromCenter', 1, 4);
-let equation = createTeX(
-'\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
-);
-equation.position(45, 175);
-equation.size(50);
-equation.stroke(MAGENTA50);
-equation.strokeWidth(20);
-equation.fill(MAGENTA50);
-equation.play('createFill', 1, 6);
+  let title = createText('Lorentz Transformation', 30, 75, 35);
+  title.fill('red');
+  title.play('growFromCenter', 1, 4);
+  let equation = createTeX(
+    '\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
+  );
+  equation.position(45, 175);
+  equation.size(50);
+  equation.stroke(MAGENTA50);
+  equation.strokeWidth(20);
+  equation.fill(MAGENTA50);
+  equation.play('createFill', 1, 6);
 }
-
 ```
 
 </details>
@@ -722,7 +722,10 @@ remove();
   <summary>Code</summary>
 
 ```js
+let t = 0;
+let i = 0;
 let MAGENTA50 = '#dc267f';
+
 function setup() {
   createCanvas(400, 400);
   scene = new Scene();
@@ -730,34 +733,32 @@ function setup() {
   reel();
 }
 
-let t = 0;
-let i = 0;
+
 function draw() {
-background(220);
-t = clock(); //sets t = time of animation timeline
+  background(220);
+  t = clock(); // sets t = time of animation timeline
 
-if (t < 1000) i = t;
+  if (t < 1000) i = t;
 
-fill(255, 0, 0);
+  fill(255, 0, 0);
 
-rect(30 + 0.25 \* i, 20, 75, 10);
+  rect(30 + 0.25 \* i, 20, 75, 10);
 }
 
 function reel() {
-let title = createText('Lorentz Transformation', 30, 75, 35);
-title.fill('red');
-title.play('growFromCenter', 1, 4);
-let equation = createTeX(
-'\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
-);
-equation.position(45, 175);
-equation.size(50);
-equation.stroke(MAGENTA50);
-equation.strokeWidth(20);
-equation.fill(MAGENTA50);
-equation.play('createFill', 1, 6);
+  let title = createText('Lorentz Transformation', 30, 75, 35);
+  title.fill('red');
+  title.play('growFromCenter', 1, 4);
+  let equation = createTeX(
+    '\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
+  );
+  equation.position(45, 175);
+  equation.size(50);
+  equation.stroke(MAGENTA50);
+  equation.strokeWidth(20);
+  equation.fill(MAGENTA50);
+  equation.play('createFill', 1, 6);
 }
-
 ```
 
 </details>
@@ -788,7 +789,10 @@ equation.play('createFill', 1, 6);
   <summary>Code</summary>
 
 ```js
+let t = 0;
+let i = 0;
 let MAGENTA50 = '#dc267f';
+
 function setup() {
   createCanvas(400, 400);
   scene = new Scene();
@@ -796,34 +800,31 @@ function setup() {
   reel();
 }
 
-let t = 0;
-let i = 0;
 function draw() {
-background(220);
-t = clock(); //sets t = time of animation timeline
+  background(220);
+  t = clock(); //sets t = time of animation timeline
 
-if (t < 1000) i = t;
+  if (t < 1000) i = t;
 
-fill(255, 0, 0);
+  fill(255, 0, 0);
 
-rect(30 + 0.25 \* i, 20, 75, 10);
+  rect(30 + 0.25 \* i, 20, 75, 10);
 }
 
 function reel() {
-let title = createText('Lorentz Transformation', 30, 75, 35);
-title.fill('red');
-title.play('growFromCenter', 1, 4);
-let equation = createTeX(
-'\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
-);
-equation.position(45, 175);
-equation.size(50);
-equation.stroke(MAGENTA50);
-equation.strokeWidth(20);
-equation.fill(MAGENTA50);
-equation.play('createFill', 1, 6);
+  let title = createText('Lorentz Transformation', 30, 75, 35);
+  title.fill('red');
+  title.play('growFromCenter', 1, 4);
+  let equation = createTeX(
+    '\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
+  );
+  equation.position(45, 175);
+  equation.size(50);
+  equation.stroke(MAGENTA50);
+  equation.strokeWidth(20);
+  equation.fill(MAGENTA50);
+  equation.play('createFill', 1, 6);
 }
-
 ```
 
 </details>
@@ -854,7 +855,10 @@ transform(object1, object2);
   <summary>Code</summary>
 
 ```js
+let t = 0;
+let i = 0;
 let MAGENTA50 = '#dc267f';
+
 function setup() {
   createCanvas(400, 400);
   scene = new Scene();
@@ -862,34 +866,31 @@ function setup() {
   reel();
 }
 
-let t = 0;
-let i = 0;
 function draw() {
-background(220);
-t = clock(); //sets t = time of animation timeline
+  background(220);
+  t = clock(); //sets t = time of animation timeline
 
-if (t < 1000) i = t;
+  if (t < 1000) i = t;
 
-fill(255, 0, 0);
+  fill(255, 0, 0);
 
-rect(30 + 0.25 \* i, 20, 75, 10);
+  rect(30 + 0.25 \* i, 20, 75, 10);
 }
 
 function reel() {
-let title = createText('Lorentz Transformation', 30, 75, 35);
-title.fill('red');
-title.play('growFromCenter', 1, 4);
-let equation = createTeX(
-'\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
-);
-equation.position(45, 175);
-equation.size(50);
-equation.stroke(MAGENTA50);
-equation.strokeWidth(20);
-equation.fill(MAGENTA50);
-equation.play('createFill', 1, 6);
+  let title = createText('Lorentz Transformation', 30, 75, 35);
+  title.fill('red');
+  title.play('growFromCenter', 1, 4);
+  let equation = createTeX(
+    '\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
+  );
+  equation.position(45, 175);
+  equation.size(50);
+  equation.stroke(MAGENTA50);
+  equation.strokeWidth(20);
+  equation.fill(MAGENTA50);
+  equation.play('createFill', 1, 6);
 }
-
 ```
 
 </details>
@@ -920,7 +921,10 @@ group([objects]);
   <summary>Code</summary>
 
 ```js
+let t = 0;
+let i = 0;
 let MAGENTA50 = '#dc267f';
+
 function setup() {
   createCanvas(400, 400);
   scene = new Scene();
@@ -928,34 +932,31 @@ function setup() {
   reel();
 }
 
-let t = 0;
-let i = 0;
 function draw() {
-background(220);
-t = clock(); //sets t = time of animation timeline
+  background(220);
+  t = clock(); //sets t = time of animation timeline
 
-if (t < 1000) i = t;
+  if (t < 1000) i = t;
 
-fill(255, 0, 0);
+  fill(255, 0, 0);
 
-rect(30 + 0.25 \* i, 20, 75, 10);
+  rect(30 + 0.25 \* i, 20, 75, 10);
 }
 
 function reel() {
-let title = createText('Lorentz Transformation', 30, 75, 35);
-title.fill('red');
-title.play('growFromCenter', 1, 4);
-let equation = createTeX(
-'\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
-);
-equation.position(45, 175);
-equation.size(50);
-equation.stroke(MAGENTA50);
-equation.strokeWidth(20);
-equation.fill(MAGENTA50);
-equation.play('createFill', 1, 6);
+  let title = createText('Lorentz Transformation', 30, 75, 35);
+  title.fill('red');
+  title.play('growFromCenter', 1, 4);
+  let equation = createTeX(
+    '\\gamma = \\dfrac{1}{\\sqrt{1 - \\frac{v^2}{c^2}}}'
+  );
+  equation.position(45, 175);
+  equation.size(50);
+  equation.stroke(MAGENTA50);
+  equation.strokeWidth(20);
+  equation.fill(MAGENTA50);
+  equation.play('createFill', 1, 6);
 }
-
 ```
 
 </details>
