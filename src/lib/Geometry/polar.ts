@@ -322,15 +322,11 @@ export class GraphPolar2D extends GObject {
 
     let polarGrid: SVGCircleElement;
     //Math.max(this.config.originX,this.svgWidth-this.originX)
-    for (
-      let i = 0;
-      i <= radialLineMax;
-      i +=
-        Math.max(this.config.scaleX, this.config.scaleY) *
-        Math.floor(
-          radialLineMax / (5 * Math.max(this.config.scaleX, this.config.scaleY))
-        )
-    ) {
+    let dr = Math.max(this.config.scaleX, this.config.scaleY) *
+            Math.floor(
+              radialLineMax / (5 * Math.max(this.config.scaleX, this.config.scaleY))
+            );
+    for (let i = 0; i <= radialLineMax; i += dr) {
       polarGrid = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'circle'
@@ -350,18 +346,14 @@ export class GraphPolar2D extends GObject {
       polarGrid.setAttribute('stroke-opacity', `0.5`);
       this.coordinate.appendChild(polarGrid);
     }
+    
     let smallPolarGrid: SVGCircleElement;
-    for (
-      let i = 0;
-      i <= radialLineMax;
-      i +=
-        (Math.max(this.config.scaleX, this.config.scaleY) *
-          Math.floor(
-            radialLineMax /
-              (5 * Math.max(this.config.scaleX, this.config.scaleY))
-          )) /
-        5
-    ) {
+    dr = (Math.max(this.config.scaleX, this.config.scaleY) *
+              Math.floor(
+                radialLineMax /
+                (5 * Math.max(this.config.scaleX, this.config.scaleY))
+              )) / 5;
+    for (let i = 0; i <= radialLineMax; i += dr) {
       smallPolarGrid = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'circle'
@@ -384,7 +376,7 @@ export class GraphPolar2D extends GObject {
 
     let radialLine;
 
-    for (let i = 1; i <= 12; i++) {
+    for (let i = 1; i <= 12; i += 1) {
       radialLine = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'line'
@@ -446,15 +438,8 @@ export class GraphPolar2D extends GObject {
         let tick;
         //x axis
         //+ve axis
-        for (
-          let i = 0;
-          i <
-          abs(
-            int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)
-          ) /
-            this.config.stepX;
-          i++
-        ) {
+        let veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) / this.config.stepX;
+        for (let i = 0; i < veEnd; i += 1) {
           let x =
             this.config.originX * this.config.scaleX +
             (i + 1) * this.config.stepX * this.config.scaleX;
@@ -478,13 +463,8 @@ export class GraphPolar2D extends GObject {
         //console.log(int(this.svgWidth / (2*this.config.scaleX)) + this.config.originX);
 
         //-ve axis
-        for (
-          let i = abs(
-            int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX
-          );
-          i >= 0;
-          i--
-        ) {
+        veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX);
+        for (let i = veEnd; i >= 0; i -= 1) {
           let x =
             this.config.originX * this.config.scaleX -
             (i + 1) * this.config.stepX * this.config.scaleX;
@@ -525,15 +505,8 @@ export class GraphPolar2D extends GObject {
         let tick;
         //y axis
         //+ve axis
-        for (
-          let i = 0;
-          i <=
-          abs(
-            -int(this.svgHeight / (2 * this.config.scaleY)) +
-              this.config.originY
-          );
-          i++
-        ) {
+        let veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY);
+        for (let i = 0; i <= veEnd; i += 1) {
           let y =
             -this.config.originY * this.config.scaleY -
             (i + 1) * this.config.stepY * this.config.scaleY;
@@ -554,14 +527,8 @@ export class GraphPolar2D extends GObject {
           this.coordinate.appendChild(tick);
         }
         //-ve axis
-        for (
-          let i = abs(
-            -int(this.svgHeight / (2 * this.config.scaleY)) -
-              this.config.originY
-          );
-          i >= 0;
-          i--
-        ) {
+        veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY);
+        for (let i = veEnd; i >= 0; i -= 1) {
           let y =
             -this.config.originY * this.config.scaleY +
             (i + 1) * this.config.stepY * this.config.scaleY;
@@ -677,7 +644,7 @@ export function createPolarSVGPath(
   //let scaleY = 100;
   //console.log(config.scaleX);
 
-  let SVG_path = `M${
+  let svgPath = `M${
     config.scaleX * eqn(thetaRange[0]) * Math.cos(0) +
     config.originX * config.scaleX
   },${
@@ -686,7 +653,7 @@ export function createPolarSVGPath(
   }`;
   for (let theta = thetaRange[0]; theta <= thetaRange[1]; theta += stepSize) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-    SVG_path = SVG_path.concat(
+    svgPath = svgPath.concat(
       ` L${
         config.scaleX * eqn(theta) * Math.cos(theta) +
         config.originX * config.scaleX
@@ -696,7 +663,7 @@ export function createPolarSVGPath(
       }`
     );
   }
-  return SVG_path;
+  return svgPath;
 }
 
 export function create2DPolarGraph(
