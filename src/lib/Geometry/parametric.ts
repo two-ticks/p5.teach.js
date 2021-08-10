@@ -348,15 +348,8 @@ export class GraphParametric2D extends GObject {
         let tick;
         //x axis
         //+ve axis
-        for (
-          let i = 0;
-          i <
-          abs(
-            int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)
-          ) /
-            this.config.stepX;
-          i++
-        ) {
+        let veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) / this.config.stepX;
+        for (let i = 0; i < veEnd; i += 1) {
           let x =
             this.config.originX * this.config.scaleX +
             (i + 1) * this.config.stepX * this.config.scaleX;
@@ -380,13 +373,8 @@ export class GraphParametric2D extends GObject {
         //console.log(int(this.svgWidth / (2*this.config.scaleX)) + this.config.originX);
 
         //-ve axis
-        for (
-          let i = abs(
-            int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX
-          );
-          i >= 0;
-          i--
-        ) {
+        veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX);
+        for (let i = veEnd; i >= 0; i -= 1) {
           let x =
             this.config.originX * this.config.scaleX -
             (i + 1) * this.config.stepX * this.config.scaleX;
@@ -427,15 +415,8 @@ export class GraphParametric2D extends GObject {
         let tick;
         //y axis
         //+ve axis
-        for (
-          let i = 0;
-          i <=
-          abs(
-            -int(this.svgHeight / (2 * this.config.scaleY)) +
-              this.config.originY
-          );
-          i++
-        ) {
+        let veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY);
+        for (let i = 0; i <= veEnd; i += 1) {
           let y =
             -this.config.originY * this.config.scaleY -
             (i + 1) * this.config.stepY * this.config.scaleY;
@@ -456,14 +437,8 @@ export class GraphParametric2D extends GObject {
           this.coordinate.appendChild(tick);
         }
         //-ve axis
-        for (
-          let i = abs(
-            -int(this.svgHeight / (2 * this.config.scaleY)) -
-              this.config.originY
-          );
-          i >= 0;
-          i--
-        ) {
+        veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY);
+        for (let i = veEnd; i >= 0; i -= 1) {
           let y =
             -this.config.originY * this.config.scaleY +
             (i + 1) * this.config.stepY * this.config.scaleY;
@@ -588,24 +563,20 @@ export function createParametricSVGPath(
   //let minX = parameterRange[0];
   // let scaleX = 100;
   // let scaleY = 100;
-  let SVG_path = `M${
+  let svgPath = `M${
     config.scaleX * xeqn(parameterRange[0]) + config.originX * config.scaleX
   },${
     -config.scaleY * yeqn(parameterRange[0]) - config.originY * config.scaleY
   }`;
-  for (
-    let parameter = parameterRange[0];
-    parameter <= parameterRange[1];
-    parameter += stepSize
-  ) {
-    // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-    SVG_path = SVG_path.concat(
-      ` L${config.scaleX * xeqn(parameter) + config.originX * config.scaleX},${
-        -config.scaleY * yeqn(parameter) - config.originY * config.scaleY
+  for (let p = parameterRange[0]; p <= parameterRange[1]; p += stepSize) {
+    // svgPath = svgPath.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
+    svgPath = svgPath.concat(
+      ` L${config.scaleX * xeqn(p) + config.originX * config.scaleX},${
+        -config.scaleY * yeqn(p) - config.originY * config.scaleY
       }`
     );
   }
-  return SVG_path;
+  return svgPath;
 }
 
 export function create2DParametricGraph(
