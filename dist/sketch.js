@@ -11,7 +11,7 @@ let ORANGE40 = '#fe6100';
 
 function setup() {
   canvas = createCanvas(400, 400);
-  scene = new Scene();
+  //overflow('hidden'); //if you want to stop DOM p5 teach elements from overflowing
   background(20);
   drawGraph();
 }
