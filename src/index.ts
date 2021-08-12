@@ -19,13 +19,13 @@ global.play = play;
 import { Scene, overflow } from './lib/Scene/scene';
 // global.Scene = Scene;
 global.overflow = overflow;
-
 global.p5.prototype.registerMethod('init', Scene);
 
 import {
   //sceneTime,
   createControls,
   clock,
+  callAt,
   addDuration
   // pauseScene,
   // playScene,
@@ -34,6 +34,7 @@ import {
 //global.sceneTime = sceneTime;
 global.createControls = createControls;
 global.clock = clock;
+global.callAt = callAt;
 global.addDuration = addDuration;
 
 // global.pauseScene = pauseScene;
@@ -44,7 +45,7 @@ import { beginGraph, endGraph, RECT } from './lib/Geometry/beginGraph';
 
 global.beginGraph = beginGraph;
 global.endGraph = endGraph;
-p5.prototype.rect = RECT;
+global.p5.prototype.rect = RECT;
 //global.rect = RECT
 
 import { transform } from './lib/Scene/transform';
