@@ -231,7 +231,6 @@ export class GraphParametric2D extends GObject {
 
   //TODO : only update linePath to increase performance
   update(xeqn: any, yeqn: any) {
-    
     const plot = this.graphObject.getElementById('plot');
 
     this.xeqn = xeqn;
@@ -348,7 +347,10 @@ export class GraphParametric2D extends GObject {
         let tick;
         //x axis
         //+ve axis
-        let veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) / this.config.stepX;
+        let veEnd =
+          abs(
+            int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)
+          ) / this.config.stepX;
         for (let i = 0; i < veEnd; i += 1) {
           let x =
             this.config.originX * this.config.scaleX +
@@ -373,7 +375,9 @@ export class GraphParametric2D extends GObject {
         //console.log(int(this.svgWidth / (2*this.config.scaleX)) + this.config.originX);
 
         //-ve axis
-        veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX);
+        veEnd = abs(
+          int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX
+        );
         for (let i = veEnd; i >= 0; i -= 1) {
           let x =
             this.config.originX * this.config.scaleX -
@@ -415,7 +419,9 @@ export class GraphParametric2D extends GObject {
         let tick;
         //y axis
         //+ve axis
-        let veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY);
+        let veEnd = abs(
+          -int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY
+        );
         for (let i = 0; i <= veEnd; i += 1) {
           let y =
             -this.config.originY * this.config.scaleY -
@@ -437,7 +443,9 @@ export class GraphParametric2D extends GObject {
           this.coordinate.appendChild(tick);
         }
         //-ve axis
-        veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY);
+        veEnd = abs(
+          -int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY
+        );
         for (let i = veEnd; i >= 0; i -= 1) {
           let y =
             -this.config.originY * this.config.scaleY +

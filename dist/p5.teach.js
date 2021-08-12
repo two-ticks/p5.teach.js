@@ -42990,7 +42990,7 @@ endTime //seconds // end time
     endTime = 0;
   }
 
-  if (!(typeof startTime == 'number' || typeof endTime == 'number')) {
+  if (!(typeof startTime === 'number' || typeof endTime === 'number')) {
     //size
     throw new Error('startTime and endTime must be passed as number');
   } else if (endTime - startTime < 0) {
@@ -43085,32 +43085,32 @@ endTime //seconds // end time
 
       object.writeElement.style('opacity', '1'); //make it visible else it will not appear
 
-      if (animationType == 'write') {
+      if (animationType === 'write') {
         //console.log(object);
         writeAnimatorText(object, timeDuration, delayDuration);
       } else if (animationType === 'growFromCenter') {
         //console.log('growFromCenter');
         growFromCenterAnimatorText(object, timeDuration, delayDuration);
-      } else if (animationType == 'allAtOnce') {//console.log('all at once');
-      } else if (animationType == 'fadeIn') {
+      } else if (animationType === 'allAtOnce') {//console.log('all at once');
+      } else if (animationType === 'fadeIn') {
         //console.log('fadeIn');
         fadeInAnimatorText(object, timeDuration, delayDuration);
-      } else if (animationType == 'fadeOut') {
+      } else if (animationType === 'fadeOut') {
         //console.log('fadeOut');
         fadeOutAnimatorText(object, timeDuration, delayDuration);
-      } else if (animationType == 'erase') {
+      } else if (animationType === 'erase') {
         //console.log('erase');
         eraseAnimatorText(object, timeDuration, delayDuration);
-      } else if (animationType == 'dissolve') {
+      } else if (animationType === 'dissolve') {
         //console.log('dissolve');
         dissolveAnimatorText(object, timeDuration, delayDuration);
-      } else if (animationType == 'waveIn') {
+      } else if (animationType === 'waveIn') {
         //console.log('waveIn');
         waveInAnimatorText(object, timeDuration, delayDuration);
-      } else if (animationType == 'waveOut') {
+      } else if (animationType === 'waveOut') {
         //console.log('waveOut');
         waveOutAnimatorText(object, timeDuration, delayDuration);
-      } else if (animationType == 'spinOut') {
+      } else if (animationType === 'spinOut') {
         //console.log('spinOut');
         spinOutAnimatorText(object, timeDuration, delayDuration);
       }
@@ -43369,8 +43369,7 @@ function allAtOnceAnimatorTeX(object, timeDuration, delayDuration) {
   var g = object.writeElement.elt.querySelectorAll('g');
   var pathEls = object.writeElement.elt.querySelectorAll('path'); //nodelist
 
-  for (var i = 0; i < pathEls.length; i++) {
-    var pathEl = pathEls[i];
+  var _loop_1 = function _loop_1(pathEl) {
     var offset = animejs_1.default.setDashoffset(pathEl);
     pathEl.setAttribute('stroke-dashoffset', offset);
     animejs_1.default({
@@ -43394,6 +43393,12 @@ function allAtOnceAnimatorTeX(object, timeDuration, delayDuration) {
       },
       autoplay: true
     });
+  };
+
+  for (var _i = 0, pathEls_1 = pathEls; _i < pathEls_1.length; _i++) {
+    var pathEl = pathEls_1[_i];
+
+    _loop_1(pathEl);
   }
 }
 
@@ -43566,8 +43571,7 @@ var MObject_1 = require("./MObject"); //TODO : add test cases
  * @param    {String} - escaped TeX input
  * @param    {number} - x
  * @param    {number} - y
- * @param    {number} - width
- * @param    {number} - height
+ * @param    {number} - font-size
  *
  * @example
  *
@@ -43899,18 +43903,17 @@ var __generator = this && this.__generator || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Scene = exports.sceneContainer = void 0;
+exports.overflow = exports.Scene = exports.sceneContainer = void 0;
 
 var Scene =
 /** @class */
 function () {
   function Scene() {
-    var p5Canvas = document.getElementsByClassName('p5Canvas')[0].getBoundingClientRect(); //console.log(p5Canvas);
-
+    //console.log(p5Canvas);
     exports.sceneContainer = document.createElement('div'); //sceneContainer.setAttribute('overflow', 'hidden');
 
-    exports.sceneContainer.setAttribute('class', 'sceneContainer');
-    exports.sceneContainer.setAttribute('style', "overflow: hidden; position: absolute; left: " + p5Canvas.x + "px; top: " + p5Canvas.y + "px; width: " + p5Canvas.width + "px; height : " + p5Canvas.height + "px"); // sceneContainer.setAttribute('height', `${p5Canvas.height}px`);
+    exports.sceneContainer.setAttribute('class', 'p5teach');
+    exports.sceneContainer.setAttribute('style', "position: absolute; left: 0 px; top: 0 px; "); // sceneContainer.setAttribute('height', `${p5Canvas.height}px`);
     // sceneContainer.setAttribute('left', `${p5Canvas.x}px`);
     // sceneContainer.setAttribute('top', `${p5Canvas.y}px`);
 
@@ -43938,6 +43941,15 @@ function () {
 }();
 
 exports.Scene = Scene;
+
+function overflow(value) {
+  if (value === 'hidden') {
+    var p5Canvas = document.getElementsByClassName('p5Canvas')[0].getBoundingClientRect();
+    exports.sceneContainer.setAttribute('style', "overflow: hidden; position: absolute; left: " + p5Canvas.x + "px; top: " + p5Canvas.y + "px; width: " + p5Canvas.width + "px; height : " + p5Canvas.height + "px");
+  }
+}
+
+exports.overflow = overflow;
 },{}],"lib/Scene/add.ts":[function(require,module,exports) {
 "use strict";
 
@@ -44993,31 +45005,44 @@ function (_super) {
   };
 
   GraphParametric2D.prototype.stroke = function (_stroke) {
+    this.config.graphColor = _stroke;
     this.linePath.setAttribute('stroke', "" + _stroke);
   };
 
   GraphParametric2D.prototype.plot = function () {
-    this.pathData = createParametricSVGPath(this.xeqn, this.yeqn, this.parameterRange, this.config); // this.graphObject = document.createElementNS(
-    //   'http://www.w3.org/2000/svg',
-    //   'svg'
-    // );
-
+    this.pathData = createParametricSVGPath(this.xeqn, this.yeqn, this.parameterRange, this.config);
     this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     this.plotting.setAttribute('id', 'plot');
     this.linePath.setAttribute('stroke', "" + this.config.graphColor);
+    this.linePath.setAttribute('stroke-width', "" + this.config.graphStrokeWidth);
     this.linePath.setAttribute('d', this.pathData);
     this.plotting.appendChild(this.linePath); // <g id="plot">
 
     this.graphObject.appendChild(this.plotting); // attaching to graphContainer
+
+    this.graphContainer.elt.appendChild(this.graphObject);
   };
 
   GraphParametric2D.prototype.remove = function () {
     this.graphContainer.elt.removeChild(this.graphObject);
-  };
+  }; //TODO : only update linePath to increase performance
+
 
   GraphParametric2D.prototype.update = function (xeqn, yeqn) {
+    var plot = this.graphObject.getElementById('plot');
+    this.xeqn = xeqn;
+    this.yeqn = yeqn;
     this.pathData = createParametricSVGPath(this.xeqn, this.yeqn, this.parameterRange, this.config);
-    this.linePath.setAttribute('d', this.pathData);
+    plot.getElementsByTagName('path')[0].setAttribute('d', this.pathData); //this.plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    //this.plotting.setAttribute('id', 'plot');
+    //console.log(this.plotting);
+    //this.linePath.setAttribute('stroke', `${this.config.graphColor}`);
+    // this.linePath.setAttribute(
+    //   'stroke-width',
+    //   `${this.config.graphStrokeWidth}`
+    // );
+    //this.plotting.appendChild(this.linePath); // <g id="plot">
+    //this.graphObject.appendChild(this.plotting);
   };
 
   GraphParametric2D.prototype.transform = function (object_finl, startTime, endTime) {
@@ -45081,7 +45106,9 @@ function (_super) {
         var tick = void 0; //x axis
         //+ve axis
 
-        for (var i = 0; i < abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) / this.config.stepX; i++) {
+        var veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) / this.config.stepX;
+
+        for (var i = 0; i < veEnd; i += 1) {
           var x = this.config.originX * this.config.scaleX + (i + 1) * this.config.stepX * this.config.scaleX;
           tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           tick.setAttribute('x', "" + x);
@@ -45096,7 +45123,9 @@ function (_super) {
         //-ve axis
 
 
-        for (var i = abs(int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX); i >= 0; i--) {
+        veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX);
+
+        for (var i = veEnd; i >= 0; i -= 1) {
           var x = this.config.originX * this.config.scaleX - (i + 1) * this.config.stepX * this.config.scaleX;
           tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           tick.setAttribute('x', "" + x);
@@ -45127,7 +45156,9 @@ function (_super) {
         var tick = void 0; //y axis
         //+ve axis
 
-        for (var i = 0; i <= abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY); i++) {
+        var veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY);
+
+        for (var i = 0; i <= veEnd; i += 1) {
           var y = -this.config.originY * this.config.scaleY - (i + 1) * this.config.stepY * this.config.scaleY;
           tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           tick.setAttribute('x', "" + (this.config.originX * this.config.scaleX + this.config.tickMarginY * this.config.scaleX));
@@ -45141,7 +45172,9 @@ function (_super) {
         } //-ve axis
 
 
-        for (var i = abs(-int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY); i >= 0; i--) {
+        veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY);
+
+        for (var i = veEnd; i >= 0; i -= 1) {
           var y = -this.config.originY * this.config.scaleY + (i + 1) * this.config.stepY * this.config.scaleY;
           tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           tick.setAttribute('x', "" + (this.config.originX * this.config.scaleX + this.config.tickMarginY * this.config.scaleX));
@@ -45243,14 +45276,14 @@ function createParametricSVGPath(xeqn, yeqn, parameterRange, config) {
   // let scaleX = 100;
   // let scaleY = 100;
 
-  var SVG_path = "M" + (config.scaleX * xeqn(parameterRange[0]) + config.originX * config.scaleX) + "," + (-config.scaleY * yeqn(parameterRange[0]) - config.originY * config.scaleY);
+  var svgPath = "M" + (config.scaleX * xeqn(parameterRange[0]) + config.originX * config.scaleX) + "," + (-config.scaleY * yeqn(parameterRange[0]) - config.originY * config.scaleY);
 
-  for (var parameter = parameterRange[0]; parameter <= parameterRange[1]; parameter += stepSize) {
-    // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-    SVG_path = SVG_path.concat(" L" + (config.scaleX * xeqn(parameter) + config.originX * config.scaleX) + "," + (-config.scaleY * yeqn(parameter) - config.originY * config.scaleY));
+  for (var p = parameterRange[0]; p <= parameterRange[1]; p += stepSize) {
+    // svgPath = svgPath.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
+    svgPath = svgPath.concat(" L" + (config.scaleX * xeqn(p) + config.originX * config.scaleX) + "," + (-config.scaleY * yeqn(p) - config.originY * config.scaleY));
   }
 
-  return SVG_path;
+  return svgPath;
 }
 
 exports.createParametricSVGPath = createParametricSVGPath;
@@ -45579,7 +45612,9 @@ function (_super) {
 
     var polarGrid; //Math.max(this.config.originX,this.svgWidth-this.originX)
 
-    for (var i = 0; i <= radialLineMax; i += Math.max(this.config.scaleX, this.config.scaleY) * Math.floor(radialLineMax / (5 * Math.max(this.config.scaleX, this.config.scaleY)))) {
+    var dr = Math.max(this.config.scaleX, this.config.scaleY) * Math.floor(radialLineMax / (5 * Math.max(this.config.scaleX, this.config.scaleY)));
+
+    for (var i = 0; i <= radialLineMax; i += dr) {
       polarGrid = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       polarGrid.setAttribute('cx', "" + this.config.originX * this.config.scaleX);
       polarGrid.setAttribute('cy', "" + -this.config.originY * this.config.scaleY);
@@ -45591,8 +45626,9 @@ function (_super) {
     }
 
     var smallPolarGrid;
+    dr = Math.max(this.config.scaleX, this.config.scaleY) * Math.floor(radialLineMax / (5 * Math.max(this.config.scaleX, this.config.scaleY))) / 5;
 
-    for (var i = 0; i <= radialLineMax; i += Math.max(this.config.scaleX, this.config.scaleY) * Math.floor(radialLineMax / (5 * Math.max(this.config.scaleX, this.config.scaleY))) / 5) {
+    for (var i = 0; i <= radialLineMax; i += dr) {
       smallPolarGrid = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       smallPolarGrid.setAttribute('cx', "" + this.config.originX * this.config.scaleX);
       smallPolarGrid.setAttribute('cy', "" + -this.config.originY * this.config.scaleY);
@@ -45605,7 +45641,7 @@ function (_super) {
 
     var radialLine;
 
-    for (var i = 1; i <= 12; i++) {
+    for (var i = 1; i <= 12; i += 1) {
       radialLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       radialLine.setAttribute('x1', "" + (radialLineMax * Math.cos(i * PI / 12) + this.config.originX * this.config.scaleX));
       radialLine.setAttribute('y1', "" + (radialLineMax * Math.sin(i * PI / 12) - this.config.originY * this.config.scaleY));
@@ -45636,7 +45672,9 @@ function (_super) {
         var tick = void 0; //x axis
         //+ve axis
 
-        for (var i = 0; i < abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) / this.config.stepX; i++) {
+        var veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX) - this.config.originX)) / this.config.stepX;
+
+        for (var i = 0; i < veEnd; i += 1) {
           var x = this.config.originX * this.config.scaleX + (i + 1) * this.config.stepX * this.config.scaleX;
           tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           tick.setAttribute('x', "" + x);
@@ -45651,7 +45689,9 @@ function (_super) {
         //-ve axis
 
 
-        for (var i = abs(int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX); i >= 0; i--) {
+        veEnd = abs(int(this.svgWidth / (2 * this.config.scaleX)) + this.config.originX);
+
+        for (var i = veEnd; i >= 0; i -= 1) {
           var x = this.config.originX * this.config.scaleX - (i + 1) * this.config.stepX * this.config.scaleX;
           tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           tick.setAttribute('x', "" + x);
@@ -45682,7 +45722,9 @@ function (_super) {
         var tick = void 0; //y axis
         //+ve axis
 
-        for (var i = 0; i <= abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY); i++) {
+        var veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) + this.config.originY);
+
+        for (var i = 0; i <= veEnd; i += 1) {
           var y = -this.config.originY * this.config.scaleY - (i + 1) * this.config.stepY * this.config.scaleY;
           tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           tick.setAttribute('x', "" + (this.config.originX * this.config.scaleX + this.config.tickMarginY * this.config.scaleX));
@@ -45696,7 +45738,9 @@ function (_super) {
         } //-ve axis
 
 
-        for (var i = abs(-int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY); i >= 0; i--) {
+        veEnd = abs(-int(this.svgHeight / (2 * this.config.scaleY)) - this.config.originY);
+
+        for (var i = veEnd; i >= 0; i -= 1) {
           var y = -this.config.originY * this.config.scaleY + (i + 1) * this.config.stepY * this.config.scaleY;
           tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           tick.setAttribute('x', "" + (this.config.originX * this.config.scaleX + this.config.tickMarginY * this.config.scaleX));
@@ -45785,14 +45829,14 @@ function createPolarSVGPath(eqn, thetaRange, config //stepSize: number = 0.001
   //let scaleY = 100;
   //console.log(config.scaleX);
 
-  var SVG_path = "M" + (config.scaleX * eqn(thetaRange[0]) * Math.cos(0) + config.originX * config.scaleX) + "," + (-config.scaleY * eqn(thetaRange[0]) * Math.sin(0) - config.originY * config.scaleY);
+  var svgPath = "M" + (config.scaleX * eqn(thetaRange[0]) * Math.cos(0) + config.originX * config.scaleX) + "," + (-config.scaleY * eqn(thetaRange[0]) * Math.sin(0) - config.originY * config.scaleY);
 
   for (var theta = thetaRange[0]; theta <= thetaRange[1]; theta += stepSize) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
-    SVG_path = SVG_path.concat(" L" + (config.scaleX * eqn(theta) * Math.cos(theta) + config.originX * config.scaleX) + "," + (-config.scaleY * eqn(theta) * Math.sin(theta) - config.originY * config.scaleY));
+    svgPath = svgPath.concat(" L" + (config.scaleX * eqn(theta) * Math.cos(theta) + config.originX * config.scaleX) + "," + (-config.scaleY * eqn(theta) * Math.sin(theta) - config.originY * config.scaleY));
   }
 
-  return SVG_path;
+  return svgPath;
 }
 
 exports.createPolarSVGPath = createPolarSVGPath;
@@ -45963,6 +46007,8 @@ global.play = play_1.play;
 var scene_1 = require("./lib/Scene/scene");
 
 global.Scene = scene_1.Scene;
+global.overflow = scene_1.overflow;
+global.p5.prototype.registerMethod('init', scene_1.Scene);
 
 var controls_1 = require("./lib/Scene/controls"); //global.sceneTime = sceneTime;
 
@@ -46019,7 +46065,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58001" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58159" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
