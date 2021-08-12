@@ -42,13 +42,10 @@ global.addDuration = addDuration;
 // global.playScene = playScene;
 // global.restartScene = restartScene;
 
-import { beginGraph, endGraph, wrapRect } from './lib/Geometry/beginGraph';
+import { beginGraph, endGraph } from './lib/Geometry/beginGraph';
 
 global.beginGraph = beginGraph;
 global.endGraph = endGraph;
-wrapRect(global.p5);
-// global.p5.prototype.rect = RECT;
-//global.rect = RECT
 
 import { transform } from './lib/Scene/transform';
 
