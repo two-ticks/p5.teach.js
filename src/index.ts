@@ -16,8 +16,11 @@ global.add = add;
 import { play } from './lib/Scene/play';
 global.play = play;
 
-import { Scene } from './lib/Scene/scene';
-global.Scene = Scene;
+import { Scene, overflow } from './lib/Scene/scene';
+// global.Scene = Scene;
+global.overflow = overflow;
+
+global.p5.prototype.registerMethod('init', Scene);
 
 import {
   //sceneTime,
