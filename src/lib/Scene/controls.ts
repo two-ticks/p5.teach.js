@@ -5,6 +5,20 @@ export function clock() {
 export function addDuration(timeDuration) {
   animationTimeline.add({ duration: timeDuration });
 }
+
+export function callAt(startTime, func) {
+  animationTimeline.add(
+    {
+      complete: function (anim) {
+        func();
+      }
+      //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+      //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+    },
+    startTime
+  );
+}
+
 export let animationTimeline = anime.timeline({}); //initilising a timeline
 // animationTimeline.add({});
 
