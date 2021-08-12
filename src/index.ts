@@ -20,7 +20,7 @@ import { Scene, overflow } from './lib/Scene/scene';
 // global.Scene = Scene;
 global.overflow = overflow;
 
-global.p5.prototype.registerMethod('init', Scene);
+global.p5.prototype.registerMethod('init', () => new Scene());
 
 import {
   //sceneTime,
@@ -40,11 +40,12 @@ global.addDuration = addDuration;
 // global.playScene = playScene;
 // global.restartScene = restartScene;
 
-import { beginGraph, endGraph, RECT } from './lib/Geometry/beginGraph';
+import { beginGraph, endGraph, wrapRect } from './lib/Geometry/beginGraph';
 
 global.beginGraph = beginGraph;
 global.endGraph = endGraph;
-p5.prototype.rect = RECT;
+wrapRect(global.p5);
+// global.p5.prototype.rect = RECT;
 //global.rect = RECT
 
 import { transform } from './lib/Scene/transform';

@@ -1,5 +1,5 @@
 import anime from 'animejs';
-import p5 from 'p5';
+// import p5 from 'p5';
 import { animationTimeline } from '../Scene/controls';
 import { sceneContainer, sceneVariables } from '../Scene/scene';
 import { transform } from '../Scene/transform';
@@ -143,38 +143,39 @@ export function endGraph() {
   sceneVariables.isGraph = 'false';
 }
 
-const _rect = p5.prototype.rect
-
-export function RECT(this, ...args) {
-  const p5rect = _rect.prototype.rect;
-  if (
-    typeof sceneVariables.isGraph === 'undefined' ||
-    sceneVariables.isGraph === 'false'
-  ) {
-    console.log("Called");
-    _rect(...args)
-  } else if (sceneVariables.isGraph === 'true') {
-    console.log('this is called');
-    const rectangle = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'rect'
-    );
-    const x = arguments[0];
-    const y = arguments[1];
-    const w = arguments[2];
-    const h = arguments[3];
-    rectangle.setAttribute('x', `${x}`);
-    rectangle.setAttribute('y', `${y}`);
-    rectangle.setAttribute('width', `${w}`);
-    rectangle.setAttribute('height', `${h}`);
-    rectangle.setAttribute('fill', `${'none'}`);
-    rectangle.setAttribute(
-      'stroke',
-      `${sceneVariables.currStrokeColor.toString()}`
-    );
-    rectangle.setAttribute('stroke-width', `${sceneVariables.currStrokeWidth}`);
-    sceneVariables.currentSVG.appendChild(rectangle);
-  }
+export function wrapRect(p5: any) {
+  p5.prototype._rect = p5.prototype.rect;
+  p5.prototype.rect = function() {
+    if (
+      typeof sceneVariables.isGraph === 'undefined' ||
+      sceneVariables.isGraph === 'false'
+    ) {
+      // console.log("Called");
+      console.log("Canvas rect() called");
+      this._rect(...Array.from(arguments));
+    } else if (sceneVariables.isGraph === 'true') {
+      console.log('SVG rect() called');
+      const rectangle = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
+      const x = arguments[0];
+      const y = arguments[1];
+      const w = arguments[2];
+      const h = arguments[3];
+      rectangle.setAttribute('x', `${x}`);
+      rectangle.setAttribute('y', `${y}`);
+      rectangle.setAttribute('width', `${w}`);
+      rectangle.setAttribute('height', `${h}`);
+      rectangle.setAttribute('fill', `${'none'}`);
+      rectangle.setAttribute(
+        'stroke',
+        `${sceneVariables.currStrokeColor.toString()}`
+      );
+      rectangle.setAttribute('stroke-width', `${sceneVariables.currStrokeWidth}`);
+      sceneVariables.currentSVG.appendChild(rectangle);
+    }
+  };
 }
 
 // p5.prototype._line = p5.prototype.line
