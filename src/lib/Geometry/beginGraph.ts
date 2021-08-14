@@ -663,8 +663,26 @@ class SVGArrow {
     sceneVariables.currentSVG.removeChild(this.arrow);
   }
 
-  arrowHead(x, y){
+  arrowHead(x, y) {
+    this.x2 = x;
+    this.y2 = y;
+    const angle = Math.atan((this.y2 - this.y1) / (this.x2 - this.x1));
 
+    this.svgLine.setAttribute(
+      'x2',
+      `${this.x2 - 1.5 * this.arrowConfig.arrowSize * Math.cos(angle)}`
+    );
+    this.svgLine.setAttribute(
+      'y2',
+      `${-(this.y2 - 6 * this.arrowConfig.arrowSize * Math.sin(angle))}`
+    );
+  }
+
+  arrowTail(x, y) {
+    this.x1 = x;
+    this.y1 = y;
+    this.svgLine.setAttribute('x1', `${this.x1}`);
+    this.svgLine.setAttribute('y1', `${-this.y1}`);
   }
 }
 
