@@ -42,10 +42,12 @@ global.addDuration = addDuration;
 // global.playScene = playScene;
 // global.restartScene = restartScene;
 
-import { arrow, beginGraph, endGraph } from './lib/Geometry/beginGraph';
+import { arrow, beginGraph, controlPoint, endGraph, SVGControlPointPosition } from './lib/Geometry/beginGraph';
 
 global.beginGraph = beginGraph;
 global.arrow = arrow
+global.controlPoint = controlPoint
+global.SVGControlPointPosition = SVGControlPointPosition
 global.endGraph = endGraph;
 
 import { transform } from './lib/Scene/transform';

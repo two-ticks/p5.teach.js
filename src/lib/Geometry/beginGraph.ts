@@ -1,4 +1,5 @@
 import anime from 'animejs';
+import p5 from 'p5';
 import { animationTimeline } from '../Scene/controls';
 import { sceneContainer, sceneVariables } from '../Scene/scene';
 import { transform } from '../Scene/transform';
@@ -114,6 +115,7 @@ export class Graph extends GObject {
       'http://www.w3.org/2000/svg',
       'svg'
     );
+    //this.graphObject.setAttribute('onload', 'SVGControlPointPosition(evt)');
     this.graphObject.setAttribute('width', `${this.svgWidth}`);
     this.graphObject.setAttribute('height', `${this.svgHeight}`);
     this.graphObject.setAttribute(
@@ -163,6 +165,7 @@ class Rectangle {
   shape: SVGRectElement;
   w: number;
   h: number;
+  shapeAngle: number;
   //rectangle: SVGRectElement;
   constructor(...args: any[]) {
     // super(arguments[0], arguments[1]);
@@ -171,6 +174,7 @@ class Rectangle {
     this.y = arguments[1];
     this.w = arguments[2];
     this.h = arguments[3];
+    this.shapeAngle = 0;
     this.shape.setAttribute('x', `${this.x}`);
     this.shape.setAttribute('y', `${this.y}`);
     this.shape.setAttribute('width', `${this.w}`);
@@ -187,6 +191,11 @@ class Rectangle {
       'stroke-width',
       `${sceneVariables.currStrokeWidth}`
     );
+    this.shape.setAttribute(
+      'style',
+      `transform : rotate(${sceneVariables.currAngle.toString()}deg);`
+    );
+    //this.shape.style.transform = `rotate(${sceneVariables.currAngle.toString()})deg;` //rotation
     sceneVariables.currentSVG.appendChild(this.shape);
     return this;
   }
@@ -198,6 +207,19 @@ class Rectangle {
   }
   remove() {
     sceneVariables.currentSVG.removeChild(this.shape);
+  }
+  rotate(angle: number, mode: string = 'relative') {
+    if (angle) {
+      if (mode === 'relative') {
+        this.shapeAngle += angle;
+      } else if (mode === 'absolute') {
+        this.shapeAngle = angle;
+      }
+    }
+    this.shape.setAttribute(
+      'style',
+      `transform : rotate(${sceneVariables.currAngle + this.shapeAngle}deg);`
+    );
   }
 }
 
@@ -307,17 +329,176 @@ class SVGCircle extends SVGEllipse {
     sceneVariables.currentSVG.appendChild(this.shape);
     return this;
   }
-  position(cx: any, cy: any) {
-    this.cx = cx;
-    this.cy = cy;
-    this.shape.setAttribute('cx', `${this.cx}`);
-    this.shape.setAttribute('cy', `${this.cy}`);
-  }
-  remove() {
-    sceneVariables.currentSVG.removeChild(this.shape);
-  }
+  // position(cx: any, cy: any) {
+  //   this.cx = cx;
+  //   this.cy = cy;
+  //   this.shape.setAttribute('cx', `${this.cx}`);
+  //   this.shape.setAttribute('cy', `${this.cy}`);
+  // }
+  // remove() {
+  //   sceneVariables.currentSVG.removeChild(this.shape);
+  // }
 }
 
+global.p5.prototype._point = global.p5.prototype.point;
+global.p5.prototype.point = function () {
+  if (
+    typeof sceneVariables.isGraph === 'undefined' ||
+    sceneVariables.isGraph === 'false'
+  ) {
+    console.log('Canvas point() called');
+    return this._point(...Array.from(arguments));
+  } else if (sceneVariables.isGraph === 'true') {
+    console.log('SVG point() called');
+    return new SVGPoint(...Array.from(arguments));
+  }
+};
+
+class SVGPoint extends SVGEllipse {
+  //rectangle: SVGRectElement;
+  constructor(...args: any[]) {
+    if (arguments[0] instanceof p5.Vector) {
+      super(
+        arguments[0].x,
+        arguments[0].y,
+        sceneVariables.currStrokeWidth,
+        sceneVariables.currStrokeWidth
+      );
+    } else {
+      super(
+        arguments[0],
+        arguments[1],
+        sceneVariables.currStrokeWidth,
+        sceneVariables.currStrokeWidth
+      );
+    }
+    if (this.shape) {
+      sceneVariables.currentSVG.removeChild(this.shape); //removes ellipse if formed by super
+    }
+    this.shape = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
+    this.cx = arguments[0];
+    this.cy = arguments[1];
+    this.rx = float(sceneVariables.currStrokeWidth);
+    this.shape.setAttribute('cx', `${this.cx}`);
+    this.shape.setAttribute('cy', `${this.cy}`);
+    this.shape.setAttribute('r', `${this.rx / 2}`);
+    this.shape.setAttribute(
+      'fill',
+      `${sceneVariables.currStrokeColor.toString()}`
+    );
+    this.shape.setAttribute(
+      'stroke',
+      `${sceneVariables.currStrokeColor.toString()}`
+    );
+    this.shape.setAttribute('stroke-width', `${0}`);
+    sceneVariables.currentSVG.appendChild(this.shape);
+    return this;
+  }
+  // position(cx: any, cy: any) {
+  //   this.cx = cx;
+  //   this.cy = cy;
+  //   this.shape.setAttribute('cx', `${this.cx}`);
+  //   this.shape.setAttribute('cy', `${this.cy}`);
+  // }
+  // remove() {
+  //   sceneVariables.currentSVG.removeChild(this.shape);
+  // }
+}
+
+export function controlPoint(...args) {
+  if (sceneVariables.isGraph === 'true') {
+    return new SVGControlPoint(...args);
+  }
+}
+class SVGControlPoint extends SVGPoint {
+  x;
+  y;
+  constructor(...args: any[]) {
+    super(arguments[0], arguments[1]);
+    // this.xco = 0;
+    // this.yco = 0;
+
+    this.shape.setAttribute('onmousedown', 'SVGControlPointPosition(evt)');
+
+    this.shape.setAttribute('class', 'controlPoint');
+    this.shape.setAttribute('posX', `${this.cx}`);
+    this.shape.setAttribute('posY', `${this.cy}`);
+
+    return this;
+  }
+
+  position() {
+    this.x = this.shape.getAttributeNS(null, 'posX');
+    this.y = this.shape.getAttributeNS(null, 'posY');
+    return [this.x, this.y];
+  }
+  // setX(x) {
+  //   this.xco = x;
+  //   // this.x = this.shape.getScreenCTM().e/ this.shape.getScreenCTM().a;
+  //   // this.y = this.shape.getScreenCTM().f/ this.shape.getScreenCTM().d;
+  //   console.log(this.xco);
+  // }
+}
+
+export function SVGControlPointPosition(event) {
+  let svg = sceneVariables.currentSVG;
+  svg.addEventListener('mousedown', startDrag);
+  svg.addEventListener('mousemove', drag);
+  svg.addEventListener('mouseup', endDrag);
+  svg.addEventListener('mouseleave', endDrag);
+  let offset, transform;
+  function getMousePosition(event) {
+    let CTM: any = svg.getScreenCTM();
+    return {
+      x: (event.clientX - CTM.e) / CTM.a,
+      y: (event.clientY - CTM.f) / CTM.d
+    };
+  }
+  function startDrag(event) {
+    if (event.target.classList.contains('controlPoint')) {
+      sceneVariables.selectedPoint = event.target;
+      //console.log(sceneVariables.selectedPoint.x);
+
+      offset = getMousePosition(event);
+      // Get all the transforms currently on this element
+      var transforms = sceneVariables.selectedPoint.transform.baseVal;
+      // Ensure the first transform is a translate transform
+      if (
+        transforms.length === 0 ||
+        transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE
+      ) {
+        // Create an transform that translates by (0, 0)
+        var translate = svg.createSVGTransform();
+        translate.setTranslate(0, 0);
+        // Add the translation to the front of the transforms list
+        sceneVariables.selectedPoint.transform.baseVal.insertItemBefore(
+          translate,
+          0
+        );
+      }
+      // Get initial translation amount
+      transform = transforms.getItem(0);
+      offset.x -= transform.matrix.e;
+      offset.y -= transform.matrix.f;
+    }
+  }
+
+  function drag(event) {
+    if (sceneVariables.selectedPoint) {
+      event.preventDefault();
+      var coord = getMousePosition(event);
+      transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
+      sceneVariables.selectedPoint.setAttribute('posX', `${coord.x}`);
+      sceneVariables.selectedPoint.setAttribute('posY', `${coord.y}`);
+    }
+  }
+  function endDrag(event) {
+    sceneVariables.selectedPoint = null;
+  }
+}
 global.p5.prototype._line = global.p5.prototype.line;
 global.p5.prototype.line = function () {
   if (
@@ -481,6 +662,10 @@ class SVGArrow {
   remove() {
     sceneVariables.currentSVG.removeChild(this.arrow);
   }
+
+  arrowHead(x, y){
+
+  }
 }
 
 global.p5.prototype._fill = global.p5.prototype.fill;
@@ -516,5 +701,19 @@ global.p5.prototype.strokeWeight = function () {
     this._strokeWeight(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
     sceneVariables.currStrokeWidth = arguments[0];
+  }
+};
+
+global.p5.prototype._rotate = global.p5.prototype.rotate;
+global.p5.prototype.rotate = function () {
+  if (
+    typeof sceneVariables.isGraph === 'undefined' ||
+    sceneVariables.isGraph === 'false'
+  ) {
+    this._rotate(...Array.from(arguments));
+  } else if (sceneVariables.isGraph === 'true') {
+    sceneVariables.currAngle += arguments[0];
+    //console.log(sceneVariables.currAngle);
+    //TODO : rotate currently takes only angles in degree
   }
 };

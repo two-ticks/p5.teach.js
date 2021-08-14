@@ -1,9 +1,23 @@
+import p5 from "p5";
+
 export let sceneContainer: HTMLDivElement;
-export let sceneVariables = {
+interface ISceneVariables {
+  isGraph: any,
+  currentSVG: SVGSVGElement,
+  currStrokeColor: p5.Color | string,
+  currStrokeWidth: string,
+  currFillColor: p5.Color | string,
+  currAngle: number,
+  selectedPoint: any
+};
+export let sceneVariables : ISceneVariables = {
   isGraph: 'false',
   currentSVG: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
   currStrokeColor: 'black',
-  currStrokeWidth: '1'
+  currStrokeWidth: '1',
+  currFillColor: 'none',
+  currAngle: 0,
+  selectedPoint : document.createElementNS('http://www.w3.org/2000/svg', 'circle') 
 };
 //export
 
@@ -17,6 +31,7 @@ export class Scene {
     sceneContainer.style.left = 0 + 'px';
     sceneContainer.style.top = 0 + 'px';
     sceneContainer.style.position = 'absolute';
+    sceneContainer.style.fill = 'none';
     // sceneContainer.style.width = 0 + 'px';
     // sceneContainer.style.height = 0 + 'px';
     // sceneContainer.setAttribute(
