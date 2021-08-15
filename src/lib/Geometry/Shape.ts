@@ -557,6 +557,7 @@ global.p5.prototype.fill = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
+    sceneVariables.currFillColor = arguments[0].toString();
     this._fill(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
     sceneVariables.currFillColor = arguments[0].toString();
@@ -569,6 +570,7 @@ global.p5.prototype.stroke = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
+    sceneVariables.currStrokeColor = arguments[0].toString();
     this._stroke(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
     sceneVariables.currStrokeColor = arguments[0].toString();
@@ -581,6 +583,7 @@ global.p5.prototype.strokeWeight = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
+    sceneVariables.currStrokeWidth = arguments[0];
     this._strokeWeight(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
     sceneVariables.currStrokeWidth = arguments[0];
@@ -593,6 +596,7 @@ global.p5.prototype.rotate = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
+    sceneVariables.currAngle += arguments[0];
     this._rotate(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
     sceneVariables.currAngle += arguments[0];
