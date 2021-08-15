@@ -33,6 +33,7 @@ export class Graph2D extends GObject {
     xAxis: any;
     yAxis: any;
     axisColor: any;
+    grid: any;
     smallGridColor: any;
     gridColor: any;
     stepX: any;
@@ -45,6 +46,7 @@ export class Graph2D extends GObject {
     tickMarginX: any;
     tickMarginY: any;
     pathElements: any;
+    graphBox : any;
   };
 
   /**
@@ -78,6 +80,7 @@ export class Graph2D extends GObject {
       scaleX: 1,
       scaleY: 1,
       axisColor: INDIGO50,
+      grid: 'true',
       smallGridColor: MAGENTA50,
       gridColor: ORANGE40,
       stepX: 1,
@@ -89,7 +92,8 @@ export class Graph2D extends GObject {
       tickColor: ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5,
-      pathElements: 1000
+      pathElements: 1000,
+      graphBox: 'true'
     };
 
     this.eqn = eqn;
@@ -172,6 +176,7 @@ export class Graph2D extends GObject {
       stepY: config.stepY ? config.stepY : this.config.stepY,
       originX: config.originX ? config.originX : this.config.originX,
       originY: config.originY ? config.originY : this.config.originY,
+      grid: config.grid ? config.grid : this.config.grid,
       tickX: config.tickX ? config.tickX : this.config.tickX,
       tickY: config.tickY ? config.tickY : this.config.tickY,
       tickColor: config.tickColor ? config.tickColor : this.config.tickColor,
@@ -183,7 +188,9 @@ export class Graph2D extends GObject {
         : this.config.tickMarginY,
       pathElements: config.pathElements
         ? config.pathElements
-        : this.config.pathElements
+        : this.config.pathElements,
+        graphBox: config.graphBox ? config.graphBox : this.config.graphBox,
+
     };
     //console.log(this.config);
   }
@@ -319,8 +326,12 @@ export class Graph2D extends GObject {
     grid.setAttribute('y', `${-this.svgHeight / 2}`);
     grid.setAttribute('width', `100%`);
     grid.setAttribute('height', `100%`);
-    grid.setAttribute('fill', `url(#grid)`);
+    if (this.config.grid === 'true') {
+      grid.setAttribute('fill', `url(#grid)`);
+    }
+    if (this.config.graphBox === 'true') {
     grid.setAttribute('stroke', `white`);
+    }
     //this.coordinate.appendChild(frame);
     this.coordinate.appendChild(grid);
 
