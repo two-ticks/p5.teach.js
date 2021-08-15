@@ -1,6 +1,7 @@
 import TeXToSVG from 'tex-to-svg';
 import { TexObject } from '../interfaces';
 import { add } from '../Scene/add';
+//import { animationTimeline } from '../Scene/controls';
 import { play } from '../Scene/play';
 import { MObject } from './MObject';
 
@@ -104,6 +105,7 @@ export class TeX extends MObject {
     this.writeElement.style(property, value);
   }
 
+
   update(_tex) {
     this.svgEquation = TeXToSVG(_tex);
     this.writeElement.html(this.svgEquation);
@@ -115,6 +117,8 @@ export class TeX extends MObject {
     g[0].setAttribute('stroke-width', this._strokeWidth);
     g[0].setAttribute('fill', this.fillColor);
     svg[0].setAttribute('fill', this.fillColor);
+    this.writeElement.position(this.x, this.y);
+
   }
 
   play(

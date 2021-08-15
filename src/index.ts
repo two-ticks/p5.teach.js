@@ -42,12 +42,16 @@ global.addDuration = addDuration;
 // global.playScene = playScene;
 // global.restartScene = restartScene;
 
-import { arrow, beginGraph, controlPoint, endGraph, SVGControlPointPosition } from './lib/Geometry/beginGraph';
+import {
+  beginGraph,
+  controlPoint,
+  endGraph,
+  SVGControlPointPosition
+} from './lib/Geometry/Shape';
 
 global.beginGraph = beginGraph;
-global.arrow = arrow
-global.controlPoint = controlPoint
-global.SVGControlPointPosition = SVGControlPointPosition
+global.controlPoint = controlPoint;
+global.SVGControlPointPosition = SVGControlPointPosition;
 global.endGraph = endGraph;
 
 import { transform } from './lib/Scene/transform';
@@ -71,3 +75,6 @@ import {
 
 global.GraphParametric2D = GraphParametric2D;
 global.create2DParametricGraph = create2DParametricGraph;
+
+import { arrow } from './lib/Geometry/arrow';
+global.arrow = arrow;

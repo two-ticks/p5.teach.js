@@ -9,13 +9,16 @@ export function addDuration(timeDuration) {
 export function callAt(startTime, func) {
   animationTimeline.add(
     {
+      //duration: startTime,
       complete: function (anim) {
+        // console.log("called");
+        
         func();
       }
       //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
       //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
     },
-    startTime
+    startTime*1000
   );
 }
 

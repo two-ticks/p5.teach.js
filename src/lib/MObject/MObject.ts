@@ -43,4 +43,30 @@ export class MObject {
       delayDuration
     );
   }
+
+  resizeTo(newSize, startTime, endTime) {
+    const object = this.writeElement;
+    const timeDuration = (endTime - startTime) * 1000;
+    const delayDuration = startTime * 1000;
+    const Size = {
+      currSize: this._size
+    };
+    animationTimeline.add(
+      {
+        targets: Size, //[this.x, this.y],
+        currSize: newSize,
+
+        //translateZ: 0,
+        easing: 'easeInOutCubic',
+        duration: timeDuration,
+        update: function (anim) {
+          object.style('font-size', `${this._size}px`);
+          this._size = Size.currSize;
+        }
+        //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+        //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+      },
+      delayDuration
+    );
+  }
 }
