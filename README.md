@@ -1,4 +1,4 @@
-<h1> <img src="assets/p5-teach-logo.png" alt="logo" width="20" /> p5.teach.js </h1> 
+<h1> <img src="assets/p5-teach-logo.png" alt="logo" width="50" /> p5.teach.js </h1> 
 
 <img src="assets/p5-astrik-teach.png" alt="astrik-logo" />
 
