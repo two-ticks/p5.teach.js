@@ -2,7 +2,7 @@
 
 <img src="assets/p5-astrik-teach.png" alt="astrik-logo" />
 
-> A math animation library for p5.js
+> A beginner friendly math animation library for p5.js
 
 p5.teach.js provides tools for teaching through p5.js, such as functions to animate text, TeX, and shapes.
 
