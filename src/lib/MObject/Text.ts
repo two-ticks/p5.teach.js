@@ -5,9 +5,6 @@ import { MObject } from './MObject';
 
 /**
  * class representing a text
- * <iframe src="https://editor.p5js.org/radium.scientist/full/7ucXgK3Vz"
-width="70%" height="510" allowfullscreen frameborder="0"
-marginwidth="0" marginheight="0"></iframe>
  */
 
 export class Text extends MObject {
@@ -24,7 +21,7 @@ export class Text extends MObject {
 
   /**
    * creates a text object
-   * 
+   *
    * @param {string} text text content
    * @param {number} x-coordinate x-coordinate of text
    * @param {number} y-coordinate y-coordinate of text

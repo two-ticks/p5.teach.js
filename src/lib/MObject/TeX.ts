@@ -10,6 +10,8 @@ import { MObject } from './MObject';
 /**
  * TeX class
  *
+ * <iframe src="../../examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+ *
  * @param    {String} - escaped TeX input
  * @param    {number} - x
  * @param    {number} - y
@@ -17,14 +19,13 @@ import { MObject } from './MObject';
  *
  * @example
  *
- * example for playing animation of type 'appear' for TeX object:
+ * example for creating TeX object:
  * ```js
- * let tex_1 = new TeX(
+ * let tex = new TeX(
  *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
  *   200,
  *   300,
- *   200,
- *   100
+ *   28
  * );
  * ```
  * @experimental
@@ -105,7 +106,6 @@ export class TeX extends MObject {
     this.writeElement.style(property, value);
   }
 
-
   update(_tex) {
     this.svgEquation = TeXToSVG(_tex);
     this.writeElement.html(this.svgEquation);
@@ -118,7 +118,6 @@ export class TeX extends MObject {
     g[0].setAttribute('fill', this.fillColor);
     svg[0].setAttribute('fill', this.fillColor);
     this.writeElement.position(this.x, this.y);
-
   }
 
   play(
@@ -130,6 +129,24 @@ export class TeX extends MObject {
   }
 }
 
+/**
+ * createTeX
+ *
+ * @param args
+ *
+ * ```js
+ * let tex = createTeX(
+ *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
+ *   200,
+ *   300,
+ *   20,
+ * );
+ * ```
+ * <br/>
+ * <iframe src="../../examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+ *
+ * @returns
+ */
 export function createTeX(...args: any[]) {
   const _texArg: TexObject = {
     _tex: args[0],

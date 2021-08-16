@@ -43632,6 +43632,8 @@ var MObject_1 = require("./MObject"); //TODO : add test cases
 /**
  * TeX class
  *
+ * <iframe src="../../examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+ *
  * @param    {String} - escaped TeX input
  * @param    {number} - x
  * @param    {number} - y
@@ -43639,14 +43641,13 @@ var MObject_1 = require("./MObject"); //TODO : add test cases
  *
  * @example
  *
- * example for playing animation of type 'appear' for TeX object:
+ * example for creating TeX object:
  * ```js
- * let tex_1 = new TeX(
+ * let tex = new TeX(
  *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
  *   200,
  *   300,
- *   200,
- *   100
+ *   28
  * );
  * ```
  * @experimental
@@ -43792,6 +43793,24 @@ function (_super) {
 }(MObject_1.MObject);
 
 exports.TeX = TeX;
+/**
+ * createTeX
+ *
+ * @param args
+ *
+ * ```js
+ * let tex = createTeX(
+ *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
+ *   200,
+ *   300,
+ *   20,
+ * );
+ * ```
+ * <br/>
+ * <iframe src="../../examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+ *
+ * @returns
+ */
 
 function createTeX() {
   var args = [];
@@ -44149,6 +44168,7 @@ function (_super) {
 
   /**
    * creates a text object
+   *
    * @param {string} text text content
    * @param {number} x-coordinate x-coordinate of text
    * @param {number} y-coordinate y-coordinate of text
@@ -44984,6 +45004,8 @@ global.p5.prototype._fill = global.p5.prototype.fill;
 
 global.p5.prototype.fill = function () {
   if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    scene_1.sceneVariables.currFillColor = arguments[0].toString();
+
     this._fill.apply(this, Array.from(arguments));
   } else if (scene_1.sceneVariables.isGraph === 'true') {
     scene_1.sceneVariables.currFillColor = arguments[0].toString();
@@ -44994,6 +45016,8 @@ global.p5.prototype._stroke = global.p5.prototype.stroke;
 
 global.p5.prototype.stroke = function () {
   if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    scene_1.sceneVariables.currStrokeColor = arguments[0].toString();
+
     this._stroke.apply(this, Array.from(arguments));
   } else if (scene_1.sceneVariables.isGraph === 'true') {
     scene_1.sceneVariables.currStrokeColor = arguments[0].toString();
@@ -45004,6 +45028,8 @@ global.p5.prototype._strokeWeight = global.p5.prototype.strokeWeight;
 
 global.p5.prototype.strokeWeight = function () {
   if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    scene_1.sceneVariables.currStrokeWidth = arguments[0];
+
     this._strokeWeight.apply(this, Array.from(arguments));
   } else if (scene_1.sceneVariables.isGraph === 'true') {
     scene_1.sceneVariables.currStrokeWidth = arguments[0];
@@ -45014,6 +45040,8 @@ global.p5.prototype._rotate = global.p5.prototype.rotate;
 
 global.p5.prototype.rotate = function () {
   if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    scene_1.sceneVariables.currAngle += arguments[0];
+
     this._rotate.apply(this, Array.from(arguments));
   } else if (scene_1.sceneVariables.isGraph === 'true') {
     scene_1.sceneVariables.currAngle += arguments[0]; //console.log(sceneVariables.currAngle);
@@ -46927,7 +46955,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53994" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50724" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
