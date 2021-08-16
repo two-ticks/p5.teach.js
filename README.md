@@ -1,4 +1,8 @@
-# p5.teach.js
+<h1> <img src="assets/p5-teach-logo.png" alt="logo" width="20" /> p5.teach.js </h1> 
+
+<img src="assets/p5-astrik-teach.png" alt="astrik-logo" />
+
+> A math animation library for p5.js
 
 p5.teach.js provides tools for teaching through p5.js, such as functions to animate text, TeX, and shapes.
 
@@ -6,7 +10,7 @@ p5.teach.js provides tools for teaching through p5.js, such as functions to anim
 
 ## Documentation
 
-- [TypeDoc Documentation](https://two-ticks.github.io/p5.teach.js/docs/index.html)
+- [TypeDoc Documentation](docs/index.html)
 - [API Reference](api_reference.md)
 - [Example Sketches](https://editor.p5js.org/radium.scientist/collections/-xxYz8cof)
 
