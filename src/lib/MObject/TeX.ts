@@ -8,28 +8,9 @@ import { MObject } from './MObject';
 //TODO : add test cases
 
 /**
- * TeX class
- *
- * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
- *
- * @param    {String} - escaped TeX input
- * @param    {number} - x
- * @param    {number} - y
- * @param    {number} - font-size
- *
- * @example
- *
- * example for creating TeX object:
- * ```js
- * let tex = new TeX(
- *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
- *   200,
- *   300,
- *   28
- * );
- * ```
- * @experimental
+ * class representing a tex
  */
+
 export class TeX extends MObject {
   svgEquation: string;
   //startTime: number; // left for later decision -> need not specify such details at initialisation
@@ -40,6 +21,26 @@ export class TeX extends MObject {
   // svgHeight: number;
   _strokeWidth: number;
   strokeColor: p5.Color;
+
+  /**
+   * creates a tex object
+   *
+   * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+   *
+   * @param    {String} - escaped TeX input
+   * @param    {number} - x
+   * @param    {number} - y
+   * @param    {number} - font-size
+   *
+   * @example
+   *
+   * example for creating TeX object:
+   * ```js
+   * let tex = new TeX(
+   *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}', 200, 300, 28);
+   * ```
+   */
+
   constructor({ _tex, x = 10, y = 10, _size = 28 }: TexObject) {
     super(_tex, x, y, _size);
     //this._tex = _tex;
@@ -52,6 +53,12 @@ export class TeX extends MObject {
     this.strokeColor = color('black');
   }
 
+  /**
+   * sets position of tex
+   * @param {number} x-coordinate x-coordinate of tex
+   * @param {number} y-coordinate y-coordinate of tex
+   */
+
   position(x: number = 10, y: number = 10) {
     if (arguments.length === 0) {
       return [this.x, this.y];
@@ -61,6 +68,11 @@ export class TeX extends MObject {
     }
   }
 
+  /**
+   * sets font-size of tex
+   * @param {number} font-size font-size of the tex
+   */
+
   size(_size: number = 28) {
     if (arguments.length === 0) {
       return this._size;
@@ -69,6 +81,11 @@ export class TeX extends MObject {
     }
   }
 
+  /**
+   * sets stroke-color of tex
+   * @param {p5.Color} stroke-color stroke-color of tex
+   */
+
   stroke(strokeColor: any = 'black') {
     if (arguments.length === 0) {
       return this.strokeColor;
@@ -76,6 +93,12 @@ export class TeX extends MObject {
       this.strokeColor = strokeColor;
     }
   }
+
+  /**
+   * sets stroke-width of tex
+   * @param {number} strokeWidth stroke-width of the tex
+   */
+
   strokeWidth(_strokeWidth: number = 8) {
     if (arguments.length === 0) {
       return this._strokeWidth;
@@ -83,6 +106,11 @@ export class TeX extends MObject {
       this._strokeWidth = _strokeWidth;
     }
   }
+
+  /**
+   * sets fill-color of text
+   * @param {p5.Color} fill-color fill-color of text
+   */
 
   fill(fillColor: any = 'black') {
     if (arguments.length === 0) {
@@ -92,20 +120,41 @@ export class TeX extends MObject {
     }
   }
 
+  /**
+   * removes text object
+   */
+
   remove() {
     //TODO : should throw error if called on object which has not been added
     this.writeElement.remove();
   }
+
+  /**
+   * adds text object
+   */
 
   add() {
     add(this);
     //this.writeTexElement.style('opacity', '1');
   }
 
+  /**
+   * Sets the given style (css) property (1st arg) of the element with the
+   * given value (2nd arg). If the single argument
+   * is given in css syntax ('text-align:center'), .style() sets the css
+   * appropriately.
+   *
+   * @param  {String} property   property to be set
+   * @param {String} value value
+   */
+
   style(property, value) {
     this.writeElement.style(property, value);
   }
 
+  /**
+   * updates the tex
+   */
   update(_tex) {
     this.svgEquation = TeXToSVG(_tex);
     this.writeElement.html(this.svgEquation);
@@ -119,6 +168,13 @@ export class TeX extends MObject {
     svg[0].setAttribute('fill', this.fillColor);
     this.writeElement.position(this.x, this.y);
   }
+
+  /**
+   * play text animation
+   * @param {String} animationType type of animation to be played
+   * @param {Number} timeDuration duration of animation
+   * @param {Number} delayDuration delay
+   */
 
   play(
     animationType: string = 'write',

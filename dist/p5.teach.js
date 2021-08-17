@@ -43630,27 +43630,7 @@ var play_1 = require("../Scene/play");
 var MObject_1 = require("./MObject"); //TODO : add test cases
 
 /**
- * TeX class
- *
- * <iframe src="../../examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
- *
- * @param    {String} - escaped TeX input
- * @param    {number} - x
- * @param    {number} - y
- * @param    {number} - font-size
- *
- * @example
- *
- * example for creating TeX object:
- * ```js
- * let tex = new TeX(
- *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
- *   200,
- *   300,
- *   28
- * );
- * ```
- * @experimental
+ * class representing a tex
  */
 
 
@@ -43658,6 +43638,25 @@ var TeX =
 /** @class */
 function (_super) {
   __extends(TeX, _super);
+  /**
+   * creates a tex object
+   *
+   * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+   *
+   * @param    {String} - escaped TeX input
+   * @param    {number} - x
+   * @param    {number} - y
+   * @param    {number} - font-size
+   *
+   * @example
+   *
+   * example for creating TeX object:
+   * ```js
+   * let tex = new TeX(
+   *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}', 200, 300, 28);
+   * ```
+   */
+
 
   function TeX(_a) {
     var _tex = _a._tex,
@@ -43680,6 +43679,12 @@ function (_super) {
     _this.strokeColor = color('black');
     return _this;
   }
+  /**
+   * sets position of tex
+   * @param {number} x-coordinate x-coordinate of tex
+   * @param {number} y-coordinate y-coordinate of tex
+   */
+
 
   TeX.prototype.position = function (x, y) {
     if (x === void 0) {
@@ -43697,6 +43702,11 @@ function (_super) {
       this.y = y;
     }
   };
+  /**
+   * sets font-size of tex
+   * @param {number} font-size font-size of the tex
+   */
+
 
   TeX.prototype.size = function (_size) {
     if (_size === void 0) {
@@ -43709,6 +43719,11 @@ function (_super) {
       this._size = _size;
     }
   };
+  /**
+   * sets stroke-color of tex
+   * @param {p5.Color} stroke-color stroke-color of tex
+   */
+
 
   TeX.prototype.stroke = function (strokeColor) {
     if (strokeColor === void 0) {
@@ -43721,6 +43736,11 @@ function (_super) {
       this.strokeColor = strokeColor;
     }
   };
+  /**
+   * sets stroke-width of tex
+   * @param {number} strokeWidth stroke-width of the tex
+   */
+
 
   TeX.prototype.strokeWidth = function (_strokeWidth) {
     if (_strokeWidth === void 0) {
@@ -43733,6 +43753,11 @@ function (_super) {
       this._strokeWidth = _strokeWidth;
     }
   };
+  /**
+   * sets fill-color of text
+   * @param {p5.Color} fill-color fill-color of text
+   */
+
 
   TeX.prototype.fill = function (fillColor) {
     if (fillColor === void 0) {
@@ -43745,19 +43770,41 @@ function (_super) {
       this.fillColor = fillColor;
     }
   };
+  /**
+   * removes text object
+   */
+
 
   TeX.prototype.remove = function () {
     //TODO : should throw error if called on object which has not been added
     this.writeElement.remove();
   };
+  /**
+   * adds text object
+   */
+
 
   TeX.prototype.add = function () {
     add_1.add(this); //this.writeTexElement.style('opacity', '1');
   };
+  /**
+   * Sets the given style (css) property (1st arg) of the element with the
+   * given value (2nd arg). If the single argument
+   * is given in css syntax ('text-align:center'), .style() sets the css
+   * appropriately.
+   *
+   * @param  {String} property   property to be set
+   * @param {String} value value
+   */
+
 
   TeX.prototype.style = function (property, value) {
     this.writeElement.style(property, value);
   };
+  /**
+   * updates the tex
+   */
+
 
   TeX.prototype.update = function (_tex) {
     this.svgEquation = tex_to_svg_1.default(_tex);
@@ -43772,6 +43819,13 @@ function (_super) {
     svg[0].setAttribute('fill', this.fillColor);
     this.writeElement.position(this.x, this.y);
   };
+  /**
+   * play text animation
+   * @param {String} animationType type of animation to be played
+   * @param {Number} timeDuration duration of animation
+   * @param {Number} delayDuration delay
+   */
+
 
   TeX.prototype.play = function (animationType, startTime, endTime) {
     if (animationType === void 0) {
@@ -43807,7 +43861,7 @@ exports.TeX = TeX;
  * );
  * ```
  * <br/>
- * <iframe src="../../examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+ * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
  *
  * @returns
  */
@@ -43991,6 +44045,7 @@ exports.overflow = exports.Scene = exports.sceneVariables = exports.sceneContain
 ;
 exports.sceneVariables = {
   isGraph: 'false',
+  graph: 'false',
   currentSVG: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
   currStrokeColor: 'black',
   currStrokeWidth: '1',
@@ -44173,6 +44228,13 @@ function (_super) {
    * @param {number} x-coordinate x-coordinate of text
    * @param {number} y-coordinate y-coordinate of text
    * @param {number} font-size font-size of the text
+   *
+   *  @example
+   *
+   * example for creating text object:
+   * ```js
+   * let text = new Text('Hi!', width/2, height/2, 28)
+   * ```
    */
 
 
@@ -44286,8 +44348,7 @@ function (_super) {
   };
   /**
    * Sets the given style (css) property (1st arg) of the element with the
-   * given value (2nd arg). If a single argument is given, .style()
-   * returns the value of the given property; however, if the single argument
+   * given value (2nd arg). If the single argument
    * is given in css syntax ('text-align:center'), .style() sets the css
    * appropriately.
    *
@@ -44499,11 +44560,11 @@ function (_super) {
 
   function Graph(x, y, svgWidth, svgHeight) {
     if (x === void 0) {
-      x = 10;
+      x = 0;
     }
 
     if (y === void 0) {
-      y = 10;
+      y = 0;
     }
 
     if (svgWidth === void 0) {
@@ -44532,6 +44593,7 @@ function (_super) {
       scaleX: 1,
       scaleY: 1,
       axisColor: INDIGO50,
+      grid: 'true',
       smallGridColor: MAGENTA50,
       gridColor: ORANGE40,
       stepX: 1,
@@ -44543,7 +44605,8 @@ function (_super) {
       tickColor: ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5,
-      arrowFollowerColor: MAGENTA50
+      pathElements: 1000,
+      graphBox: 'true'
     };
     _this.config.scaleX = abs(_this.svgWidth / (_this.config.maxX - _this.config.minX));
     _this.config.scaleY = abs(_this.svgHeight / (_this.config.maxY - _this.config.minY)); // this.x = x;
@@ -44578,9 +44641,39 @@ function (_super) {
 
     _this.graphContainer.elt.appendChild(_this.graphObject);
 
-    scene_1.sceneVariables.currentSVG = _this.graphObject;
-    return _this; //return this;
+    return _this;
   }
+
+  Graph.prototype.configure = function (config) {
+    this.config = {
+      graphColor: config.graphColor ? config.graphColor : this.config.graphColor,
+      graphStrokeWidth: config.graphStrokeWidth ? config.graphStrokeWidth : this.config.graphStrokeWidth,
+      arrowSize: config.arrowSize ? config.arrowSize : this.config.arrowSize,
+      xAxis: config.xAxis ? config.xAxis : this.config.xAxis,
+      yAxis: config.yAxis ? config.yAxis : this.config.yAxis,
+      minX: config.minX ? config.minX : this.config.minX,
+      maxX: config.maxX ? config.maxX : this.config.maxX,
+      minY: config.minY ? config.minY : this.config.minY,
+      maxY: config.maxY ? config.maxY : this.config.maxY,
+      scaleX: config.scaleX ? config.scaleX : this.config.scaleX,
+      scaleY: config.scaleY ? config.scaleY : this.config.scaleY,
+      axisColor: config.axisColor ? config.axisColor : this.config.axisColor,
+      smallGridColor: config.smallGridColor ? config.smallGridColor : this.config.smallGridColor,
+      gridColor: config.gridColor ? config.gridColor : this.config.gridColor,
+      stepX: config.stepX ? config.stepX : this.config.stepX,
+      stepY: config.stepY ? config.stepY : this.config.stepY,
+      originX: config.originX ? config.originX : this.config.originX,
+      originY: config.originY ? config.originY : this.config.originY,
+      grid: config.grid ? config.grid : this.config.grid,
+      tickX: config.tickX ? config.tickX : this.config.tickX,
+      tickY: config.tickY ? config.tickY : this.config.tickY,
+      tickColor: config.tickColor ? config.tickColor : this.config.tickColor,
+      tickMarginX: config.tickMarginX ? config.tickMarginX : this.config.tickMarginX,
+      tickMarginY: config.tickMarginY ? config.tickMarginY : this.config.tickMarginY,
+      pathElements: config.pathElements ? config.pathElements : this.config.pathElements,
+      graphBox: config.graphBox ? config.graphBox : this.config.graphBox
+    }; //console.log(this.config);
+  };
 
   return Graph;
 }(GObject_1.GObject);
@@ -44589,11 +44682,11 @@ exports.Graph = Graph;
 
 function beginGraph(x, y, svgWidth, svgHeight) {
   if (x === void 0) {
-    x = 10;
+    x = 0;
   }
 
   if (y === void 0) {
-    y = 10;
+    y = 0;
   }
 
   if (svgWidth === void 0) {
@@ -44605,6 +44698,8 @@ function beginGraph(x, y, svgWidth, svgHeight) {
   }
 
   var graphTemperoryObject = new Graph(x, y, svgWidth, svgHeight);
+  scene_1.sceneVariables.graph = graphTemperoryObject;
+  scene_1.sceneVariables.currentSVG = graphTemperoryObject.graphObject;
   return graphTemperoryObject;
 }
 
@@ -45088,7 +45183,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create2DGraph = exports.createSVGPath = exports.Graph2D = void 0;
+exports.axis = exports.plot2D = exports.create2DGraph = exports.createSVGPath = exports.Graph2D = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
@@ -45565,6 +45660,174 @@ function create2DGraph(eqn, x, y, svgWidth, svgHeight) {
 }
 
 exports.create2DGraph = create2DGraph;
+
+function plot2D(eqn) {
+  //const plot2d = new Graph2D(eqn, sceneVariables.currentSVG.getBBox().x, sceneVariables.currentSVG.getBBox().y, sceneVariables.currentSVG.getBBox().width, sceneVariables.currentSVG.getBBox().height);
+  if (scene_1.sceneVariables.isGraph === 'true') {
+    var linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    linePath.setAttribute('fill', 'none');
+    linePath.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor);
+    linePath.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    var pathData = createSVGPath(eqn, scene_1.sceneVariables.graph.config);
+    var plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    plotting.setAttribute('id', 'plot'); // linePath.setAttribute(
+    //   'stroke',
+    //   `${sceneVariables.graph.config.graphColor}`
+    // );
+    // linePath.setAttribute(
+    //   'stroke-width',
+    //   `${sceneVariables.graph.config.graphStrokeWidth}`
+    // );
+
+    linePath.setAttribute('d', pathData);
+    plotting.appendChild(linePath); // <g id="plot">
+
+    scene_1.sceneVariables.graph.graphObject.appendChild(plotting); // attaching to graphContainer
+
+    scene_1.sceneVariables.graph.graphContainer.elt.appendChild(scene_1.sceneVariables.graph.graphObject); // sceneVariables.currentSVG.appendChild;
+  }
+}
+
+exports.plot2D = plot2D;
+
+function axis() {
+  var graph = scene_1.sceneVariables.graph;
+
+  if (scene_1.sceneVariables.isGraph === 'true') {
+    graph.coordinate = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    graph.coordinate.setAttribute('id', 'coordinateSystem');
+    var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML += "<marker refX=\"" + 2 * graph.config.arrowSize + "\" refY=\"" + graph.config.arrowSize + "\" markerWidth=\"" + 2 * graph.config.arrowSize + "\" markerHeight=\"" + 2 * graph.config.arrowSize + "\" id=\"marker-arrow\" class=\"marker\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L " + 2 * graph.config.arrowSize + " " + graph.config.arrowSize + " L 0 " + 2 * graph.config.arrowSize + " z\" style=\"fill: " + graph.config.axisColor + "\"></path></marker>";
+    graph.graphObject.appendChild(defs); // graph.graphObject.appendChild(arrowPath);
+    // let frame = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    // frame.setAttribute('x', `${-graph.svgWidth / 2}`);
+    // frame.setAttribute('y', `${-graph.svgHeight / 2}`);
+    // frame.setAttribute('width', `${graph.svgWidth}`);
+    // frame.setAttribute('height', `${graph.svgHeight}`);
+    // frame.setAttribute('fill', `rgba(0,0,0,0)`);
+    // frame.setAttribute('stroke', `white`);
+    //grid
+
+    defs.innerHTML += "<pattern id=\"smallGrid\" width=\"" + graph.config.stepX * graph.config.scaleX + "\" height=\"" + graph.config.stepY * graph.config.scaleY + "\" patternUnits=\"userSpaceOnUse\">\n   <path d=\"M " + graph.config.stepX * graph.config.scaleX + " 0 L 0 0 0 " + graph.config.stepY * graph.config.scaleY + "\" fill=\"none\" stroke=\"" + graph.config.smallGridColor + "\" stroke-width=\"0.5\"/>\n  </pattern>\n  <pattern x = " + graph.config.originX * graph.config.scaleX + " y = " + graph.config.originY * graph.config.scaleY + " id=\"grid\" width=\"" + 4 * graph.config.stepX * graph.config.scaleX + "\" height=\"" + 4 * graph.config.stepY * graph.config.scaleY + "\" patternUnits=\"userSpaceOnUse\">\n   <rect width=\"" + 4 * graph.config.stepX * graph.config.scaleX + "\" height=\"" + 4 * graph.config.stepY * graph.config.scaleY + "\" fill=\"url(#smallGrid)\"/>\n   <path d=\"M " + 4 * graph.config.stepX * graph.config.scaleX + " 0 L 0 0 0 " + 4 * graph.config.stepY * graph.config.scaleY + "\" fill=\"none\" stroke=\"" + graph.config.gridColor + "\" stroke-width=\"1\"/>\n  </pattern>";
+    var grid = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    grid.setAttribute('x', "" + -graph.svgWidth / 2);
+    grid.setAttribute('y', "" + -graph.svgHeight / 2);
+    grid.setAttribute('width', "100%");
+    grid.setAttribute('height', "100%");
+
+    if (graph.config.grid === 'true') {
+      grid.setAttribute('fill', "url(#grid)");
+    }
+
+    if (graph.config.graphBox === 'true') {
+      grid.setAttribute('stroke', "white");
+    } //graph.coordinate.appendChild(frame);
+
+
+    graph.coordinate.appendChild(grid); //axes
+    //console.log(graph.config.axisX);
+    // console.log(graph.config.tickX);
+
+    if (graph.config.xAxis === 'true') {
+      var xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      xAxis.setAttribute('x1', "" + -graph.svgWidth / 2);
+      xAxis.setAttribute('y1', "" + -graph.config.originY * graph.config.scaleY);
+      xAxis.setAttribute('x2', "" + graph.svgWidth / 2);
+      xAxis.setAttribute('y2', "" + -graph.config.originY * graph.config.scaleY);
+      xAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      xAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      xAxis.setAttribute('stroke', "" + graph.config.axisColor);
+      xAxis.setAttribute('fill', "none");
+      graph.coordinate.appendChild(xAxis);
+
+      if (graph.config.tickX === 'true') {
+        var tick = void 0; //x axis
+        //+ve axis
+
+        for (var i = 0; i < abs(int(graph.svgWidth / (2 * graph.config.scaleX) - graph.config.originX)) / graph.config.stepX; i++) {
+          var x = graph.config.originX * graph.config.scaleX + (i + 1) * graph.config.stepX * graph.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + x);
+          tick.setAttribute('y', "" + (-graph.config.originY * graph.config.scaleY - graph.config.tickMarginX * graph.config.scaleY));
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + graph.config.tickColor;
+          graph.coordinate.appendChild(tick);
+        } //console.log(int(graph.svgWidth / (2*graph.config.scaleX)) + graph.config.originX);
+        //-ve axis
+
+
+        for (var i = abs(int(graph.svgWidth / (2 * graph.config.scaleX)) + graph.config.originX); i >= 0; i--) {
+          var x = graph.config.originX * graph.config.scaleX - (i + 1) * graph.config.stepX * graph.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + x);
+          tick.setAttribute('y', "" + (-graph.config.originY * graph.config.scaleY - graph.config.tickMarginX * graph.config.scaleY));
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + graph.config.tickColor;
+          graph.coordinate.appendChild(tick);
+        }
+      }
+    }
+
+    if (graph.config.yAxis === 'true') {
+      var yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      yAxis.setAttribute('x1', "" + graph.config.originX * graph.config.scaleX);
+      yAxis.setAttribute('y1', "" + -graph.svgHeight / 2);
+      yAxis.setAttribute('x2', "" + graph.config.originX * graph.config.scaleX);
+      yAxis.setAttribute('y2', "" + graph.svgHeight / 2);
+      yAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      yAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      yAxis.setAttribute('stroke', "" + graph.config.axisColor);
+      yAxis.setAttribute('fill', "none");
+      graph.coordinate.appendChild(yAxis);
+
+      if (graph.config.tickY === 'true') {
+        var tick = void 0; //y axis
+        //+ve axis
+
+        for (var i = 0; i <= abs(-int(graph.svgHeight / (2 * graph.config.scaleY)) + graph.config.originY); i++) {
+          var y = -graph.config.originY * graph.config.scaleY - (i + 1) * graph.config.stepY * graph.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + (graph.config.originX * graph.config.scaleX + graph.config.tickMarginY * graph.config.scaleX));
+          tick.setAttribute('y', "" + y);
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + graph.config.tickColor;
+          graph.coordinate.appendChild(tick);
+        } //-ve axis
+
+
+        for (var i = abs(-int(graph.svgHeight / (2 * graph.config.scaleY)) - graph.config.originY); i >= 0; i--) {
+          var y = -graph.config.originY * graph.config.scaleY + (i + 1) * graph.config.stepY * graph.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + (graph.config.originX * graph.config.scaleX + graph.config.tickMarginY * graph.config.scaleX));
+          tick.setAttribute('y', "" + y);
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + graph.config.tickColor;
+          graph.coordinate.appendChild(tick);
+        }
+      }
+    } //xAxis.setAttribute('stroke', color);
+    //xAxis.setAttribute('stroke-width', w);
+    //ticks
+    //graph.plotting.appendChild(graph.linePath);
+
+
+    graph.graphObject.appendChild(graph.coordinate); // <g id="coordinateSystem">
+  }
+}
+
+exports.axis = axis;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Geometry/parametric.ts":[function(require,module,exports) {
 "use strict";
 
@@ -45605,7 +45868,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create2DParametricGraph = exports.createParametricSVGPath = exports.GraphParametric2D = void 0;
+exports.parametric2D = exports.create2DParametricGraph = exports.createParametricSVGPath = exports.GraphParametric2D = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
@@ -46084,6 +46347,41 @@ function create2DParametricGraph(xeqn, yeqn, parameterRange, x, y, svgWidth, svg
 }
 
 exports.create2DParametricGraph = create2DParametricGraph;
+
+function parametric2D(xeqn, yeqn, parameterRange) {
+  if (parameterRange === void 0) {
+    parameterRange = [0, 2 * Math.PI];
+  } // sceneVariables.graph.xeqn = xeqn;
+  // sceneVariables.graph.yeqn = yeqn;
+  // sceneVariables.graph.parameterRange = parameterRange;
+
+
+  if (scene_1.sceneVariables.isGraph === 'true') {
+    var linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    linePath.setAttribute('fill', 'none');
+    linePath.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+    linePath.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    var pathData = createParametricSVGPath(xeqn, yeqn, parameterRange, scene_1.sceneVariables.graph.config);
+    var plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    plotting.setAttribute('id', 'plot'); // linePath.setAttribute(
+    //   'stroke',
+    //   `${sceneVariables.graph.config.graphColor}`
+    // );
+    // linePath.setAttribute(
+    //   'stroke-width',
+    //   `${sceneVariables.graph.config.graphStrokeWidth}`
+    // );
+
+    linePath.setAttribute('d', pathData);
+    plotting.appendChild(linePath); // <g id="plot">
+
+    scene_1.sceneVariables.graph.graphObject.appendChild(plotting); // attaching to graphContainer
+
+    scene_1.sceneVariables.graph.graphContainer.elt.appendChild(scene_1.sceneVariables.graph.graphObject);
+  }
+}
+
+exports.parametric2D = parametric2D;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
 "use strict";
 
@@ -46124,7 +46422,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create2DPolarGraph = exports.createPolarSVGPath = exports.GraphPolar2D = void 0;
+exports.polar2D = exports.create2DPolarGraph = exports.createPolarSVGPath = exports.GraphPolar2D = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
@@ -46637,6 +46935,41 @@ function create2DPolarGraph(eqn, thetaRange, x, y, svgWidth, svgHeight) {
 }
 
 exports.create2DPolarGraph = create2DPolarGraph;
+
+function polar2D(eqn, thetaRange) {
+  if (thetaRange === void 0) {
+    thetaRange = [0, 2 * Math.PI];
+  } // sceneVariables.graph.xeqn = xeqn;
+  // sceneVariables.graph.yeqn = yeqn;
+  // sceneVariables.graph.parameterRange = parameterRange;
+
+
+  if (scene_1.sceneVariables.isGraph === 'true') {
+    var linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    linePath.setAttribute('fill', 'none');
+    linePath.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+    linePath.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    var pathData = createPolarSVGPath(eqn, thetaRange, scene_1.sceneVariables.graph.config);
+    var plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    plotting.setAttribute('id', 'plot'); // linePath.setAttribute(
+    //   'stroke',
+    //   `${sceneVariables.graph.config.graphColor}`
+    // );
+    // linePath.setAttribute(
+    //   'stroke-width',
+    //   `${sceneVariables.graph.config.graphStrokeWidth}`
+    // );
+
+    linePath.setAttribute('d', pathData);
+    plotting.appendChild(linePath); // <g id="plot">
+
+    scene_1.sceneVariables.graph.graphObject.appendChild(plotting); // attaching to graphContainer
+
+    scene_1.sceneVariables.graph.graphContainer.elt.appendChild(scene_1.sceneVariables.graph.graphObject);
+  }
+}
+
+exports.polar2D = polar2D;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Scene/transform.ts":[function(require,module,exports) {
 "use strict"; //TODO : transform function : use morphing
 
@@ -46912,16 +47245,20 @@ global.transform = transform_1.transform;
 var graph_1 = require("./lib/Geometry/graph");
 
 global.Graph2D = graph_1.Graph2D;
+global.plot2D = graph_1.plot2D;
+global.axis = graph_1.axis;
 global.create2DGraph = graph_1.create2DGraph;
 
 var polar_1 = require("./lib/Geometry/polar");
 
 global.GraphPolar2D = polar_1.GraphPolar2D;
+global.polar2D = polar_1.polar2D;
 global.create2DPolarGraph = polar_1.create2DPolarGraph;
 
 var parametric_1 = require("./lib/Geometry/parametric");
 
 global.GraphParametric2D = parametric_1.GraphParametric2D;
+global.parametric2D = parametric_1.parametric2D;
 global.create2DParametricGraph = parametric_1.create2DParametricGraph;
 
 var arrow_1 = require("./lib/Geometry/arrow");
@@ -46955,7 +47292,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50724" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53263" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
