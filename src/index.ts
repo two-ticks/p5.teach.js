@@ -58,9 +58,11 @@ import { transform } from './lib/Scene/transform';
 
 global.transform = transform;
 
-import { Graph2D, create2DGraph } from './lib/Geometry/graph';
+import { Graph2D, create2DGraph, plot2D, axis } from './lib/Geometry/graph';
 
 global.Graph2D = Graph2D;
+global.plot2D = plot2D;
+global.axis = axis;
 global.create2DGraph = create2DGraph;
 
 import { GraphPolar2D, create2DPolarGraph } from './lib/Geometry/polar';

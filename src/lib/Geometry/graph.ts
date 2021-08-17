@@ -1,6 +1,6 @@
 import anime from 'animejs';
 import { animationTimeline } from '../Scene/controls';
-import { sceneContainer } from '../Scene/scene';
+import { sceneContainer, sceneVariables } from '../Scene/scene';
 import { transform } from '../Scene/transform';
 import { GObject } from './GObject';
 
@@ -46,7 +46,7 @@ export class Graph2D extends GObject {
     tickMarginX: any;
     tickMarginY: any;
     pathElements: any;
-    graphBox : any;
+    graphBox: any;
   };
 
   /**
@@ -189,8 +189,7 @@ export class Graph2D extends GObject {
       pathElements: config.pathElements
         ? config.pathElements
         : this.config.pathElements,
-        graphBox: config.graphBox ? config.graphBox : this.config.graphBox,
-
+      graphBox: config.graphBox ? config.graphBox : this.config.graphBox
     };
     //console.log(this.config);
   }
@@ -330,7 +329,7 @@ export class Graph2D extends GObject {
       grid.setAttribute('fill', `url(#grid)`);
     }
     if (this.config.graphBox === 'true') {
-    grid.setAttribute('stroke', `white`);
+      grid.setAttribute('stroke', `white`);
     }
     //this.coordinate.appendChild(frame);
     this.coordinate.appendChild(grid);
@@ -504,7 +503,7 @@ export class Graph2D extends GObject {
     this.graphObject.appendChild(this.coordinate); // <g id="coordinateSystem">
   }
 
-  update(eqn: any) {
+  update(eqn: Function) {
     this.pathData = createSVGPath(eqn, this.config);
     this.linePath.setAttribute('d', this.pathData);
   }
@@ -589,4 +588,289 @@ export function create2DGraph(
 ) {
   //const _object =
   return new Graph2D(eqn, x, y, svgWidth, svgHeight);
+}
+
+export function plot2D(eqn: Function) {
+  //const plot2d = new Graph2D(eqn, sceneVariables.currentSVG.getBBox().x, sceneVariables.currentSVG.getBBox().y, sceneVariables.currentSVG.getBBox().width, sceneVariables.currentSVG.getBBox().height);
+  if (sceneVariables.isGraph === 'true') {
+    sceneVariables.graph.eqn = eqn;
+    sceneVariables.graph.pathData = createSVGPath(
+      sceneVariables.graph.eqn,
+      sceneVariables.graph.config
+    );
+    sceneVariables.graph.plotting = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'g'
+    );
+    sceneVariables.graph.plotting.setAttribute('id', 'plot');
+    sceneVariables.graph.linePath.setAttribute(
+      'stroke',
+      `${sceneVariables.graph.config.graphColor}`
+    );
+    sceneVariables.graph.linePath.setAttribute(
+      'stroke-width',
+      `${sceneVariables.graph.config.graphStrokeWidth}`
+    );
+    sceneVariables.graph.linePath.setAttribute(
+      'd',
+      sceneVariables.graph.pathData
+    );
+    sceneVariables.graph.plotting.appendChild(sceneVariables.graph.linePath); // <g id="plot">
+    sceneVariables.graph.graphObject.appendChild(sceneVariables.graph.plotting);
+
+    // attaching to graphContainer
+    sceneVariables.graph.graphContainer.elt.appendChild(
+      sceneVariables.graph.graphObject
+    );
+
+    // sceneVariables.currentSVG.appendChild;
+  }
+}
+
+export function axis() {
+  const graph = sceneVariables.graph;
+
+  if (sceneVariables.isGraph === 'true') {
+    graph.coordinate = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'g'
+    );
+    graph.coordinate.setAttribute('id', 'coordinateSystem');
+    let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML += `<marker refX="${2 * graph.config.arrowSize}" refY="${
+      graph.config.arrowSize
+    }" markerWidth="${2 * graph.config.arrowSize}" markerHeight="${
+      2 * graph.config.arrowSize
+    }" id="marker-arrow" class="marker" orient="auto-start-reverse"><path d="M 0 0 L ${
+      2 * graph.config.arrowSize
+    } ${graph.config.arrowSize} L 0 ${
+      2 * graph.config.arrowSize
+    } z" style="fill: ${graph.config.axisColor}"></path></marker>`;
+    graph.graphObject.appendChild(defs);
+    // graph.graphObject.appendChild(arrowPath);
+
+    // let frame = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    // frame.setAttribute('x', `${-graph.svgWidth / 2}`);
+    // frame.setAttribute('y', `${-graph.svgHeight / 2}`);
+    // frame.setAttribute('width', `${graph.svgWidth}`);
+    // frame.setAttribute('height', `${graph.svgHeight}`);
+    // frame.setAttribute('fill', `rgba(0,0,0,0)`);
+    // frame.setAttribute('stroke', `white`);
+
+    //grid
+    defs.innerHTML += `<pattern id="smallGrid" width="${
+      graph.config.stepX * graph.config.scaleX
+    }" height="${
+      graph.config.stepY * graph.config.scaleY
+    }" patternUnits="userSpaceOnUse">
+   <path d="M ${graph.config.stepX * graph.config.scaleX} 0 L 0 0 0 ${
+      graph.config.stepY * graph.config.scaleY
+    }" fill="none" stroke="${graph.config.smallGridColor}" stroke-width="0.5"/>
+  </pattern>
+  <pattern x = ${graph.config.originX * graph.config.scaleX} y = ${
+      graph.config.originY * graph.config.scaleY
+    } id="grid" width="${
+      4 * graph.config.stepX * graph.config.scaleX
+    }" height="${
+      4 * graph.config.stepY * graph.config.scaleY
+    }" patternUnits="userSpaceOnUse">
+   <rect width="${4 * graph.config.stepX * graph.config.scaleX}" height="${
+      4 * graph.config.stepY * graph.config.scaleY
+    }" fill="url(#smallGrid)"/>
+   <path d="M ${4 * graph.config.stepX * graph.config.scaleX} 0 L 0 0 0 ${
+      4 * graph.config.stepY * graph.config.scaleY
+    }" fill="none" stroke="${graph.config.gridColor}" stroke-width="1"/>
+  </pattern>`;
+
+    let grid = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    grid.setAttribute('x', `${-graph.svgWidth / 2}`);
+    grid.setAttribute('y', `${-graph.svgHeight / 2}`);
+    grid.setAttribute('width', `100%`);
+    grid.setAttribute('height', `100%`);
+    if (graph.config.grid === 'true') {
+      grid.setAttribute('fill', `url(#grid)`);
+    }
+    if (graph.config.graphBox === 'true') {
+      grid.setAttribute('stroke', `white`);
+    }
+    //graph.coordinate.appendChild(frame);
+    graph.coordinate.appendChild(grid);
+
+    //axes
+    //console.log(graph.config.axisX);
+    // console.log(graph.config.tickX);
+    if (graph.config.xAxis === 'true') {
+      let xAxis = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'line'
+      );
+      xAxis.setAttribute('x1', `${-graph.svgWidth / 2}`);
+      xAxis.setAttribute(
+        'y1',
+        `${-graph.config.originY * graph.config.scaleY}`
+      );
+      xAxis.setAttribute('x2', `${graph.svgWidth / 2}`);
+      xAxis.setAttribute(
+        'y2',
+        `${-graph.config.originY * graph.config.scaleY}`
+      );
+      xAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      xAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      xAxis.setAttribute('stroke', `${graph.config.axisColor}`);
+      xAxis.setAttribute('fill', `none`);
+      graph.coordinate.appendChild(xAxis);
+
+      if (graph.config.tickX === 'true') {
+        let tick;
+        //x axis
+        //+ve axis
+        for (
+          let i = 0;
+          i <
+          abs(
+            int(
+              graph.svgWidth / (2 * graph.config.scaleX) - graph.config.originX
+            )
+          ) /
+            graph.config.stepX;
+          i++
+        ) {
+          let x =
+            graph.config.originX * graph.config.scaleX +
+            (i + 1) * graph.config.stepX * graph.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', `${x}`);
+          tick.setAttribute(
+            'y',
+            `${
+              -graph.config.originY * graph.config.scaleY -
+              graph.config.tickMarginX * graph.config.scaleY
+            }`
+          );
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = `${graph.config.tickColor}`;
+          graph.coordinate.appendChild(tick);
+        }
+
+        //console.log(int(graph.svgWidth / (2*graph.config.scaleX)) + graph.config.originX);
+
+        //-ve axis
+        for (
+          let i = abs(
+            int(graph.svgWidth / (2 * graph.config.scaleX)) +
+              graph.config.originX
+          );
+          i >= 0;
+          i--
+        ) {
+          let x =
+            graph.config.originX * graph.config.scaleX -
+            (i + 1) * graph.config.stepX * graph.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', `${x}`);
+          tick.setAttribute(
+            'y',
+            `${
+              -graph.config.originY * graph.config.scaleY -
+              graph.config.tickMarginX * graph.config.scaleY
+            }`
+          );
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = `${graph.config.tickColor}`;
+          graph.coordinate.appendChild(tick);
+        }
+      }
+    }
+
+    if (graph.config.yAxis === 'true') {
+      let yAxis = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'line'
+      );
+      yAxis.setAttribute('x1', `${graph.config.originX * graph.config.scaleX}`);
+      yAxis.setAttribute('y1', `${-graph.svgHeight / 2}`);
+      yAxis.setAttribute('x2', `${graph.config.originX * graph.config.scaleX}`);
+      yAxis.setAttribute('y2', `${graph.svgHeight / 2}`);
+      yAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      yAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      yAxis.setAttribute('stroke', `${graph.config.axisColor}`);
+      yAxis.setAttribute('fill', `none`);
+      graph.coordinate.appendChild(yAxis);
+      if (graph.config.tickY === 'true') {
+        let tick;
+        //y axis
+        //+ve axis
+        for (
+          let i = 0;
+          i <=
+          abs(
+            -int(graph.svgHeight / (2 * graph.config.scaleY)) +
+              graph.config.originY
+          );
+          i++
+        ) {
+          let y =
+            -graph.config.originY * graph.config.scaleY -
+            (i + 1) * graph.config.stepY * graph.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute(
+            'x',
+            `${
+              graph.config.originX * graph.config.scaleX +
+              graph.config.tickMarginY * graph.config.scaleX
+            }`
+          );
+          tick.setAttribute('y', `${y}`);
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = `${graph.config.tickColor}`;
+          graph.coordinate.appendChild(tick);
+        }
+        //-ve axis
+        for (
+          let i = abs(
+            -int(graph.svgHeight / (2 * graph.config.scaleY)) -
+              graph.config.originY
+          );
+          i >= 0;
+          i--
+        ) {
+          let y =
+            -graph.config.originY * graph.config.scaleY +
+            (i + 1) * graph.config.stepY * graph.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute(
+            'x',
+            `${
+              graph.config.originX * graph.config.scaleX +
+              graph.config.tickMarginY * graph.config.scaleX
+            }`
+          );
+          tick.setAttribute('y', `${y}`);
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = `${graph.config.tickColor}`;
+          graph.coordinate.appendChild(tick);
+        }
+      }
+    }
+
+    //xAxis.setAttribute('stroke', color);
+    //xAxis.setAttribute('stroke-width', w);
+
+    //ticks
+
+    //graph.plotting.appendChild(graph.linePath);
+    graph.graphObject.appendChild(graph.coordinate); // <g id="coordinateSystem">
+  }
 }

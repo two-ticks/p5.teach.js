@@ -29,6 +29,7 @@ export class Graph extends GObject {
     xAxis: any;
     yAxis: any;
     axisColor: any;
+    grid: any;
     smallGridColor: any;
     gridColor: any;
     stepX: any;
@@ -40,7 +41,8 @@ export class Graph extends GObject {
     tickColor: any;
     tickMarginX: any;
     tickMarginY: any;
-    arrowFollowerColor: any;
+    pathElements: any;
+    graphBox: any;
   };
   // pathData: any;
   // graphObject: any;
@@ -73,6 +75,7 @@ export class Graph extends GObject {
       scaleX: 1,
       scaleY: 1,
       axisColor: INDIGO50,
+      grid: 'true',
       smallGridColor: MAGENTA50,
       gridColor: ORANGE40,
       stepX: 1,
@@ -84,7 +87,8 @@ export class Graph extends GObject {
       tickColor: ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5,
-      arrowFollowerColor: MAGENTA50
+      pathElements: 1000,
+      graphBox: 'true'
     };
 
     this.config.scaleX = abs(
@@ -126,8 +130,52 @@ export class Graph extends GObject {
     );
     this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     this.graphContainer.elt.appendChild(this.graphObject);
-    sceneVariables.currentSVG = this.graphObject;
-    //return this;
+
+    return this;
+  }
+
+  configure(config) {
+    this.config = {
+      graphColor: config.graphColor
+        ? config.graphColor
+        : this.config.graphColor,
+      graphStrokeWidth: config.graphStrokeWidth
+        ? config.graphStrokeWidth
+        : this.config.graphStrokeWidth,
+      arrowSize: config.arrowSize ? config.arrowSize : this.config.arrowSize,
+      xAxis: config.xAxis ? config.xAxis : this.config.xAxis,
+      yAxis: config.yAxis ? config.yAxis : this.config.yAxis,
+      minX: config.minX ? config.minX : this.config.minX,
+      maxX: config.maxX ? config.maxX : this.config.maxX,
+      minY: config.minY ? config.minY : this.config.minY,
+      maxY: config.maxY ? config.maxY : this.config.maxY,
+      scaleX: config.scaleX ? config.scaleX : this.config.scaleX,
+      scaleY: config.scaleY ? config.scaleY : this.config.scaleY,
+      axisColor: config.axisColor ? config.axisColor : this.config.axisColor,
+      smallGridColor: config.smallGridColor
+        ? config.smallGridColor
+        : this.config.smallGridColor,
+      gridColor: config.gridColor ? config.gridColor : this.config.gridColor,
+      stepX: config.stepX ? config.stepX : this.config.stepX,
+      stepY: config.stepY ? config.stepY : this.config.stepY,
+      originX: config.originX ? config.originX : this.config.originX,
+      originY: config.originY ? config.originY : this.config.originY,
+      grid: config.grid ? config.grid : this.config.grid,
+      tickX: config.tickX ? config.tickX : this.config.tickX,
+      tickY: config.tickY ? config.tickY : this.config.tickY,
+      tickColor: config.tickColor ? config.tickColor : this.config.tickColor,
+      tickMarginX: config.tickMarginX
+        ? config.tickMarginX
+        : this.config.tickMarginX,
+      tickMarginY: config.tickMarginY
+        ? config.tickMarginY
+        : this.config.tickMarginY,
+      pathElements: config.pathElements
+        ? config.pathElements
+        : this.config.pathElements,
+      graphBox: config.graphBox ? config.graphBox : this.config.graphBox
+    };
+    //console.log(this.config);
   }
 }
 
@@ -138,6 +186,8 @@ export function beginGraph(
   svgHeight: number = height
 ) {
   const graphTemperoryObject = new Graph(x, y, svgWidth, svgHeight);
+  sceneVariables.graph = graphTemperoryObject;
+  sceneVariables.currentSVG = graphTemperoryObject.graphObject;
   return graphTemperoryObject;
 }
 

@@ -3,6 +3,7 @@ import p5 from "p5";
 export let sceneContainer: HTMLDivElement;
 interface ISceneVariables {
   isGraph: any,
+  graph : any,
   currentSVG: SVGSVGElement,
   currStrokeColor: p5.Color | string,
   currStrokeWidth: string,
@@ -12,6 +13,7 @@ interface ISceneVariables {
 };
 export let sceneVariables : ISceneVariables = {
   isGraph: 'false',
+  graph : 'false',
   currentSVG: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
   currStrokeColor: 'black',
   currStrokeWidth: '1',
