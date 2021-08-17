@@ -593,36 +593,43 @@ export function create2DGraph(
 export function plot2D(eqn: Function) {
   //const plot2d = new Graph2D(eqn, sceneVariables.currentSVG.getBBox().x, sceneVariables.currentSVG.getBBox().y, sceneVariables.currentSVG.getBBox().width, sceneVariables.currentSVG.getBBox().height);
   if (sceneVariables.isGraph === 'true') {
-    sceneVariables.graph.eqn = eqn;
-    sceneVariables.graph.pathData = createSVGPath(
-      sceneVariables.graph.eqn,
+    let linePath = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'path'
+    );
+    linePath.setAttribute('fill', 'none');
+    linePath.setAttribute('stroke', `${sceneVariables.currStrokeColor}`);
+    linePath.setAttribute('stroke-width', `${sceneVariables.currStrokeWidth}`);
+    let pathData = createSVGPath(
+      eqn,
       sceneVariables.graph.config
     );
-    sceneVariables.graph.plotting = document.createElementNS(
+    const plotting = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'g'
     );
-    sceneVariables.graph.plotting.setAttribute('id', 'plot');
-    sceneVariables.graph.linePath.setAttribute(
-      'stroke',
-      `${sceneVariables.graph.config.graphColor}`
-    );
-    sceneVariables.graph.linePath.setAttribute(
-      'stroke-width',
-      `${sceneVariables.graph.config.graphStrokeWidth}`
-    );
-    sceneVariables.graph.linePath.setAttribute(
+    plotting.setAttribute('id', 'plot');
+    // linePath.setAttribute(
+    //   'stroke',
+    //   `${sceneVariables.graph.config.graphColor}`
+    // );
+    // linePath.setAttribute(
+    //   'stroke-width',
+    //   `${sceneVariables.graph.config.graphStrokeWidth}`
+    // );
+    linePath.setAttribute(
       'd',
-      sceneVariables.graph.pathData
+      pathData
     );
-    sceneVariables.graph.plotting.appendChild(sceneVariables.graph.linePath); // <g id="plot">
-    sceneVariables.graph.graphObject.appendChild(sceneVariables.graph.plotting);
+
+    plotting.appendChild(linePath); // <g id="plot">
+
+    sceneVariables.graph.graphObject.appendChild(plotting);
 
     // attaching to graphContainer
     sceneVariables.graph.graphContainer.elt.appendChild(
       sceneVariables.graph.graphObject
     );
-
     // sceneVariables.currentSVG.appendChild;
   }
 }

@@ -1,6 +1,6 @@
 import anime from 'animejs';
 import { animationTimeline } from '../Scene/controls';
-import { sceneContainer } from '../Scene/scene';
+import { sceneContainer, sceneVariables } from '../Scene/scene';
 import { transform } from '../Scene/transform';
 import { GObject } from './GObject';
 
@@ -605,4 +605,52 @@ export function create2DParametricGraph(
     svgWidth,
     svgHeight
   );
+}
+
+export function parametric2D(xeqn, yeqn, parameterRange : number[] = [0, 2 * Math.PI]) {
+  // sceneVariables.graph.xeqn = xeqn;
+  // sceneVariables.graph.yeqn = yeqn;
+  // sceneVariables.graph.parameterRange = parameterRange;
+  if (sceneVariables.isGraph === 'true') {
+    let linePath = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'path'
+    );
+    linePath.setAttribute('fill', 'none');
+    linePath.setAttribute('stroke', `${sceneVariables.currStrokeColor.toString()}`);
+    linePath.setAttribute('stroke-width', `${sceneVariables.currStrokeWidth}`);
+    let pathData = createParametricSVGPath(
+      xeqn,
+      yeqn,
+      parameterRange,
+      sceneVariables.graph.config
+    );
+
+    const plotting = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'g'
+    );
+    plotting.setAttribute('id', 'plot');
+    // linePath.setAttribute(
+    //   'stroke',
+    //   `${sceneVariables.graph.config.graphColor}`
+    // );
+    // linePath.setAttribute(
+    //   'stroke-width',
+    //   `${sceneVariables.graph.config.graphStrokeWidth}`
+    // );
+    linePath.setAttribute(
+      'd',
+      pathData
+    );
+
+    plotting.appendChild(linePath); // <g id="plot">
+
+    sceneVariables.graph.graphObject.appendChild(plotting);
+
+    // attaching to graphContainer
+    sceneVariables.graph.graphContainer.elt.appendChild(
+      sceneVariables.graph.graphObject
+    );
+  }
 }

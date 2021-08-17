@@ -65,17 +65,22 @@ global.plot2D = plot2D;
 global.axis = axis;
 global.create2DGraph = create2DGraph;
 
-import { GraphPolar2D, create2DPolarGraph } from './lib/Geometry/polar';
+import { GraphPolar2D, create2DPolarGraph, polar2D } from './lib/Geometry/polar';
 
 global.GraphPolar2D = GraphPolar2D;
+global.polar2D = polar2D;
+
 global.create2DPolarGraph = create2DPolarGraph;
 
 import {
   GraphParametric2D,
-  create2DParametricGraph
+  create2DParametricGraph,
+  parametric2D
 } from './lib/Geometry/parametric';
 
 global.GraphParametric2D = GraphParametric2D;
+global.parametric2D = parametric2D;
+
 global.create2DParametricGraph = create2DParametricGraph;
 
 import { arrow } from './lib/Geometry/arrow';

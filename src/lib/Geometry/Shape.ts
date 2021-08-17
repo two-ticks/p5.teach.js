@@ -54,8 +54,8 @@ export class Graph extends GObject {
   // linePath: SVGPathElement;
 
   constructor(
-    x: number = 10,
-    y: number = 10,
+    x: number = 0,
+    y: number = 0,
     svgWidth: number = 300,
     svgHeight: number = 300
   ) {
@@ -180,8 +180,8 @@ export class Graph extends GObject {
 }
 
 export function beginGraph(
-  x: number = 10,
-  y: number = 10,
+  x: number = 0,
+  y: number = 0,
   svgWidth: number = width,
   svgHeight: number = height
 ) {
