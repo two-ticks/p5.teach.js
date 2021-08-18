@@ -739,7 +739,7 @@ class SVGVertex {
           sceneVariables.graph.config.scaleX
       );
       sceneVariables.currentPolygon.vertices.push(
-        args[1] *
+        -args[1] *
           sceneVariables.graph.config.stepY *
           sceneVariables.graph.config.scaleY
       );
@@ -777,4 +777,36 @@ function SVGEndShape(...args) {
     sceneVariables.currentPolygon.vertices.toString()
   );
   sceneVariables.currentPolygon = null;
+}
+
+export function polyline(...args) {
+  let vertices = args;
+  let shape = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'polyline'
+  );
+  shape.setAttribute('fill', `${sceneVariables.currFillColor.toString()}`);
+  shape.setAttribute('stroke', `${sceneVariables.currStrokeColor.toString()}`);
+  shape.setAttribute('stroke-width', `${sceneVariables.currStrokeWidth}`);
+  shape.setAttribute(
+    'style',
+    `transform : rotate(${sceneVariables.currAngle.toString()}deg);`
+  );
+  let scaledVertices = vertices.map((elt, i) => {
+    if (i % 2 === 0) {
+      return elt *
+        sceneVariables.graph.config.stepX *
+        sceneVariables.graph.config.scaleX;
+    }
+    else if (i%2 === 1){
+      return -elt *
+      sceneVariables.graph.config.stepY *
+      sceneVariables.graph.config.scaleY
+    }
+  });
+  
+  
+  shape.setAttribute('points', scaledVertices.toString());
+  sceneVariables.currentSVG.appendChild(shape);
+  return vertices;
 }

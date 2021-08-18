@@ -46,10 +46,12 @@ import {
   beginGraph,
   controlPoint,
   endGraph,
-  SVGControlPointPosition
+  SVGControlPointPosition,
+  polyline
 } from './lib/Geometry/Shape';
 
 global.beginGraph = beginGraph;
+global.polyline = polyline;
 global.controlPoint = controlPoint;
 global.SVGControlPointPosition = SVGControlPointPosition;
 global.endGraph = endGraph;
@@ -65,7 +67,11 @@ global.plot2D = plot2D;
 global.axis = axis;
 global.create2DGraph = create2DGraph;
 
-import { GraphPolar2D, create2DPolarGraph, polar2D } from './lib/Geometry/polar';
+import {
+  GraphPolar2D,
+  create2DPolarGraph,
+  polar2D
+} from './lib/Geometry/polar';
 
 global.GraphPolar2D = GraphPolar2D;
 global.polar2D = polar2D;
