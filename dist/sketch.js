@@ -1,45 +1,55 @@
-// Parameters for graph of cosine
-let amp = 4;
-let freq = 2;
-
-// Color blind safe palette
-let ULTRAMARINE40 = '#648fff';
-let MAGENTA50 = '#dc267f';
-let GOLD20 = '#ffb000';
-let INDIGO50 = '#785ef0';
-let ORANGE40 = '#fe6100';
+// color blind safe palette
+const ULTRAMARINE40 = '#648fff';
+const MAGENTA50 = '#dc267f';
+const GOLD20 = '#ffb000';
+const INDIGO50 = '#785ef0';
+const ORANGE40 = '#fe6100';
 
 function setup() {
-  canvas = createCanvas(400, 400);
-  //overflow('hidden'); //if you want to stop DOM p5 teach elements from overflowing
-  background(20);
+  createCanvas(400, 400);
+  // overflow('hidden') //if you want to stop DOM p5 teach elements from overflowing
+  background(50);
   drawGraph();
 }
 
 function drawGraph() {
-  let graph = create2DGraph((t) => amp * cos(freq * t));
-  graph.size(width, height);
-  let config = {
-    stepX: 1,
-    stepY: 1,
-    minX: -10,
+  const tex = createTeX('y = 2x + 10', 250, 50);
+  tex.size(20);
+  tex.fill(GOLD20);
+  tex.stroke(GOLD20);
+  tex.add();
+  tex.moveTo(25, 50, 1, 2);
+  stroke(GOLD20);
+
+  const graph = beginGraph(0, 0); // begin(x, y, width, height)
+  graph.configure({
+    scaleX: 5,
     maxX: 10,
-    graphColor: GOLD20,
-    graphStrokeWidth: 2,
-    tickX: 'true',
-    tickY: 'true',
-    tickColor: INDIGO50,
-    smallGridColor: ULTRAMARINE40,
-    gridColor: MAGENTA50,
-    originX: 0,
-    originY: 0
-  };
-  graph.configure(config);
-  graph.axis();
-  graph.plot();
-  graph.position(0, 0);
-  let label = createTeX(`f(t)=${amp}\\cos{${freq}t}`);
-  label.position(width / 2, height / 12);
-  label.fill(GOLD20);
-  label.play();
+    minX: -12,
+    scaleY: 5,
+    maxY: 10,
+    minY: -10,
+    stepX: 3,
+    stepY: 3,
+    tickX: 'false',
+    tickY: 'false'
+  });
+  axis();
+  //stroke('blue')
+  plot2D((x) => 2 * x + 10);
+  stroke('skyBlue');
+  parametric2D(
+    (t) => 20 + 10 * sin(3 * t + PI / 4),
+    (t) => -20 + 10 * cos(2 * t)
+  );
+  stroke('lime');
+
+  polar2D(
+    (t) =>
+      5 * ((sin(t) * sqrt(abs(cos(t)))) / (sin(t) + 7 / 5) - 2 * sin(t) + 2),
+    [0, 4 * PI]
+  );
+
+  plot2D((x) => x + 6);
+  endGraph();
 }

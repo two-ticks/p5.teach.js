@@ -1,3 +1,5 @@
+import { animationTimeline } from '../Scene/controls';
+
 export class MObject {
   writeElement!: p5.Element; // <div> for animation
   sentence: string; //input string as tex or text
@@ -11,5 +13,60 @@ export class MObject {
     this.y = y;
     this.fillColor = color('black');
     this._size = _size;
+  }
+
+  moveTo(newX, newY, startTime, endTime) {
+    const object = this.writeElement;
+    const timeDuration = (endTime - startTime) * 1000;
+    const delayDuration = startTime * 1000;
+    const currCoord = {
+      currX: this.x,
+      currY: this.y
+    };
+    animationTimeline.add(
+      {
+        targets: currCoord, //[this.x, this.y],
+        currX: newX,
+        currY: newY,
+
+        //translateZ: 0,
+        easing: 'easeInOutCubic',
+        duration: timeDuration,
+        update: function (anim) {
+          this.x = currCoord.currX;
+          this.y = currCoord.currY;
+          object.position(this.x, this.y);
+        }
+        //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+        //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+      },
+      delayDuration
+    );
+  }
+
+  resizeTo(newSize, startTime, endTime) {
+    const object = this.writeElement;
+    const timeDuration = (endTime - startTime) * 1000;
+    const delayDuration = startTime * 1000;
+    const Size = {
+      currSize: this._size
+    };
+    animationTimeline.add(
+      {
+        targets: Size, //[this.x, this.y],
+        currSize: newSize,
+
+        //translateZ: 0,
+        easing: 'easeInOutCubic',
+        duration: timeDuration,
+        update: function (anim) {
+          object.style('font-size', `${this._size}px`);
+          this._size = Size.currSize;
+        }
+        //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+        //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+      },
+      delayDuration
+    );
   }
 }

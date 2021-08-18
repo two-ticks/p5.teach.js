@@ -33,5 +33,6 @@ export function add(object: Text | TeX) {
     object.writeElement.style('color', `${object.fillColor}`);
     //object.writeElement.style('text-stroke-width', `${object._strokeWidth}`); //TODO : not working without -webkit
     object.writeElement.style('opacity', '0'); //to hide text at initialisation
+    object.writeElement.style('white-space', 'nowrap'); //TODO : check for animations if breaking
   }
 }

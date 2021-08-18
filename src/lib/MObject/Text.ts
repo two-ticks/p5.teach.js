@@ -21,10 +21,18 @@ export class Text extends MObject {
 
   /**
    * creates a text object
+   *
    * @param {string} text text content
    * @param {number} x-coordinate x-coordinate of text
    * @param {number} y-coordinate y-coordinate of text
    * @param {number} font-size font-size of the text
+   *
+   *  @example
+   *
+   * example for creating text object:
+   * ```js
+   * let text = new Text('Hi!', width/2, height/2, 28)
+   * ```
    */
 
   constructor({ _text, x = 10, y = 10, _size = 28 }: TextObject) {
@@ -119,8 +127,7 @@ export class Text extends MObject {
 
   /**
    * Sets the given style (css) property (1st arg) of the element with the
-   * given value (2nd arg). If a single argument is given, .style()
-   * returns the value of the given property; however, if the single argument
+   * given value (2nd arg). If the single argument
    * is given in css syntax ('text-align:center'), .style() sets the css
    * appropriately.
    *

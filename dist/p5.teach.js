@@ -42819,7 +42819,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.createControls = exports.animationTimeline = exports.addDuration = exports.clock = void 0;
+exports.createControls = exports.animationTimeline = exports.callAt = exports.addDuration = exports.clock = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
@@ -42836,6 +42836,20 @@ function addDuration(timeDuration) {
 }
 
 exports.addDuration = addDuration;
+
+function callAt(startTime, func) {
+  exports.animationTimeline.add({
+    //duration: startTime,
+    complete: function complete(anim) {
+      // console.log("called");
+      func();
+    } //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+    //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+  }, startTime * 1000);
+}
+
+exports.callAt = callAt;
 exports.animationTimeline = animejs_1.default.timeline({}); //initilising a timeline
 // animationTimeline.add({});
 
@@ -43498,6 +43512,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.MObject = void 0;
 
+var controls_1 = require("../Scene/controls");
+
 var MObject =
 /** @class */
 function () {
@@ -43511,11 +43527,58 @@ function () {
     this._size = _size;
   }
 
+  MObject.prototype.moveTo = function (newX, newY, startTime, endTime) {
+    var object = this.writeElement;
+    var timeDuration = (endTime - startTime) * 1000;
+    var delayDuration = startTime * 1000;
+    var currCoord = {
+      currX: this.x,
+      currY: this.y
+    };
+    controls_1.animationTimeline.add({
+      targets: currCoord,
+      currX: newX,
+      currY: newY,
+      //translateZ: 0,
+      easing: 'easeInOutCubic',
+      duration: timeDuration,
+      update: function update(anim) {
+        this.x = currCoord.currX;
+        this.y = currCoord.currY;
+        object.position(this.x, this.y);
+      } //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+      //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+    }, delayDuration);
+  };
+
+  MObject.prototype.resizeTo = function (newSize, startTime, endTime) {
+    var object = this.writeElement;
+    var timeDuration = (endTime - startTime) * 1000;
+    var delayDuration = startTime * 1000;
+    var Size = {
+      currSize: this._size
+    };
+    controls_1.animationTimeline.add({
+      targets: Size,
+      currSize: newSize,
+      //translateZ: 0,
+      easing: 'easeInOutCubic',
+      duration: timeDuration,
+      update: function update(anim) {
+        object.style('font-size', this._size + "px");
+        this._size = Size.currSize;
+      } //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+      //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+    }, delayDuration);
+  };
+
   return MObject;
 }();
 
 exports.MObject = MObject;
-},{}],"lib/MObject/TeX.ts":[function(require,module,exports) {
+},{"../Scene/controls":"lib/Scene/controls.ts"}],"lib/MObject/TeX.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -43559,33 +43622,15 @@ exports.createTeX = exports.TeX = void 0;
 
 var tex_to_svg_1 = __importDefault(require("tex-to-svg"));
 
-var add_1 = require("../Scene/add");
+var add_1 = require("../Scene/add"); //import { animationTimeline } from '../Scene/controls';
+
 
 var play_1 = require("../Scene/play");
 
 var MObject_1 = require("./MObject"); //TODO : add test cases
 
 /**
- * TeX class
- *
- * @param    {String} - escaped TeX input
- * @param    {number} - x
- * @param    {number} - y
- * @param    {number} - font-size
- *
- * @example
- *
- * example for playing animation of type 'appear' for TeX object:
- * ```js
- * let tex_1 = new TeX(
- *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
- *   200,
- *   300,
- *   200,
- *   100
- * );
- * ```
- * @experimental
+ * class representing a tex
  */
 
 
@@ -43593,6 +43638,25 @@ var TeX =
 /** @class */
 function (_super) {
   __extends(TeX, _super);
+  /**
+   * creates a tex object
+   *
+   * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+   *
+   * @param    {String} - escaped TeX input
+   * @param    {number} - x
+   * @param    {number} - y
+   * @param    {number} - font-size
+   *
+   * @example
+   *
+   * example for creating TeX object:
+   * ```js
+   * let tex = new TeX(
+   *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}', 200, 300, 28);
+   * ```
+   */
+
 
   function TeX(_a) {
     var _tex = _a._tex,
@@ -43615,6 +43679,12 @@ function (_super) {
     _this.strokeColor = color('black');
     return _this;
   }
+  /**
+   * sets position of tex
+   * @param {number} x-coordinate x-coordinate of tex
+   * @param {number} y-coordinate y-coordinate of tex
+   */
+
 
   TeX.prototype.position = function (x, y) {
     if (x === void 0) {
@@ -43632,6 +43702,11 @@ function (_super) {
       this.y = y;
     }
   };
+  /**
+   * sets font-size of tex
+   * @param {number} font-size font-size of the tex
+   */
+
 
   TeX.prototype.size = function (_size) {
     if (_size === void 0) {
@@ -43644,6 +43719,11 @@ function (_super) {
       this._size = _size;
     }
   };
+  /**
+   * sets stroke-color of tex
+   * @param {p5.Color} stroke-color stroke-color of tex
+   */
+
 
   TeX.prototype.stroke = function (strokeColor) {
     if (strokeColor === void 0) {
@@ -43656,6 +43736,11 @@ function (_super) {
       this.strokeColor = strokeColor;
     }
   };
+  /**
+   * sets stroke-width of tex
+   * @param {number} strokeWidth stroke-width of the tex
+   */
+
 
   TeX.prototype.strokeWidth = function (_strokeWidth) {
     if (_strokeWidth === void 0) {
@@ -43668,6 +43753,11 @@ function (_super) {
       this._strokeWidth = _strokeWidth;
     }
   };
+  /**
+   * sets fill-color of text
+   * @param {p5.Color} fill-color fill-color of text
+   */
+
 
   TeX.prototype.fill = function (fillColor) {
     if (fillColor === void 0) {
@@ -43680,19 +43770,41 @@ function (_super) {
       this.fillColor = fillColor;
     }
   };
+  /**
+   * removes text object
+   */
+
 
   TeX.prototype.remove = function () {
     //TODO : should throw error if called on object which has not been added
     this.writeElement.remove();
   };
+  /**
+   * adds text object
+   */
+
 
   TeX.prototype.add = function () {
     add_1.add(this); //this.writeTexElement.style('opacity', '1');
   };
+  /**
+   * Sets the given style (css) property (1st arg) of the element with the
+   * given value (2nd arg). If the single argument
+   * is given in css syntax ('text-align:center'), .style() sets the css
+   * appropriately.
+   *
+   * @param  {String} property   property to be set
+   * @param {String} value value
+   */
+
 
   TeX.prototype.style = function (property, value) {
     this.writeElement.style(property, value);
   };
+  /**
+   * updates the tex
+   */
+
 
   TeX.prototype.update = function (_tex) {
     this.svgEquation = tex_to_svg_1.default(_tex);
@@ -43705,7 +43817,15 @@ function (_super) {
     g[0].setAttribute('stroke-width', this._strokeWidth);
     g[0].setAttribute('fill', this.fillColor);
     svg[0].setAttribute('fill', this.fillColor);
+    this.writeElement.position(this.x, this.y);
   };
+  /**
+   * play text animation
+   * @param {String} animationType type of animation to be played
+   * @param {Number} timeDuration duration of animation
+   * @param {Number} delayDuration delay
+   */
+
 
   TeX.prototype.play = function (animationType, startTime, endTime) {
     if (animationType === void 0) {
@@ -43727,6 +43847,24 @@ function (_super) {
 }(MObject_1.MObject);
 
 exports.TeX = TeX;
+/**
+ * createTeX
+ *
+ * @param args
+ *
+ * ```js
+ * let tex = createTeX(
+ *  '\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}\\overrightarrow{F}_{12} = k_e \\frac{q_1 q_2}{r^2}',
+ *   200,
+ *   300,
+ *   20,
+ * );
+ * ```
+ * <br/>
+ * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+ *
+ * @returns
+ */
 
 function createTeX() {
   var args = [];
@@ -43903,7 +44041,18 @@ var __generator = this && this.__generator || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.overflow = exports.Scene = exports.sceneContainer = void 0;
+exports.overflow = exports.Scene = exports.sceneVariables = exports.sceneContainer = void 0;
+;
+exports.sceneVariables = {
+  isGraph: 'false',
+  graph: 'false',
+  currentSVG: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+  currStrokeColor: 'black',
+  currStrokeWidth: '1',
+  currFillColor: 'none',
+  currAngle: 0,
+  selectedPoint: document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+}; //export
 
 var Scene =
 /** @class */
@@ -43912,8 +44061,18 @@ function () {
     //console.log(p5Canvas);
     exports.sceneContainer = document.createElement('div'); //sceneContainer.setAttribute('overflow', 'hidden');
 
-    exports.sceneContainer.setAttribute('class', 'p5teach');
-    exports.sceneContainer.setAttribute('style', "position: absolute; left: 0 px; top: 0 px; "); // sceneContainer.setAttribute('height', `${p5Canvas.height}px`);
+    exports.sceneContainer.setAttribute('class', 'p5teach'); // sceneContainer.style.overflow = value;
+
+    exports.sceneContainer.style.left = 0 + 'px';
+    exports.sceneContainer.style.top = 0 + 'px';
+    exports.sceneContainer.style.position = 'absolute';
+    exports.sceneContainer.style.fill = 'none'; // sceneContainer.style.width = 0 + 'px';
+    // sceneContainer.style.height = 0 + 'px';
+    // sceneContainer.setAttribute(
+    //   'style',
+    //   `position: absolute; left: 0 px; top: 0 px; `
+    // );
+    // sceneContainer.setAttribute('height', `${p5Canvas.height}px`);
     // sceneContainer.setAttribute('left', `${p5Canvas.x}px`);
     // sceneContainer.setAttribute('top', `${p5Canvas.y}px`);
 
@@ -43943,9 +44102,15 @@ function () {
 exports.Scene = Scene;
 
 function overflow(value) {
-  if (value === 'hidden') {
+  if (value === 'visible') {
+    exports.sceneContainer.style.overflow = value;
+  } else if (value === 'hidden') {
     var p5Canvas = document.getElementsByClassName('p5Canvas')[0].getBoundingClientRect();
-    exports.sceneContainer.setAttribute('style', "overflow: hidden; position: absolute; left: " + p5Canvas.x + "px; top: " + p5Canvas.y + "px; width: " + p5Canvas.width + "px; height : " + p5Canvas.height + "px");
+    exports.sceneContainer.style.overflow = value;
+    exports.sceneContainer.style.left = p5Canvas.x + 'px';
+    exports.sceneContainer.style.top = p5Canvas.y + 'px';
+    exports.sceneContainer.style.width = p5Canvas.width + 'px';
+    exports.sceneContainer.style.height = p5Canvas.height + 'px';
   }
 }
 
@@ -43991,6 +44156,8 @@ function add(object) {
     object.writeElement.style('color', "" + object.fillColor); //object.writeElement.style('text-stroke-width', `${object._strokeWidth}`); //TODO : not working without -webkit
 
     object.writeElement.style('opacity', '0'); //to hide text at initialisation
+
+    object.writeElement.style('white-space', 'nowrap'); //TODO : check for animations if breaking
   }
 }
 
@@ -44056,10 +44223,18 @@ function (_super) {
 
   /**
    * creates a text object
+   *
    * @param {string} text text content
    * @param {number} x-coordinate x-coordinate of text
    * @param {number} y-coordinate y-coordinate of text
    * @param {number} font-size font-size of the text
+   *
+   *  @example
+   *
+   * example for creating text object:
+   * ```js
+   * let text = new Text('Hi!', width/2, height/2, 28)
+   * ```
    */
 
 
@@ -44173,8 +44348,7 @@ function (_super) {
   };
   /**
    * Sets the given style (css) property (1st arg) of the element with the
-   * given value (2nd arg). If a single argument is given, .style()
-   * returns the value of the given property; however, if the single argument
+   * given value (2nd arg). If the single argument
    * is given in css syntax ('text-align:center'), .style() sets the css
    * appropriately.
    *
@@ -44258,6 +44432,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.GObject = void 0;
 
+var controls_1 = require("../Scene/controls");
+
 var GObject =
 /** @class */
 function () {
@@ -44284,11 +44460,690 @@ function () {
     this.svgHeight = svgHeight;
   }
 
+  GObject.prototype.moveTo = function (newX, newY, startTime, endTime) {
+    var object = this.graphContainer;
+    var timeDuration = (endTime - startTime) * 1000;
+    var delayDuration = startTime * 1000;
+    var currCoord = {
+      currX: this.x,
+      currY: this.y
+    };
+    controls_1.animationTimeline.add({
+      targets: currCoord,
+      currX: newX,
+      currY: newY,
+      //translateZ: 0,
+      easing: 'easeInOutCubic',
+      duration: timeDuration,
+      update: function update(anim) {
+        this.x = currCoord.currX;
+        this.y = currCoord.currY;
+        object.position(this.x, this.y);
+      } //delay: anime.stagger(CONFIG.PLAY.DISSOLVE_STAGGERING_DELAY)
+      //delay: anime.stagger(180, { start: timeDuration }) //time duration must be replaced with delay
+
+    }, delayDuration);
+  };
+
   return GObject;
 }();
 
 exports.GObject = GObject;
-},{}],"lib/Geometry/graph.ts":[function(require,module,exports) {
+},{"../Scene/controls":"lib/Scene/controls.ts"}],"lib/Geometry/Shape.ts":[function(require,module,exports) {
+
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var __spreadArray = this && this.__spreadArray || function (to, from) {
+  for (var i = 0, il = from.length, j = to.length; i < il; i++, j++) {
+    to[j] = from[i];
+  }
+
+  return to;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SVGControlPointPosition = exports.controlPoint = exports.endGraph = exports.beginGraph = exports.Graph = void 0;
+
+var scene_1 = require("../Scene/scene");
+
+var GObject_1 = require("./GObject");
+
+var global = globalThis;
+var ULTRAMARINE40 = '#648fff';
+var MAGENTA50 = '#dc267f';
+var GOLD20 = '#ffb000';
+var INDIGO50 = '#785ef0';
+var ORANGE40 = '#fe6100';
+
+var Graph =
+/** @class */
+function (_super) {
+  __extends(Graph, _super); // pathData: any;
+  // graphObject: any;
+  // graphContainer: any;
+  // x: number;
+  // y: number;
+  // svgWidth: number;
+  // svgHeight: number;
+  // linePath: SVGPathElement;
+
+
+  function Graph(x, y, svgWidth, svgHeight) {
+    if (x === void 0) {
+      x = 0;
+    }
+
+    if (y === void 0) {
+      y = 0;
+    }
+
+    if (svgWidth === void 0) {
+      svgWidth = 300;
+    }
+
+    if (svgHeight === void 0) {
+      svgHeight = 300;
+    }
+
+    var _this = this;
+
+    scene_1.sceneVariables.isGraph = 'true'; //window.isGraph = 'true';
+
+    _this = _super.call(this, x, y, svgWidth, svgHeight) || this;
+    _this.config = {
+      graphColor: GOLD20,
+      graphStrokeWidth: 1,
+      arrowSize: 3,
+      xAxis: 'true',
+      yAxis: 'true',
+      minX: -5,
+      maxX: 5,
+      minY: -5,
+      maxY: 5,
+      scaleX: 1,
+      scaleY: 1,
+      axisColor: INDIGO50,
+      grid: 'true',
+      smallGridColor: MAGENTA50,
+      gridColor: ORANGE40,
+      stepX: 1,
+      stepY: 1,
+      originX: 0,
+      originY: 0,
+      tickX: 'true',
+      tickY: 'true',
+      tickColor: ULTRAMARINE40,
+      tickMarginX: -0.5,
+      tickMarginY: -0.5,
+      pathElements: 1000,
+      graphBox: 'true'
+    };
+    _this.config.scaleX = abs(_this.svgWidth / (_this.config.maxX - _this.config.minX));
+    _this.config.scaleY = abs(_this.svgHeight / (_this.config.maxY - _this.config.minY)); // this.x = x;
+    // this.y = y;
+    // this.svgWidth = svgWidth;
+    // this.svgHeight = svgHeight;
+    //this.pathData = createParametricSVGPath(this.xeqn, this.yeqn, this.parameterRange, this.config);
+
+    _this.graphContainer = createElement('div');
+
+    _this.graphContainer.parent(scene_1.sceneContainer);
+
+    _this.linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+    _this.linePath.setAttribute('fill', 'none');
+
+    _this.linePath.setAttribute('stroke', 'black');
+
+    _this.linePath.setAttribute('stroke-width', "" + _this.config.graphStrokeWidth);
+
+    _this.graphContainer.position(_this.x, _this.y);
+
+    _this.graphObject = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); //this.graphObject.setAttribute('onload', 'SVGControlPointPosition(evt)');
+
+    _this.graphObject.setAttribute('width', "" + _this.svgWidth);
+
+    _this.graphObject.setAttribute('height', "" + _this.svgHeight);
+
+    _this.graphObject.setAttribute('viewBox', -_this.svgWidth / 2 + " " + -_this.svgHeight / 2 + " " + _this.svgWidth + " " + _this.svgHeight);
+
+    _this.graphObject.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+    _this.graphContainer.elt.appendChild(_this.graphObject);
+
+    return _this;
+  }
+
+  Graph.prototype.configure = function (config) {
+    this.config = {
+      graphColor: config.graphColor ? config.graphColor : this.config.graphColor,
+      graphStrokeWidth: config.graphStrokeWidth ? config.graphStrokeWidth : this.config.graphStrokeWidth,
+      arrowSize: config.arrowSize ? config.arrowSize : this.config.arrowSize,
+      xAxis: config.xAxis ? config.xAxis : this.config.xAxis,
+      yAxis: config.yAxis ? config.yAxis : this.config.yAxis,
+      minX: config.minX ? config.minX : this.config.minX,
+      maxX: config.maxX ? config.maxX : this.config.maxX,
+      minY: config.minY ? config.minY : this.config.minY,
+      maxY: config.maxY ? config.maxY : this.config.maxY,
+      scaleX: config.scaleX ? config.scaleX : this.config.scaleX,
+      scaleY: config.scaleY ? config.scaleY : this.config.scaleY,
+      axisColor: config.axisColor ? config.axisColor : this.config.axisColor,
+      smallGridColor: config.smallGridColor ? config.smallGridColor : this.config.smallGridColor,
+      gridColor: config.gridColor ? config.gridColor : this.config.gridColor,
+      stepX: config.stepX ? config.stepX : this.config.stepX,
+      stepY: config.stepY ? config.stepY : this.config.stepY,
+      originX: config.originX ? config.originX : this.config.originX,
+      originY: config.originY ? config.originY : this.config.originY,
+      grid: config.grid ? config.grid : this.config.grid,
+      tickX: config.tickX ? config.tickX : this.config.tickX,
+      tickY: config.tickY ? config.tickY : this.config.tickY,
+      tickColor: config.tickColor ? config.tickColor : this.config.tickColor,
+      tickMarginX: config.tickMarginX ? config.tickMarginX : this.config.tickMarginX,
+      tickMarginY: config.tickMarginY ? config.tickMarginY : this.config.tickMarginY,
+      pathElements: config.pathElements ? config.pathElements : this.config.pathElements,
+      graphBox: config.graphBox ? config.graphBox : this.config.graphBox
+    }; //console.log(this.config);
+  };
+
+  return Graph;
+}(GObject_1.GObject);
+
+exports.Graph = Graph;
+
+function beginGraph(x, y, svgWidth, svgHeight) {
+  if (x === void 0) {
+    x = 0;
+  }
+
+  if (y === void 0) {
+    y = 0;
+  }
+
+  if (svgWidth === void 0) {
+    svgWidth = width;
+  }
+
+  if (svgHeight === void 0) {
+    svgHeight = height;
+  }
+
+  var graphTemperoryObject = new Graph(x, y, svgWidth, svgHeight);
+  scene_1.sceneVariables.graph = graphTemperoryObject;
+  scene_1.sceneVariables.currentSVG = graphTemperoryObject.graphObject;
+  return graphTemperoryObject;
+}
+
+exports.beginGraph = beginGraph;
+
+function endGraph() {
+  scene_1.sceneVariables.isGraph = 'false';
+}
+
+exports.endGraph = endGraph;
+global.p5.prototype._rect = global.p5.prototype.rect;
+
+global.p5.prototype.rect = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    console.log('Canvas rect() called');
+    return this._rect.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    console.log('SVG rect() called');
+    return new (Rectangle.bind.apply(Rectangle, __spreadArray([void 0], Array.from(arguments))))();
+  }
+};
+
+var Rectangle =
+/** @class */
+function () {
+  //rectangle: SVGRectElement;
+  function Rectangle() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    } // super(arguments[0], arguments[1]);
+
+
+    this.shape = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    this.x = arguments[0];
+    this.y = arguments[1];
+    this.w = arguments[2];
+    this.h = arguments[3];
+    this.shapeAngle = 0;
+    this.shape.setAttribute('x', "" + this.x);
+    this.shape.setAttribute('y', "" + this.y);
+    this.shape.setAttribute('width', "" + this.w);
+    this.shape.setAttribute('height', "" + this.h);
+    this.shape.setAttribute('fill', "" + scene_1.sceneVariables.currFillColor.toString());
+    this.shape.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+    this.shape.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    this.shape.setAttribute('style', "transform : rotate(" + scene_1.sceneVariables.currAngle.toString() + "deg);"); //this.shape.style.transform = `rotate(${sceneVariables.currAngle.toString()})deg;` //rotation
+
+    scene_1.sceneVariables.currentSVG.appendChild(this.shape);
+    return this;
+  }
+
+  Rectangle.prototype.position = function (x, y) {
+    this.x = x;
+    this.y = y;
+    this.shape.setAttribute('x', "" + this.x);
+    this.shape.setAttribute('y', "" + this.y);
+  };
+
+  Rectangle.prototype.remove = function () {
+    scene_1.sceneVariables.currentSVG.removeChild(this.shape);
+  };
+
+  Rectangle.prototype.rotate = function (angle, mode) {
+    if (mode === void 0) {
+      mode = 'relative';
+    }
+
+    if (angle) {
+      if (mode === 'relative') {
+        this.shapeAngle += angle;
+      } else if (mode === 'absolute') {
+        this.shapeAngle = angle;
+      }
+    }
+
+    this.shape.setAttribute('style', "transform : rotate(" + (scene_1.sceneVariables.currAngle + this.shapeAngle) + "deg);");
+  };
+
+  return Rectangle;
+}();
+
+global.p5.prototype._ellipse = global.p5.prototype.ellipse;
+
+global.p5.prototype.ellipse = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    console.log('Canvas ellipse() called');
+    return this._ellipse.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    console.log('SVG ellipse() called');
+    return new (SVGEllipse.bind.apply(SVGEllipse, __spreadArray([void 0], Array.from(arguments))))();
+  }
+};
+
+var SVGEllipse =
+/** @class */
+function () {
+  //rectangle: SVGRectElement;
+  function SVGEllipse() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+
+    this.shape = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    this.cx = arguments[0];
+    this.cy = arguments[1];
+    this.rx = arguments[2];
+    this.ry = arguments[3];
+    this.shape.setAttribute('cx', "" + this.cx);
+    this.shape.setAttribute('cy', "" + this.cy);
+    this.shape.setAttribute('rx', "" + this.rx);
+    this.shape.setAttribute('ry', "" + this.ry);
+    this.shape.setAttribute('fill', "" + scene_1.sceneVariables.currFillColor.toString());
+    this.shape.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+    this.shape.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    this.shape.setAttribute('style', "transform : rotate(" + scene_1.sceneVariables.currAngle.toString() + "deg);");
+    scene_1.sceneVariables.currentSVG.appendChild(this.shape);
+    return this;
+  }
+
+  SVGEllipse.prototype.position = function (cx, cy) {
+    this.cx = cx;
+    this.cy = cy;
+    this.shape.setAttribute('cx', "" + this.cx);
+    this.shape.setAttribute('cy', "" + this.cy);
+  };
+
+  SVGEllipse.prototype.remove = function () {
+    scene_1.sceneVariables.currentSVG.removeChild(this.shape);
+  };
+
+  return SVGEllipse;
+}();
+
+global.p5.prototype._circle = global.p5.prototype.circle;
+
+global.p5.prototype.circle = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    console.log('Canvas circle() called');
+    return this._circle.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    console.log('SVG circle() called');
+    return new (SVGCircle.bind.apply(SVGCircle, __spreadArray([void 0], Array.from(arguments))))();
+  }
+};
+
+var SVGCircle =
+/** @class */
+function (_super) {
+  __extends(SVGCircle, _super); //rectangle: SVGRectElement;
+
+
+  function SVGCircle() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+
+    var _this = _super.call(this, arguments[0], arguments[1], arguments[2], arguments[2]) || this;
+
+    if (_this.shape) {
+      scene_1.sceneVariables.currentSVG.removeChild(_this.shape); //removes ellipse if formed by super
+    }
+
+    _this.shape = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    _this.cx = arguments[0];
+    _this.cy = arguments[1];
+    _this.rx = arguments[2];
+
+    _this.shape.setAttribute('cx', "" + _this.cx);
+
+    _this.shape.setAttribute('cy', "" + _this.cy);
+
+    _this.shape.setAttribute('r', "" + _this.rx);
+
+    _this.shape.setAttribute('fill', "" + scene_1.sceneVariables.currFillColor.toString());
+
+    _this.shape.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+
+    _this.shape.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+
+    scene_1.sceneVariables.currentSVG.appendChild(_this.shape);
+    return _this;
+  }
+
+  return SVGCircle;
+}(SVGEllipse);
+
+global.p5.prototype._point = global.p5.prototype.point;
+
+global.p5.prototype.point = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    console.log('Canvas point() called');
+    return this._point.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    console.log('SVG point() called');
+    return new (SVGPoint.bind.apply(SVGPoint, __spreadArray([void 0], Array.from(arguments))))();
+  }
+};
+
+var SVGPoint =
+/** @class */
+function (_super) {
+  __extends(SVGPoint, _super); //rectangle: SVGRectElement;
+
+
+  function SVGPoint() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+
+    var _this = _super.call(this, arguments[0], arguments[1], scene_1.sceneVariables.currStrokeWidth, scene_1.sceneVariables.currStrokeWidth) || this;
+
+    if (_this.shape) {
+      scene_1.sceneVariables.currentSVG.removeChild(_this.shape); //removes ellipse if formed by super
+    }
+
+    _this.shape = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    _this.cx = arguments[0];
+    _this.cy = arguments[1];
+    _this.rx = float(scene_1.sceneVariables.currStrokeWidth);
+
+    _this.shape.setAttribute('cx', "" + _this.cx);
+
+    _this.shape.setAttribute('cy', "" + _this.cy);
+
+    _this.shape.setAttribute('r', "" + _this.rx / 2);
+
+    _this.shape.setAttribute('fill', "" + scene_1.sceneVariables.currStrokeColor.toString());
+
+    _this.shape.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+
+    _this.shape.setAttribute('stroke-width', "" + 0);
+
+    scene_1.sceneVariables.currentSVG.appendChild(_this.shape);
+    return _this;
+  }
+
+  return SVGPoint;
+}(SVGEllipse);
+
+function controlPoint() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  if (scene_1.sceneVariables.isGraph === 'true') {
+    return new (SVGControlPoint.bind.apply(SVGControlPoint, __spreadArray([void 0], args)))();
+  }
+}
+
+exports.controlPoint = controlPoint;
+
+var SVGControlPoint =
+/** @class */
+function (_super) {
+  __extends(SVGControlPoint, _super);
+
+  function SVGControlPoint() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+
+    var _this = _super.call(this, arguments[0], arguments[1]) || this; // this.xco = 0;
+    // this.yco = 0;
+
+
+    _this.shape.setAttribute('onmousedown', 'SVGControlPointPosition(evt)');
+
+    _this.shape.setAttribute('class', 'controlPoint');
+
+    _this.shape.setAttribute('posX', "" + _this.cx);
+
+    _this.shape.setAttribute('posY', "" + _this.cy);
+
+    return _this;
+  }
+
+  SVGControlPoint.prototype.position = function () {
+    this.x = this.shape.getAttributeNS(null, 'posX');
+    this.y = this.shape.getAttributeNS(null, 'posY');
+    return [this.x, this.y];
+  };
+
+  return SVGControlPoint;
+}(SVGPoint);
+
+function SVGControlPointPosition(event) {
+  var svg = scene_1.sceneVariables.currentSVG;
+  svg.addEventListener('mousedown', startDrag);
+  svg.addEventListener('mousemove', drag);
+  svg.addEventListener('mouseup', endDrag);
+  svg.addEventListener('mouseleave', endDrag);
+  var offset, transform;
+
+  function getMousePosition(event) {
+    var CTM = svg.getScreenCTM();
+    return {
+      x: (event.clientX - CTM.e) / CTM.a,
+      y: (event.clientY - CTM.f) / CTM.d
+    };
+  }
+
+  function startDrag(event) {
+    if (event.target.classList.contains('controlPoint')) {
+      scene_1.sceneVariables.selectedPoint = event.target; //console.log(sceneVariables.selectedPoint.x);
+
+      offset = getMousePosition(event); // Get all the transforms currently on this element
+
+      var transforms = scene_1.sceneVariables.selectedPoint.transform.baseVal; // Ensure the first transform is a translate transform
+
+      if (transforms.length === 0 || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+        // Create an transform that translates by (0, 0)
+        var translate = svg.createSVGTransform();
+        translate.setTranslate(0, 0); // Add the translation to the front of the transforms list
+
+        scene_1.sceneVariables.selectedPoint.transform.baseVal.insertItemBefore(translate, 0);
+      } // Get initial translation amount
+
+
+      transform = transforms.getItem(0);
+      offset.x -= transform.matrix.e;
+      offset.y -= transform.matrix.f;
+    }
+  }
+
+  function drag(event) {
+    if (scene_1.sceneVariables.selectedPoint) {
+      event.preventDefault();
+      var coord = getMousePosition(event);
+      transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
+      scene_1.sceneVariables.selectedPoint.setAttribute('posX', "" + coord.x);
+      scene_1.sceneVariables.selectedPoint.setAttribute('posY', "" + coord.y);
+    }
+  }
+
+  function endDrag(event) {
+    scene_1.sceneVariables.selectedPoint = null;
+  }
+}
+
+exports.SVGControlPointPosition = SVGControlPointPosition;
+global.p5.prototype._line = global.p5.prototype.line;
+
+global.p5.prototype.line = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    return this._line.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    return new (SVGLine.bind.apply(SVGLine, __spreadArray([void 0], Array.from(arguments))))();
+  }
+};
+
+var SVGLine =
+/** @class */
+function () {
+  function SVGLine() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+
+    this.svgLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    this.x1 = arguments[0];
+    this.y1 = arguments[1];
+    this.x2 = arguments[2];
+    this.y2 = arguments[3];
+    this.svgLine.setAttribute('x1', "" + this.x1);
+    this.svgLine.setAttribute('y1', "" + this.y1);
+    this.svgLine.setAttribute('x2', "" + this.x2);
+    this.svgLine.setAttribute('y2', "" + -this.y2);
+    this.svgLine.setAttribute('fill', "" + scene_1.sceneVariables.currFillColor.toString());
+    this.svgLine.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+    this.svgLine.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    this.svgLine.setAttribute('style', "transform : rotate(" + scene_1.sceneVariables.currAngle.toString() + "deg);");
+    scene_1.sceneVariables.currentSVG.appendChild(this.svgLine);
+  }
+
+  SVGLine.prototype.remove = function () {
+    scene_1.sceneVariables.currentSVG.removeChild(this.svgLine);
+  };
+
+  return SVGLine;
+}();
+
+global.p5.prototype._fill = global.p5.prototype.fill;
+
+global.p5.prototype.fill = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    scene_1.sceneVariables.currFillColor = arguments[0].toString();
+
+    this._fill.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    scene_1.sceneVariables.currFillColor = arguments[0].toString();
+  }
+};
+
+global.p5.prototype._stroke = global.p5.prototype.stroke;
+
+global.p5.prototype.stroke = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    scene_1.sceneVariables.currStrokeColor = arguments[0].toString();
+
+    this._stroke.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    scene_1.sceneVariables.currStrokeColor = arguments[0].toString();
+  }
+};
+
+global.p5.prototype._strokeWeight = global.p5.prototype.strokeWeight;
+
+global.p5.prototype.strokeWeight = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    scene_1.sceneVariables.currStrokeWidth = arguments[0];
+
+    this._strokeWeight.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    scene_1.sceneVariables.currStrokeWidth = arguments[0];
+  }
+};
+
+global.p5.prototype._rotate = global.p5.prototype.rotate;
+
+global.p5.prototype.rotate = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    scene_1.sceneVariables.currAngle += arguments[0];
+
+    this._rotate.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    scene_1.sceneVariables.currAngle += arguments[0]; //console.log(sceneVariables.currAngle);
+    //TODO : rotate currently takes only angles in degree
+  }
+};
+},{"../Scene/scene":"lib/Scene/scene.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Geometry/graph.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -44328,7 +45183,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create2DGraph = exports.createSVGPath = exports.Graph2D = void 0;
+exports.axis = exports.plot2D = exports.create2DGraph = exports.createSVGPath = exports.Graph2D = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
@@ -44396,6 +45251,7 @@ function (_super) {
       scaleX: 1,
       scaleY: 1,
       axisColor: INDIGO50,
+      grid: 'true',
       smallGridColor: MAGENTA50,
       gridColor: ORANGE40,
       stepX: 1,
@@ -44407,7 +45263,8 @@ function (_super) {
       tickColor: ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5,
-      pathElements: 1000
+      pathElements: 1000,
+      graphBox: 'true'
     };
     _this.eqn = eqn; // this.x = x;
     // this.y = y;
@@ -44481,12 +45338,14 @@ function (_super) {
       stepY: config.stepY ? config.stepY : this.config.stepY,
       originX: config.originX ? config.originX : this.config.originX,
       originY: config.originY ? config.originY : this.config.originY,
+      grid: config.grid ? config.grid : this.config.grid,
       tickX: config.tickX ? config.tickX : this.config.tickX,
       tickY: config.tickY ? config.tickY : this.config.tickY,
       tickColor: config.tickColor ? config.tickColor : this.config.tickColor,
       tickMarginX: config.tickMarginX ? config.tickMarginX : this.config.tickMarginX,
       tickMarginY: config.tickMarginY ? config.tickMarginY : this.config.tickMarginY,
-      pathElements: config.pathElements ? config.pathElements : this.config.pathElements
+      pathElements: config.pathElements ? config.pathElements : this.config.pathElements,
+      graphBox: config.graphBox ? config.graphBox : this.config.graphBox
     }; //console.log(this.config);
   };
   /**
@@ -44595,8 +45454,15 @@ function (_super) {
     grid.setAttribute('y', "" + -this.svgHeight / 2);
     grid.setAttribute('width', "100%");
     grid.setAttribute('height', "100%");
-    grid.setAttribute('fill', "url(#grid)");
-    grid.setAttribute('stroke', "white"); //this.coordinate.appendChild(frame);
+
+    if (this.config.grid === 'true') {
+      grid.setAttribute('fill', "url(#grid)");
+    }
+
+    if (this.config.graphBox === 'true') {
+      grid.setAttribute('stroke', "white");
+    } //this.coordinate.appendChild(frame);
+
 
     this.coordinate.appendChild(grid); //axes
     //console.log(this.config.axisX);
@@ -44794,6 +45660,174 @@ function create2DGraph(eqn, x, y, svgWidth, svgHeight) {
 }
 
 exports.create2DGraph = create2DGraph;
+
+function plot2D(eqn) {
+  //const plot2d = new Graph2D(eqn, sceneVariables.currentSVG.getBBox().x, sceneVariables.currentSVG.getBBox().y, sceneVariables.currentSVG.getBBox().width, sceneVariables.currentSVG.getBBox().height);
+  if (scene_1.sceneVariables.isGraph === 'true') {
+    var linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    linePath.setAttribute('fill', 'none');
+    linePath.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor);
+    linePath.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    var pathData = createSVGPath(eqn, scene_1.sceneVariables.graph.config);
+    var plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    plotting.setAttribute('id', 'plot'); // linePath.setAttribute(
+    //   'stroke',
+    //   `${sceneVariables.graph.config.graphColor}`
+    // );
+    // linePath.setAttribute(
+    //   'stroke-width',
+    //   `${sceneVariables.graph.config.graphStrokeWidth}`
+    // );
+
+    linePath.setAttribute('d', pathData);
+    plotting.appendChild(linePath); // <g id="plot">
+
+    scene_1.sceneVariables.graph.graphObject.appendChild(plotting); // attaching to graphContainer
+
+    scene_1.sceneVariables.graph.graphContainer.elt.appendChild(scene_1.sceneVariables.graph.graphObject); // sceneVariables.currentSVG.appendChild;
+  }
+}
+
+exports.plot2D = plot2D;
+
+function axis() {
+  var graph = scene_1.sceneVariables.graph;
+
+  if (scene_1.sceneVariables.isGraph === 'true') {
+    graph.coordinate = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    graph.coordinate.setAttribute('id', 'coordinateSystem');
+    var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML += "<marker refX=\"" + 2 * graph.config.arrowSize + "\" refY=\"" + graph.config.arrowSize + "\" markerWidth=\"" + 2 * graph.config.arrowSize + "\" markerHeight=\"" + 2 * graph.config.arrowSize + "\" id=\"marker-arrow\" class=\"marker\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L " + 2 * graph.config.arrowSize + " " + graph.config.arrowSize + " L 0 " + 2 * graph.config.arrowSize + " z\" style=\"fill: " + graph.config.axisColor + "\"></path></marker>";
+    graph.graphObject.appendChild(defs); // graph.graphObject.appendChild(arrowPath);
+    // let frame = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    // frame.setAttribute('x', `${-graph.svgWidth / 2}`);
+    // frame.setAttribute('y', `${-graph.svgHeight / 2}`);
+    // frame.setAttribute('width', `${graph.svgWidth}`);
+    // frame.setAttribute('height', `${graph.svgHeight}`);
+    // frame.setAttribute('fill', `rgba(0,0,0,0)`);
+    // frame.setAttribute('stroke', `white`);
+    //grid
+
+    defs.innerHTML += "<pattern id=\"smallGrid\" width=\"" + graph.config.stepX * graph.config.scaleX + "\" height=\"" + graph.config.stepY * graph.config.scaleY + "\" patternUnits=\"userSpaceOnUse\">\n   <path d=\"M " + graph.config.stepX * graph.config.scaleX + " 0 L 0 0 0 " + graph.config.stepY * graph.config.scaleY + "\" fill=\"none\" stroke=\"" + graph.config.smallGridColor + "\" stroke-width=\"0.5\"/>\n  </pattern>\n  <pattern x = " + graph.config.originX * graph.config.scaleX + " y = " + graph.config.originY * graph.config.scaleY + " id=\"grid\" width=\"" + 4 * graph.config.stepX * graph.config.scaleX + "\" height=\"" + 4 * graph.config.stepY * graph.config.scaleY + "\" patternUnits=\"userSpaceOnUse\">\n   <rect width=\"" + 4 * graph.config.stepX * graph.config.scaleX + "\" height=\"" + 4 * graph.config.stepY * graph.config.scaleY + "\" fill=\"url(#smallGrid)\"/>\n   <path d=\"M " + 4 * graph.config.stepX * graph.config.scaleX + " 0 L 0 0 0 " + 4 * graph.config.stepY * graph.config.scaleY + "\" fill=\"none\" stroke=\"" + graph.config.gridColor + "\" stroke-width=\"1\"/>\n  </pattern>";
+    var grid = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    grid.setAttribute('x', "" + -graph.svgWidth / 2);
+    grid.setAttribute('y', "" + -graph.svgHeight / 2);
+    grid.setAttribute('width', "100%");
+    grid.setAttribute('height', "100%");
+
+    if (graph.config.grid === 'true') {
+      grid.setAttribute('fill', "url(#grid)");
+    }
+
+    if (graph.config.graphBox === 'true') {
+      grid.setAttribute('stroke', "white");
+    } //graph.coordinate.appendChild(frame);
+
+
+    graph.coordinate.appendChild(grid); //axes
+    //console.log(graph.config.axisX);
+    // console.log(graph.config.tickX);
+
+    if (graph.config.xAxis === 'true') {
+      var xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      xAxis.setAttribute('x1', "" + -graph.svgWidth / 2);
+      xAxis.setAttribute('y1', "" + -graph.config.originY * graph.config.scaleY);
+      xAxis.setAttribute('x2', "" + graph.svgWidth / 2);
+      xAxis.setAttribute('y2', "" + -graph.config.originY * graph.config.scaleY);
+      xAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      xAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      xAxis.setAttribute('stroke', "" + graph.config.axisColor);
+      xAxis.setAttribute('fill', "none");
+      graph.coordinate.appendChild(xAxis);
+
+      if (graph.config.tickX === 'true') {
+        var tick = void 0; //x axis
+        //+ve axis
+
+        for (var i = 0; i < abs(int(graph.svgWidth / (2 * graph.config.scaleX) - graph.config.originX)) / graph.config.stepX; i++) {
+          var x = graph.config.originX * graph.config.scaleX + (i + 1) * graph.config.stepX * graph.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + x);
+          tick.setAttribute('y', "" + (-graph.config.originY * graph.config.scaleY - graph.config.tickMarginX * graph.config.scaleY));
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + graph.config.tickColor;
+          graph.coordinate.appendChild(tick);
+        } //console.log(int(graph.svgWidth / (2*graph.config.scaleX)) + graph.config.originX);
+        //-ve axis
+
+
+        for (var i = abs(int(graph.svgWidth / (2 * graph.config.scaleX)) + graph.config.originX); i >= 0; i--) {
+          var x = graph.config.originX * graph.config.scaleX - (i + 1) * graph.config.stepX * graph.config.scaleX;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + x);
+          tick.setAttribute('y', "" + (-graph.config.originY * graph.config.scaleY - graph.config.tickMarginX * graph.config.scaleY));
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + graph.config.tickColor;
+          graph.coordinate.appendChild(tick);
+        }
+      }
+    }
+
+    if (graph.config.yAxis === 'true') {
+      var yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      yAxis.setAttribute('x1', "" + graph.config.originX * graph.config.scaleX);
+      yAxis.setAttribute('y1', "" + -graph.svgHeight / 2);
+      yAxis.setAttribute('x2', "" + graph.config.originX * graph.config.scaleX);
+      yAxis.setAttribute('y2', "" + graph.svgHeight / 2);
+      yAxis.setAttribute('marker-start', 'url(#marker-arrow)');
+      yAxis.setAttribute('marker-end', 'url(#marker-arrow)');
+      yAxis.setAttribute('stroke', "" + graph.config.axisColor);
+      yAxis.setAttribute('fill', "none");
+      graph.coordinate.appendChild(yAxis);
+
+      if (graph.config.tickY === 'true') {
+        var tick = void 0; //y axis
+        //+ve axis
+
+        for (var i = 0; i <= abs(-int(graph.svgHeight / (2 * graph.config.scaleY)) + graph.config.originY); i++) {
+          var y = -graph.config.originY * graph.config.scaleY - (i + 1) * graph.config.stepY * graph.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + (graph.config.originX * graph.config.scaleX + graph.config.tickMarginY * graph.config.scaleX));
+          tick.setAttribute('y', "" + y);
+          tick.innerHTML = (i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + graph.config.tickColor;
+          graph.coordinate.appendChild(tick);
+        } //-ve axis
+
+
+        for (var i = abs(-int(graph.svgHeight / (2 * graph.config.scaleY)) - graph.config.originY); i >= 0; i--) {
+          var y = -graph.config.originY * graph.config.scaleY + (i + 1) * graph.config.stepY * graph.config.scaleY;
+          tick = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          tick.setAttribute('x', "" + (graph.config.originX * graph.config.scaleX + graph.config.tickMarginY * graph.config.scaleX));
+          tick.setAttribute('y', "" + y);
+          tick.innerHTML = -(i + 1).toString();
+          tick.style.textAnchor = 'middle';
+          tick.style.alignmentBaseline = 'middle';
+          tick.style.strokeOpacity = '.2';
+          tick.style.fill = "" + graph.config.tickColor;
+          graph.coordinate.appendChild(tick);
+        }
+      }
+    } //xAxis.setAttribute('stroke', color);
+    //xAxis.setAttribute('stroke-width', w);
+    //ticks
+    //graph.plotting.appendChild(graph.linePath);
+
+
+    graph.graphObject.appendChild(graph.coordinate); // <g id="coordinateSystem">
+  }
+}
+
+exports.axis = axis;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Geometry/parametric.ts":[function(require,module,exports) {
 "use strict";
 
@@ -44834,7 +45868,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create2DParametricGraph = exports.createParametricSVGPath = exports.GraphParametric2D = void 0;
+exports.parametric2D = exports.create2DParametricGraph = exports.createParametricSVGPath = exports.GraphParametric2D = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
@@ -45313,6 +46347,41 @@ function create2DParametricGraph(xeqn, yeqn, parameterRange, x, y, svgWidth, svg
 }
 
 exports.create2DParametricGraph = create2DParametricGraph;
+
+function parametric2D(xeqn, yeqn, parameterRange) {
+  if (parameterRange === void 0) {
+    parameterRange = [0, 2 * Math.PI];
+  } // sceneVariables.graph.xeqn = xeqn;
+  // sceneVariables.graph.yeqn = yeqn;
+  // sceneVariables.graph.parameterRange = parameterRange;
+
+
+  if (scene_1.sceneVariables.isGraph === 'true') {
+    var linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    linePath.setAttribute('fill', 'none');
+    linePath.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+    linePath.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    var pathData = createParametricSVGPath(xeqn, yeqn, parameterRange, scene_1.sceneVariables.graph.config);
+    var plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    plotting.setAttribute('id', 'plot'); // linePath.setAttribute(
+    //   'stroke',
+    //   `${sceneVariables.graph.config.graphColor}`
+    // );
+    // linePath.setAttribute(
+    //   'stroke-width',
+    //   `${sceneVariables.graph.config.graphStrokeWidth}`
+    // );
+
+    linePath.setAttribute('d', pathData);
+    plotting.appendChild(linePath); // <g id="plot">
+
+    scene_1.sceneVariables.graph.graphObject.appendChild(plotting); // attaching to graphContainer
+
+    scene_1.sceneVariables.graph.graphContainer.elt.appendChild(scene_1.sceneVariables.graph.graphObject);
+  }
+}
+
+exports.parametric2D = parametric2D;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Geometry/polar.ts":[function(require,module,exports) {
 "use strict";
 
@@ -45353,7 +46422,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create2DPolarGraph = exports.createPolarSVGPath = exports.GraphPolar2D = void 0;
+exports.polar2D = exports.create2DPolarGraph = exports.createPolarSVGPath = exports.GraphPolar2D = void 0;
 
 var animejs_1 = __importDefault(require("animejs"));
 
@@ -45866,6 +46935,41 @@ function create2DPolarGraph(eqn, thetaRange, x, y, svgWidth, svgHeight) {
 }
 
 exports.create2DPolarGraph = create2DPolarGraph;
+
+function polar2D(eqn, thetaRange) {
+  if (thetaRange === void 0) {
+    thetaRange = [0, 2 * Math.PI];
+  } // sceneVariables.graph.xeqn = xeqn;
+  // sceneVariables.graph.yeqn = yeqn;
+  // sceneVariables.graph.parameterRange = parameterRange;
+
+
+  if (scene_1.sceneVariables.isGraph === 'true') {
+    var linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    linePath.setAttribute('fill', 'none');
+    linePath.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+    linePath.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    var pathData = createPolarSVGPath(eqn, thetaRange, scene_1.sceneVariables.graph.config);
+    var plotting = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    plotting.setAttribute('id', 'plot'); // linePath.setAttribute(
+    //   'stroke',
+    //   `${sceneVariables.graph.config.graphColor}`
+    // );
+    // linePath.setAttribute(
+    //   'stroke-width',
+    //   `${sceneVariables.graph.config.graphStrokeWidth}`
+    // );
+
+    linePath.setAttribute('d', pathData);
+    plotting.appendChild(linePath); // <g id="plot">
+
+    scene_1.sceneVariables.graph.graphObject.appendChild(plotting); // attaching to graphContainer
+
+    scene_1.sceneVariables.graph.graphContainer.elt.appendChild(scene_1.sceneVariables.graph.graphObject);
+  }
+}
+
+exports.polar2D = polar2D;
 },{"animejs":"../node_modules/animejs/lib/anime.es.js","../Scene/controls":"lib/Scene/controls.ts","../Scene/scene":"lib/Scene/scene.ts","../Scene/transform":"lib/Scene/transform.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Scene/transform.ts":[function(require,module,exports) {
 "use strict"; //TODO : transform function : use morphing
 
@@ -45977,7 +47081,112 @@ function transform(objectInit, objectFinl, startTime, endTime) {
 }
 
 exports.transform = transform;
-},{"../Geometry/graph":"lib/Geometry/graph.ts","../Geometry/parametric":"lib/Geometry/parametric.ts","../Geometry/polar":"lib/Geometry/polar.ts","./controls":"lib/Scene/controls.ts"}],"index.ts":[function(require,module,exports) {
+},{"../Geometry/graph":"lib/Geometry/graph.ts","../Geometry/parametric":"lib/Geometry/parametric.ts","../Geometry/polar":"lib/Geometry/polar.ts","./controls":"lib/Scene/controls.ts"}],"lib/Geometry/arrow.ts":[function(require,module,exports) {
+"use strict";
+
+var __spreadArray = this && this.__spreadArray || function (to, from) {
+  for (var i = 0, il = from.length, j = to.length; i < il; i++, j++) {
+    to[j] = from[i];
+  }
+
+  return to;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.arrow = void 0;
+
+var scene_1 = require("../Scene/scene");
+
+function arrow() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {//return this._line(...Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    return new (SVGArrow.bind.apply(SVGArrow, __spreadArray([void 0], Array.from(arguments))))();
+  }
+}
+
+exports.arrow = arrow;
+
+var SVGArrow =
+/** @class */
+function () {
+  function SVGArrow() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+
+    this.arrowConfig = {
+      arrowHeadColor: scene_1.sceneVariables.currStrokeColor,
+      arrowHeadHeight: float(scene_1.sceneVariables.currStrokeWidth),
+      arrowSize: float(scene_1.sceneVariables.currStrokeWidth)
+    }; // this.arrowSize =
+    // this.arrowHeadColor = ;
+
+    this.arrow = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    this.svgLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    this.x1 = arguments[0];
+    this.y1 = arguments[1];
+    this.x2 = arguments[2];
+    this.y2 = arguments[3];
+    var angle = Math.atan((this.y2 - this.y1) / (this.x2 - this.x1));
+    this.svgLine.setAttribute('x1', "" + this.x1);
+    this.svgLine.setAttribute('y1', "" + -this.y1);
+    this.svgLine.setAttribute('x2', "" + (this.x2 - 1.5 * this.arrowConfig.arrowSize * Math.cos(angle)));
+    this.svgLine.setAttribute('y2', "" + -(this.y2 - 6 * this.arrowConfig.arrowSize * Math.sin(angle)));
+    this.svgLine.setAttribute('fill', "" + scene_1.sceneVariables.currFillColor.toString());
+    this.svgLine.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+    this.svgLine.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    this.defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    this.defs.innerHTML = "<marker refX=\"" + 0 + "\" refY=\"" + this.arrowConfig.arrowSize + "\" markerWidth=\"" + 2 * this.arrowConfig.arrowSize + "\" markerHeight=\"" + 2 * this.arrowConfig.arrowSize + "\" id=\"marker-arrow\" class=\"marker\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L " + 2 * this.arrowConfig.arrowSize + " " + this.arrowConfig.arrowSize + " L 0 " + 2 * this.arrowConfig.arrowSize + " z\" style=\"fill: " + this.arrowConfig.arrowHeadColor.toString() + "\"></path></marker>"; //this.svgLine.setAttribute('marker-start', 'url(#marker-arrow)');
+
+    this.svgLine.setAttribute('marker-end', 'url(#marker-arrow)');
+    this.arrow.appendChild(this.defs);
+    this.arrow.appendChild(this.svgLine);
+    scene_1.sceneVariables.currentSVG.appendChild(this.arrow);
+  }
+
+  SVGArrow.prototype.configure = function (arrowConfig) {
+    this.arrowConfig = {
+      arrowHeadColor: arrowConfig.arrowHeadColor ? arrowConfig.arrowHeadColor : this.arrowConfig.arrowHeadColor,
+      arrowHeadHeight: arrowConfig.arrowHeadHeight ? arrowConfig.arrowHeadHeight : this.arrowConfig.arrowHeadHeight,
+      arrowSize: arrowConfig.arrowSize ? arrowConfig.arrowSize : this.arrowConfig.arrowSize
+    };
+    this.defs.innerHTML = "<marker refX=\"" + 0 + "\" refY=\"" + this.arrowConfig.arrowSize + "\" markerWidth=\"" + 2 * this.arrowConfig.arrowSize + "\" markerHeight=\"" + 2 * this.arrowConfig.arrowSize + "\" id=\"marker-arrow\" class=\"marker\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L " + 2 * this.arrowConfig.arrowSize + " " + this.arrowConfig.arrowSize + " L 0 " + 2 * this.arrowConfig.arrowSize + " z\" style=\"fill: " + this.arrowConfig.arrowHeadColor.toString() + "\"></path></marker>"; //this.svgLine.setAttribute('marker-start', 'url(#marker-arrow)');
+
+    this.svgLine.setAttribute('marker-end', 'url(#marker-arrow)');
+  };
+
+  SVGArrow.prototype.remove = function () {
+    scene_1.sceneVariables.currentSVG.removeChild(this.arrow);
+  };
+
+  SVGArrow.prototype.arrowHead = function (x, y) {
+    this.x2 = x;
+    this.y2 = y;
+    var angle = Math.atan((this.y2 - this.y1) / (this.x2 - this.x1));
+    this.svgLine.setAttribute('x2', "" + (this.x2 - 1.5 * this.arrowConfig.arrowSize * Math.cos(angle)));
+    this.svgLine.setAttribute('y2', "" + -(this.y2 - 6 * this.arrowConfig.arrowSize * Math.sin(angle)));
+  };
+
+  SVGArrow.prototype.arrowTail = function (x, y) {
+    this.x1 = x;
+    this.y1 = y;
+    this.svgLine.setAttribute('x1', "" + this.x1);
+    this.svgLine.setAttribute('y1', "" + -this.y1);
+  };
+
+  return SVGArrow;
+}();
+},{"../Scene/scene":"lib/Scene/scene.ts"}],"index.ts":[function(require,module,exports) {
 
 "use strict";
 
@@ -46004,20 +47213,30 @@ var play_1 = require("./lib/Scene/play");
 
 global.play = play_1.play;
 
-var scene_1 = require("./lib/Scene/scene");
+var scene_1 = require("./lib/Scene/scene"); // global.Scene = Scene;
 
-global.Scene = scene_1.Scene;
+
 global.overflow = scene_1.overflow;
-global.p5.prototype.registerMethod('init', scene_1.Scene);
+global.p5.prototype.registerMethod('init', function () {
+  return new scene_1.Scene();
+});
 
 var controls_1 = require("./lib/Scene/controls"); //global.sceneTime = sceneTime;
 
 
 global.createControls = controls_1.createControls;
 global.clock = controls_1.clock;
+global.callAt = controls_1.callAt;
 global.addDuration = controls_1.addDuration; // global.pauseScene = pauseScene;
 // global.playScene = playScene;
 // global.restartScene = restartScene;
+
+var Shape_1 = require("./lib/Geometry/Shape");
+
+global.beginGraph = Shape_1.beginGraph;
+global.controlPoint = Shape_1.controlPoint;
+global.SVGControlPointPosition = Shape_1.SVGControlPointPosition;
+global.endGraph = Shape_1.endGraph;
 
 var transform_1 = require("./lib/Scene/transform");
 
@@ -46026,18 +47245,26 @@ global.transform = transform_1.transform;
 var graph_1 = require("./lib/Geometry/graph");
 
 global.Graph2D = graph_1.Graph2D;
+global.plot2D = graph_1.plot2D;
+global.axis = graph_1.axis;
 global.create2DGraph = graph_1.create2DGraph;
 
 var polar_1 = require("./lib/Geometry/polar");
 
 global.GraphPolar2D = polar_1.GraphPolar2D;
+global.polar2D = polar_1.polar2D;
 global.create2DPolarGraph = polar_1.create2DPolarGraph;
 
 var parametric_1 = require("./lib/Geometry/parametric");
 
 global.GraphParametric2D = parametric_1.GraphParametric2D;
+global.parametric2D = parametric_1.parametric2D;
 global.create2DParametricGraph = parametric_1.create2DParametricGraph;
-},{"./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/scene":"lib/Scene/scene.ts","./lib/Scene/controls":"lib/Scene/controls.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts","./lib/Geometry/polar":"lib/Geometry/polar.ts","./lib/Geometry/parametric":"lib/Geometry/parametric.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var arrow_1 = require("./lib/Geometry/arrow");
+
+global.arrow = arrow_1.arrow;
+},{"./lib/MObject/Text":"lib/MObject/Text.ts","./lib/MObject/TeX":"lib/MObject/TeX.ts","./lib/Scene/add":"lib/Scene/add.ts","./lib/Scene/play":"lib/Scene/play.ts","./lib/Scene/scene":"lib/Scene/scene.ts","./lib/Scene/controls":"lib/Scene/controls.ts","./lib/Geometry/Shape":"lib/Geometry/Shape.ts","./lib/Scene/transform":"lib/Scene/transform.ts","./lib/Geometry/graph":"lib/Geometry/graph.ts","./lib/Geometry/polar":"lib/Geometry/polar.ts","./lib/Geometry/parametric":"lib/Geometry/parametric.ts","./lib/Geometry/arrow":"lib/Geometry/arrow.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -46065,7 +47292,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58159" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53263" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
