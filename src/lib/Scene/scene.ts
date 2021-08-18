@@ -9,7 +9,8 @@ interface ISceneVariables {
   currStrokeWidth: string,
   currFillColor: p5.Color | string,
   currAngle: number,
-  selectedPoint: any
+  selectedPoint: any,
+  currentPolygon
 };
 export let sceneVariables : ISceneVariables = {
   isGraph: 'false',
@@ -19,7 +20,8 @@ export let sceneVariables : ISceneVariables = {
   currStrokeWidth: '1',
   currFillColor: 'none',
   currAngle: 0,
-  selectedPoint : document.createElementNS('http://www.w3.org/2000/svg', 'circle') 
+  selectedPoint : document.createElementNS('http://www.w3.org/2000/svg', 'circle'), 
+  currentPolygon : 'false'
 };
 //export
 

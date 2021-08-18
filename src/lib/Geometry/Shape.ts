@@ -68,10 +68,10 @@ export class Graph extends GObject {
       arrowSize: 3,
       xAxis: 'true',
       yAxis: 'true',
-      minX: -5,
-      maxX: 5,
-      minY: -5,
-      maxY: 5,
+      minX: -12,
+      maxX: 10,
+      minY: -10,
+      maxY: 10,
       scaleX: 1,
       scaleY: 1,
       axisColor: INDIGO50,
@@ -82,8 +82,8 @@ export class Graph extends GObject {
       stepY: 1,
       originX: 0,
       originY: 0,
-      tickX: 'true',
-      tickY: 'true',
+      tickX: 'false',
+      tickY: 'false',
       tickColor: ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5,
@@ -654,3 +654,127 @@ global.p5.prototype.rotate = function () {
     //TODO : rotate currently takes only angles in degree
   }
 };
+
+/**
+ * beginShape
+ */
+
+global.p5.prototype._beginShape = global.p5.prototype.beginShape;
+global.p5.prototype.beginShape = function () {
+  if (
+    typeof sceneVariables.isGraph === 'undefined' ||
+    sceneVariables.isGraph === 'false'
+  ) {
+    console.log('Canvas beginShape() called');
+    return this._beginShape(...Array.from(arguments));
+  } else if (sceneVariables.isGraph === 'true') {
+    console.log('SVG beginShape() called');
+    return new SVGPolygon(...Array.from(arguments));
+  }
+};
+
+class SVGPolygon {
+  vertices;
+  shape: SVGPolygonElement;
+  //rectangle: SVGRectElement;
+  constructor(...args: any[]) {
+    this.vertices = [];
+    this.shape = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'polygon'
+    );
+    sceneVariables.currentPolygon = this;
+    this.shape.setAttribute(
+      'fill',
+      `${sceneVariables.currFillColor.toString()}`
+    );
+    this.shape.setAttribute(
+      'stroke',
+      `${sceneVariables.currStrokeColor.toString()}`
+    );
+    this.shape.setAttribute(
+      'stroke-width',
+      `${sceneVariables.currStrokeWidth}`
+    );
+    this.shape.setAttribute(
+      'style',
+      `transform : rotate(${sceneVariables.currAngle.toString()}deg);`
+    );
+    sceneVariables.currentSVG.appendChild(this.shape);
+    return this;
+  }
+  // position(cx: any, cy: any) {
+  //   this.cx = cx;
+  //   this.cy = cy;
+  //   this.shape.setAttribute('cx', `${this.cx}`);
+  //   this.shape.setAttribute('cy', `${this.cy}`);
+  // }
+  remove() {
+    sceneVariables.currentSVG.removeChild(this.shape);
+  }
+}
+
+global.p5.prototype._vertex = global.p5.prototype.vertex;
+global.p5.prototype.vertex = function () {
+  if (
+    typeof sceneVariables.isGraph === 'undefined' ||
+    sceneVariables.isGraph === 'false'
+  ) {
+    console.log('Canvas beginShape() called');
+    return this._vertex(...Array.from(arguments));
+  } else if (sceneVariables.isGraph === 'true') {
+    console.log('SVG beginShape() called');
+    return new SVGVertex(...Array.from(arguments));
+  }
+};
+
+class SVGVertex {
+  //vertices;
+  //rectangle: SVGRectElement;
+  constructor(...args: any[]) {
+    if (sceneVariables.currentPolygon != null) {
+      sceneVariables.currentPolygon.vertices.push(
+        args[0] *
+          sceneVariables.graph.config.stepX *
+          sceneVariables.graph.config.scaleX
+      );
+      sceneVariables.currentPolygon.vertices.push(
+        args[1] *
+          sceneVariables.graph.config.stepY *
+          sceneVariables.graph.config.scaleY
+      );
+    }
+    return this;
+  }
+  // position(cx: any, cy: any) {
+  //   this.cx = cx;
+  //   this.cy = cy;
+  //   this.shape.setAttribute('cx', `${this.cx}`);
+  //   this.shape.setAttribute('cy', `${this.cy}`);
+  // }
+  // remove() {
+  //   sceneVariables.currentSVG.removeChild(this.shape);
+  // }
+}
+
+global.p5.prototype._endShape = global.p5.prototype.endShape;
+global.p5.prototype.endShape = function () {
+  if (
+    typeof sceneVariables.isGraph === 'undefined' ||
+    sceneVariables.isGraph === 'false'
+  ) {
+    console.log('Canvas beginShape() called');
+    return this._endShape(...Array.from(arguments));
+  } else if (sceneVariables.isGraph === 'true') {
+    console.log('SVG beginShape() called');
+    return SVGEndShape(...Array.from(arguments));
+  }
+};
+
+function SVGEndShape(...args) {
+  sceneVariables.currentPolygon.shape.setAttribute(
+    'points',
+    sceneVariables.currentPolygon.vertices.toString()
+  );
+  sceneVariables.currentPolygon = null;
+}
