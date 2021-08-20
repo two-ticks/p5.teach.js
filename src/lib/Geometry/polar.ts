@@ -230,6 +230,7 @@ export class GraphPolar2D extends GObject {
   transform(object_finl: any, startTime: number = 0, endTime: number = 2) {
     transform(this, object_finl, startTime, endTime);
   }
+
   play() {
     const pathElement = this.graphContainer.elt.querySelectorAll('path');
     const lineDrawing = anime({

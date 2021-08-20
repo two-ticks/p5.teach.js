@@ -1,6 +1,6 @@
-# p5.teach.js 
+# p5.teach.js
 
-<img src="assets/p5-astrik-teach.png" alt="astrik-logo" />
+<img src="https://two-ticks.github.io/p5.teach.js/assets/p5-astrik-teach.png" alt="astrik-logo" />
 
 > A beginner friendly math animation library for p5.js
 
@@ -22,11 +22,6 @@ p5.teach.js provides tools for teaching through p5.js, such as functions to anim
 4. As the code is updated, the final js file is updated in `dist/p5.teach.js` dynamically
 5. The sketch in the `index.html` file is reflected with the changes
 
-## Generating documentation
-
-1. We use `TypeDoc` 
-2. Run `yarn typedoc src` for generating docs
-
 ## Tests
 
 1. We use `jest` for testing
@@ -41,3 +36,7 @@ p5.teach.js provides tools for teaching through p5.js, such as functions to anim
 
 1. Run `yarn build` to export the final js file
 2. Final js file is exported as `dist/p5.teach.js`
+
+## Generating documentation
+
+1. Run `yarn typedoc src` for generating docs

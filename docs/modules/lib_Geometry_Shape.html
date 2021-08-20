@@ -78,10 +78,10 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="lib_Geometry_Shape.html#SVGControlPointPosition" class="tsd-kind-icon">SVGControl<wbr>Point<wbr>Position</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="lib_Geometry_Shape.html#beginGraph" class="tsd-kind-icon">begin<wbr>Graph</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="lib_Geometry_Shape.html#controlPoint" class="tsd-kind-icon">control<wbr>Point</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="lib_Geometry_Shape.html#endGraph" class="tsd-kind-icon">end<wbr>Graph</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="lib_Geometry_Shape.html#polyline" class="tsd-kind-icon">polyline</a></li>
 							</ul>
 						</section>
 					</div>
@@ -89,29 +89,6 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="SVGControlPointPosition" class="tsd-anchor"></a>
-					<h3>SVGControl<wbr>Point<wbr>Position</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">SVGControl<wbr>Point<wbr>Position<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/Shape.ts#L444">Geometry/Shape.ts:444</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>event: <span class="tsd-signature-type">any</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="beginGraph" class="tsd-anchor"></a>
 					<h3>begin<wbr>Graph</h3>
@@ -122,16 +99,26 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/Shape.ts#L134">Geometry/Shape.ts:134</a></li>
+									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/9069ca1/src/lib/Geometry/Shape.ts#L199">Geometry/Shape.ts:199</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>beginGraph() begins a SVG graph</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>remarks</dt>
+									<dd><p>This function is part of <a href="../classes/lib_Geometry_Shape.Graph.html">Graph</a></p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>x: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 10</span></h5>
+									<h5>x: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
 								</li>
 								<li>
-									<h5>y: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 10</span></h5>
+									<h5>y: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
 								</li>
 								<li>
 									<h5>svgWidth: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = ...</span></h5>
@@ -154,9 +141,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/Shape.ts#L409">Geometry/Shape.ts:409</a></li>
+									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/9069ca1/src/lib/Geometry/Shape.ts#L483">Geometry/Shape.ts:483</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>controlPoint(x, y) creates a draggable point at (x,y)</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -164,6 +156,7 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">SVGControlPoint</span></h4>
+							<p>co-ordinates of current position</p>
 						</li>
 					</ul>
 				</section>
@@ -177,10 +170,43 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/Shape.ts#L145">Geometry/Shape.ts:145</a></li>
+									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/9069ca1/src/lib/Geometry/Shape.ts#L213">Geometry/Shape.ts:213</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>endGraph() ends a SVG graph</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="polyline" class="tsd-anchor"></a>
+					<h3>polyline</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">polyline<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/9069ca1/src/lib/Geometry/Shape.ts#L755">Geometry/Shape.ts:755</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>polyline is used to create any shape that consists of only straight lines</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -248,9 +274,6 @@
 						<a href="../classes/lib_Geometry_Shape.Graph.html" class="tsd-kind-icon">Graph</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="lib_Geometry_Shape.html#SVGControlPointPosition" class="tsd-kind-icon">SVGControl<wbr>Point<wbr>Position</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="lib_Geometry_Shape.html#beginGraph" class="tsd-kind-icon">begin<wbr>Graph</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
@@ -258,6 +281,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="lib_Geometry_Shape.html#endGraph" class="tsd-kind-icon">end<wbr>Graph</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="lib_Geometry_Shape.html#polyline" class="tsd-kind-icon">polyline</a>
 					</li>
 				</ul>
 			</nav>
