@@ -1,27 +1,37 @@
-import p5 from "p5";
+// import p5 from 'p5';
+
+//IBM's color blind safe palette https://github.com/IBM-Design/colors
+export const ULTRAMARINE40 = '#648fff';
+export const MAGENTA50 = '#dc267f';
+export const GOLD20 = '#ffb000';
+export const INDIGO50 = '#785ef0';
+export const ORANGE40 = '#fe6100';
 
 export let sceneContainer: HTMLDivElement;
 interface ISceneVariables {
-  isGraph: any,
-  graph : any,
-  currentSVG: SVGSVGElement,
-  currStrokeColor: p5.Color | string,
-  currStrokeWidth: string,
-  currFillColor: p5.Color | string,
-  currAngle: number,
-  selectedPoint: any,
-  currentPolygon
-};
-export let sceneVariables : ISceneVariables = {
+  isGraph: any;
+  graph: any;
+  currentSVG: SVGSVGElement;
+  currStrokeColor: p5.Color | string;
+  currStrokeWidth: string;
+  currFillColor: p5.Color | string;
+  currAngle: number;
+  selectedPoint: any;
+  currentPolygon;
+}
+export let sceneVariables: ISceneVariables = {
   isGraph: 'false',
-  graph : 'false',
+  graph: 'false',
   currentSVG: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
   currStrokeColor: 'black',
   currStrokeWidth: '1',
   currFillColor: 'none',
   currAngle: 0,
-  selectedPoint : document.createElementNS('http://www.w3.org/2000/svg', 'circle'), 
-  currentPolygon : 'false'
+  selectedPoint: document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'circle'
+  ),
+  currentPolygon: 'false'
 };
 //export
 

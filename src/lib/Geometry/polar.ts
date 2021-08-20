@@ -1,15 +1,15 @@
 import anime from 'animejs';
 import { animationTimeline } from '../Scene/controls';
-import { sceneContainer, sceneVariables } from '../Scene/scene';
+import { GOLD20, INDIGO50, MAGENTA50, ORANGE40, sceneContainer, sceneVariables, ULTRAMARINE40 } from '../Scene/scene';
 import { transform } from '../Scene/transform';
 import { GObject } from './GObject';
 
 // color blind safe palette
-const ULTRAMARINE40 = '#648fff';
-const MAGENTA50 = '#dc267f';
-const GOLD20 = '#ffb000';
-const INDIGO50 = '#785ef0';
-const ORANGE40 = '#fe6100';
+// const ULTRAMARINE40 = '#648fff';
+// const MAGENTA50 = '#dc267f';
+// const GOLD20 = '#ffb000';
+// const INDIGO50 = '#785ef0';
+// const ORANGE40 = '#fe6100';
 
 export class GraphPolar2D extends GObject {
   eqn: Function;

@@ -1,15 +1,23 @@
 import anime from 'animejs';
 import { animationTimeline } from '../Scene/controls';
-import { sceneContainer, sceneVariables } from '../Scene/scene';
+import {
+  GOLD20,
+  INDIGO50,
+  MAGENTA50,
+  ORANGE40,
+  sceneContainer,
+  sceneVariables,
+  ULTRAMARINE40
+} from '../Scene/scene';
 import { transform } from '../Scene/transform';
 import { GObject } from './GObject';
 
 // color blind safe palette
-const ULTRAMARINE40 = '#648fff';
-const MAGENTA50 = '#dc267f';
-const GOLD20 = '#ffb000';
-const INDIGO50 = '#785ef0';
-const ORANGE40 = '#fe6100';
+// const ULTRAMARINE40 = '#648fff';
+// const MAGENTA50 = '#dc267f';
+// const GOLD20 = '#ffb000';
+// const INDIGO50 = '#785ef0';
+// const ORANGE40 = '#fe6100';
 
 /**
  * class representing a 2-D Cartesian Graph
@@ -600,10 +608,7 @@ export function plot2D(eqn: Function) {
     linePath.setAttribute('fill', 'none');
     linePath.setAttribute('stroke', `${sceneVariables.currStrokeColor}`);
     linePath.setAttribute('stroke-width', `${sceneVariables.currStrokeWidth}`);
-    let pathData = createSVGPath(
-      eqn,
-      sceneVariables.graph.config
-    );
+    let pathData = createSVGPath(eqn, sceneVariables.graph.config);
     const plotting = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'g'
@@ -617,10 +622,7 @@ export function plot2D(eqn: Function) {
     //   'stroke-width',
     //   `${sceneVariables.graph.config.graphStrokeWidth}`
     // );
-    linePath.setAttribute(
-      'd',
-      pathData
-    );
+    linePath.setAttribute('d', pathData);
 
     plotting.appendChild(linePath); // <g id="plot">
 

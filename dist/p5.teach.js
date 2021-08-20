@@ -43893,7 +43893,7 @@ function createTeX() {
 
 exports.createTeX = createTeX;
 },{"tex-to-svg":"../node_modules/tex-to-svg/TeXToSVG.js","../Scene/add":"lib/Scene/add.ts","../Scene/play":"lib/Scene/play.ts","./MObject":"lib/MObject/MObject.ts"}],"lib/Scene/scene.ts":[function(require,module,exports) {
-"use strict";
+"use strict"; // import p5 from 'p5';
 
 var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
   function adopt(value) {
@@ -44041,8 +44041,13 @@ var __generator = this && this.__generator || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.overflow = exports.Scene = exports.sceneVariables = exports.sceneContainer = void 0;
-;
+exports.overflow = exports.Scene = exports.sceneVariables = exports.sceneContainer = exports.ORANGE40 = exports.INDIGO50 = exports.GOLD20 = exports.MAGENTA50 = exports.ULTRAMARINE40 = void 0; //IBM's color blind safe palette https://github.com/IBM-Design/colors
+
+exports.ULTRAMARINE40 = '#648fff';
+exports.MAGENTA50 = '#dc267f';
+exports.GOLD20 = '#ffb000';
+exports.INDIGO50 = '#785ef0';
+exports.ORANGE40 = '#fe6100';
 exports.sceneVariables = {
   isGraph: 'false',
   graph: 'false',
@@ -44051,7 +44056,8 @@ exports.sceneVariables = {
   currStrokeWidth: '1',
   currFillColor: 'none',
   currAngle: 0,
-  selectedPoint: document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+  selectedPoint: document.createElementNS('http://www.w3.org/2000/svg', 'circle'),
+  currentPolygon: 'false'
 }; //export
 
 var Scene =
@@ -44532,18 +44538,17 @@ var __spreadArray = this && this.__spreadArray || function (to, from) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SVGControlPointPosition = exports.controlPoint = exports.endGraph = exports.beginGraph = exports.Graph = void 0;
+exports.polyline = exports.SVGControlPointPosition = exports.controlPoint = exports.endGraph = exports.beginGraph = exports.Graph = void 0;
 
 var scene_1 = require("../Scene/scene");
 
 var GObject_1 = require("./GObject");
 
-var global = globalThis;
-var ULTRAMARINE40 = '#648fff';
-var MAGENTA50 = '#dc267f';
-var GOLD20 = '#ffb000';
-var INDIGO50 = '#785ef0';
-var ORANGE40 = '#fe6100';
+var global = globalThis; // const ULTRAMARINE40 = '#648fff';
+// const MAGENTA50 = '#dc267f';
+// const GOLD20 = '#ffb000';
+// const INDIGO50 = '#785ef0';
+// const ORANGE40 = '#fe6100';
 
 var Graph =
 /** @class */
@@ -44581,28 +44586,28 @@ function (_super) {
 
     _this = _super.call(this, x, y, svgWidth, svgHeight) || this;
     _this.config = {
-      graphColor: GOLD20,
+      graphColor: scene_1.GOLD20,
       graphStrokeWidth: 1,
       arrowSize: 3,
       xAxis: 'true',
       yAxis: 'true',
-      minX: -5,
-      maxX: 5,
-      minY: -5,
-      maxY: 5,
+      minX: -12,
+      maxX: 10,
+      minY: -10,
+      maxY: 10,
       scaleX: 1,
       scaleY: 1,
-      axisColor: INDIGO50,
+      axisColor: scene_1.INDIGO50,
       grid: 'true',
-      smallGridColor: MAGENTA50,
-      gridColor: ORANGE40,
+      smallGridColor: scene_1.MAGENTA50,
+      gridColor: scene_1.ORANGE40,
       stepX: 1,
       stepY: 1,
       originX: 0,
       originY: 0,
-      tickX: 'true',
-      tickY: 'true',
-      tickColor: ULTRAMARINE40,
+      tickX: 'false',
+      tickY: 'false',
+      tickColor: scene_1.ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5,
       pathElements: 1000,
@@ -45143,6 +45148,142 @@ global.p5.prototype.rotate = function () {
     //TODO : rotate currently takes only angles in degree
   }
 };
+/**
+ * beginShape
+ */
+
+
+global.p5.prototype._beginShape = global.p5.prototype.beginShape;
+
+global.p5.prototype.beginShape = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    console.log('Canvas beginShape() called');
+    return this._beginShape.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    console.log('SVG beginShape() called');
+    return new (SVGPolygon.bind.apply(SVGPolygon, __spreadArray([void 0], Array.from(arguments))))();
+  }
+};
+
+var SVGPolygon =
+/** @class */
+function () {
+  //rectangle: SVGRectElement;
+  function SVGPolygon() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+
+    this.vertices = [];
+    this.shape = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    scene_1.sceneVariables.currentPolygon = this;
+    this.shape.setAttribute('fill', "" + scene_1.sceneVariables.currFillColor.toString());
+    this.shape.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+    this.shape.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+    this.shape.setAttribute('style', "transform : rotate(" + scene_1.sceneVariables.currAngle.toString() + "deg);");
+    scene_1.sceneVariables.currentSVG.appendChild(this.shape);
+    return this;
+  } // position(cx: any, cy: any) {
+  //   this.cx = cx;
+  //   this.cy = cy;
+  //   this.shape.setAttribute('cx', `${this.cx}`);
+  //   this.shape.setAttribute('cy', `${this.cy}`);
+  // }
+
+
+  SVGPolygon.prototype.remove = function () {
+    scene_1.sceneVariables.currentSVG.removeChild(this.shape);
+  };
+
+  return SVGPolygon;
+}();
+
+global.p5.prototype._vertex = global.p5.prototype.vertex;
+
+global.p5.prototype.vertex = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    console.log('Canvas beginShape() called');
+    return this._vertex.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    console.log('SVG beginShape() called');
+    return new (SVGVertex.bind.apply(SVGVertex, __spreadArray([void 0], Array.from(arguments))))();
+  }
+};
+
+var SVGVertex =
+/** @class */
+function () {
+  //vertices;
+  //rectangle: SVGRectElement;
+  function SVGVertex() {
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+
+    if (scene_1.sceneVariables.currentPolygon != null) {
+      scene_1.sceneVariables.currentPolygon.vertices.push(args[0] * scene_1.sceneVariables.graph.config.stepX * scene_1.sceneVariables.graph.config.scaleX);
+      scene_1.sceneVariables.currentPolygon.vertices.push(-args[1] * scene_1.sceneVariables.graph.config.stepY * scene_1.sceneVariables.graph.config.scaleY);
+    }
+
+    return this;
+  }
+
+  return SVGVertex;
+}();
+
+global.p5.prototype._endShape = global.p5.prototype.endShape;
+
+global.p5.prototype.endShape = function () {
+  if (typeof scene_1.sceneVariables.isGraph === 'undefined' || scene_1.sceneVariables.isGraph === 'false') {
+    console.log('Canvas beginShape() called');
+    return this._endShape.apply(this, Array.from(arguments));
+  } else if (scene_1.sceneVariables.isGraph === 'true') {
+    console.log('SVG beginShape() called');
+    return SVGEndShape.apply(void 0, Array.from(arguments));
+  }
+};
+
+function SVGEndShape() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  scene_1.sceneVariables.currentPolygon.shape.setAttribute('points', scene_1.sceneVariables.currentPolygon.vertices.toString());
+  scene_1.sceneVariables.currentPolygon = null;
+}
+
+function polyline() {
+  var args = [];
+
+  for (var _i = 0; _i < arguments.length; _i++) {
+    args[_i] = arguments[_i];
+  }
+
+  var vertices = args;
+  var shape = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+  shape.setAttribute('fill', "" + scene_1.sceneVariables.currFillColor.toString());
+  shape.setAttribute('stroke', "" + scene_1.sceneVariables.currStrokeColor.toString());
+  shape.setAttribute('stroke-width', "" + scene_1.sceneVariables.currStrokeWidth);
+  shape.setAttribute('style', "transform : rotate(" + scene_1.sceneVariables.currAngle.toString() + "deg);");
+  var scaledVertices = vertices.map(function (elt, i) {
+    if (i % 2 === 0) {
+      return elt * scene_1.sceneVariables.graph.config.stepX * scene_1.sceneVariables.graph.config.scaleX;
+    } else if (i % 2 === 1) {
+      return -elt * scene_1.sceneVariables.graph.config.stepY * scene_1.sceneVariables.graph.config.scaleY;
+    }
+  });
+  shape.setAttribute('points', scaledVertices.toString());
+  scene_1.sceneVariables.currentSVG.appendChild(shape);
+  return vertices;
+}
+
+exports.polyline = polyline;
 },{"../Scene/scene":"lib/Scene/scene.ts","./GObject":"lib/Geometry/GObject.ts"}],"lib/Geometry/graph.ts":[function(require,module,exports) {
 "use strict";
 
@@ -45194,16 +45335,16 @@ var scene_1 = require("../Scene/scene");
 var transform_1 = require("../Scene/transform");
 
 var GObject_1 = require("./GObject"); // color blind safe palette
+// const ULTRAMARINE40 = '#648fff';
+// const MAGENTA50 = '#dc267f';
+// const GOLD20 = '#ffb000';
+// const INDIGO50 = '#785ef0';
+// const ORANGE40 = '#fe6100';
 
-
-var ULTRAMARINE40 = '#648fff';
-var MAGENTA50 = '#dc267f';
-var GOLD20 = '#ffb000';
-var INDIGO50 = '#785ef0';
-var ORANGE40 = '#fe6100';
 /**
  * class representing a 2-D Cartesian Graph
  */
+
 
 var Graph2D =
 /** @class */
@@ -45239,7 +45380,7 @@ function (_super) {
     var _this = _super.call(this, x, y, svgWidth, svgHeight) || this;
 
     _this.config = {
-      graphColor: GOLD20,
+      graphColor: scene_1.GOLD20,
       graphStrokeWidth: 1,
       arrowSize: 3,
       xAxis: 'true',
@@ -45250,17 +45391,17 @@ function (_super) {
       maxY: 5,
       scaleX: 1,
       scaleY: 1,
-      axisColor: INDIGO50,
+      axisColor: scene_1.INDIGO50,
       grid: 'true',
-      smallGridColor: MAGENTA50,
-      gridColor: ORANGE40,
+      smallGridColor: scene_1.MAGENTA50,
+      gridColor: scene_1.ORANGE40,
       stepX: 1,
       stepY: 1,
       originX: 0,
       originY: 0,
       tickX: 'true',
       tickY: 'true',
-      tickColor: ULTRAMARINE40,
+      tickColor: scene_1.ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5,
       pathElements: 1000,
@@ -45878,13 +46019,12 @@ var scene_1 = require("../Scene/scene");
 
 var transform_1 = require("../Scene/transform");
 
-var GObject_1 = require("./GObject");
+var GObject_1 = require("./GObject"); // const ULTRAMARINE40 = '#648fff';
+// const MAGENTA50 = '#dc267f';
+// const GOLD20 = '#ffb000';
+// const INDIGO50 = '#785ef0';
+// const ORANGE40 = '#fe6100';
 
-var ULTRAMARINE40 = '#648fff';
-var MAGENTA50 = '#dc267f';
-var GOLD20 = '#ffb000';
-var INDIGO50 = '#785ef0';
-var ORANGE40 = '#fe6100';
 
 var GraphParametric2D =
 /** @class */
@@ -45923,7 +46063,7 @@ function (_super) {
     var _this = _super.call(this, x, y, svgWidth, svgHeight) || this;
 
     _this.config = {
-      graphColor: GOLD20,
+      graphColor: scene_1.GOLD20,
       graphStrokeWidth: 1,
       arrowSize: 3,
       xAxis: 'true',
@@ -45934,19 +46074,19 @@ function (_super) {
       maxY: 5,
       scaleX: 1,
       scaleY: 1,
-      axisColor: INDIGO50,
-      smallGridColor: MAGENTA50,
-      gridColor: ORANGE40,
+      axisColor: scene_1.INDIGO50,
+      smallGridColor: scene_1.MAGENTA50,
+      gridColor: scene_1.ORANGE40,
       stepX: 1,
       stepY: 1,
       originX: 0,
       originY: 0,
       tickX: 'true',
       tickY: 'true',
-      tickColor: ULTRAMARINE40,
+      tickColor: scene_1.ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5,
-      arrowFollowerColor: MAGENTA50
+      arrowFollowerColor: scene_1.MAGENTA50
     };
     _this.xeqn = xeqn;
     _this.yeqn = yeqn;
@@ -46433,13 +46573,12 @@ var scene_1 = require("../Scene/scene");
 var transform_1 = require("../Scene/transform");
 
 var GObject_1 = require("./GObject"); // color blind safe palette
+// const ULTRAMARINE40 = '#648fff';
+// const MAGENTA50 = '#dc267f';
+// const GOLD20 = '#ffb000';
+// const INDIGO50 = '#785ef0';
+// const ORANGE40 = '#fe6100';
 
-
-var ULTRAMARINE40 = '#648fff';
-var MAGENTA50 = '#dc267f';
-var GOLD20 = '#ffb000';
-var INDIGO50 = '#785ef0';
-var ORANGE40 = '#fe6100';
 
 var GraphPolar2D =
 /** @class */
@@ -46478,7 +46617,7 @@ function (_super) {
     var _this = _super.call(this, x, y, svgWidth, svgHeight) || this;
 
     _this.config = {
-      graphColor: GOLD20,
+      graphColor: scene_1.GOLD20,
       graphStrokeWidth: 1,
       arrowSize: 3,
       xAxis: 'true',
@@ -46489,19 +46628,19 @@ function (_super) {
       maxY: 5,
       scaleX: 1,
       scaleY: 1,
-      axisColor: INDIGO50,
-      smallGridColor: MAGENTA50,
-      gridColor: ORANGE40,
+      axisColor: scene_1.INDIGO50,
+      smallGridColor: scene_1.MAGENTA50,
+      gridColor: scene_1.ORANGE40,
       stepX: 1,
       stepY: 1,
       originX: 0,
       originY: 0,
       tickX: 'true',
       tickY: 'true',
-      tickColor: ULTRAMARINE40,
+      tickColor: scene_1.ULTRAMARINE40,
       tickMarginX: -0.5,
       tickMarginY: -0.5,
-      arrowFollowerColor: MAGENTA50
+      arrowFollowerColor: scene_1.MAGENTA50
     };
     _this.eqn = eqn;
     _this.thetaRange = thetaRange;
@@ -47234,6 +47373,7 @@ global.addDuration = controls_1.addDuration; // global.pauseScene = pauseScene;
 var Shape_1 = require("./lib/Geometry/Shape");
 
 global.beginGraph = Shape_1.beginGraph;
+global.polyline = Shape_1.polyline;
 global.controlPoint = Shape_1.controlPoint;
 global.SVGControlPointPosition = Shape_1.SVGControlPointPosition;
 global.endGraph = Shape_1.endGraph;
@@ -47292,7 +47432,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53263" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56255" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
