@@ -91,3 +91,6 @@ global.create2DParametricGraph = create2DParametricGraph;
 
 import { arrow } from './lib/Geometry/arrow';
 global.arrow = arrow;
+
+import { safeColor } from './lib/Scene/scene';
+global.safeColor = safeColor;

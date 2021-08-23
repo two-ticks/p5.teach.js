@@ -1,55 +1,69 @@
 // color blind safe palette
-const ULTRAMARINE40 = '#648fff';
-const MAGENTA50 = '#dc267f';
-const GOLD20 = '#ffb000';
-const INDIGO50 = '#785ef0';
-const ORANGE40 = '#fe6100';
+// safeColor = {
+//   ULTRAMARINE40: "#648fff",
+//   MAGENTA50: "#dc267f",
+//   GOLD20: "#ffb000",
+//   INDIGO50: "#785ef0",
+//   ORANGE40: "#fe6100",
+// };
 
 function setup() {
-  createCanvas(400, 400);
-  // overflow('hidden') //if you want to stop DOM p5 teach elements from overflowing
-  background(50);
-  drawGraph();
-}
-
-function drawGraph() {
-  const tex = createTeX('y = 2x + 10', 250, 50);
-  tex.size(20);
-  tex.fill(GOLD20);
-  tex.stroke(GOLD20);
-  tex.add();
-  tex.moveTo(25, 50, 1, 2);
-  stroke(GOLD20);
-
-  const graph = beginGraph(0, 0); // begin(x, y, width, height)
-  graph.configure({
-    scaleX: 5,
-    maxX: 10,
-    minX: -12,
-    scaleY: 5,
-    maxY: 10,
-    minY: -10,
-    stepX: 3,
-    stepY: 3,
-    tickX: 'false',
-    tickY: 'false'
-  });
-  axis();
-  //stroke('blue')
-  plot2D((x) => 2 * x + 10);
-  stroke('skyBlue');
-  parametric2D(
-    (t) => 20 + 10 * sin(3 * t + PI / 4),
-    (t) => -20 + 10 * cos(2 * t)
-  );
-  stroke('lime');
-
-  polar2D(
-    (t) =>
-      5 * ((sin(t) * sqrt(abs(cos(t)))) / (sin(t) + 7 / 5) - 2 * sin(t) + 2),
-    [0, 4 * PI]
-  );
-
-  plot2D((x) => x + 6);
-  endGraph();
+  createCanvas(640, 360)
+  background('white')
+  
+  let graph = beginGraph(0, 0, width, height)
+  
+  // Original input
+  let x = createTeX('x')
+  x.fill(safeColor.MAGENTA50)
+  x.stroke(safeColor.MAGENTA50)
+  x.position(30, height / 2 - 18)
+  x.play()
+  stroke(safeColor.MAGENTA50)
+  let a1 = arrow(-270, 0, -230, 0)
+  a1.configure({ arrowSize: 5 })
+  
+  // Function f
+  stroke(safeColor.ULTRAMARINE40)
+  rect(-220, -28, 50, 50)
+  let f = createTeX('f')
+  f.position(width / 4 - 45, height / 2 - 18)
+  f.fill(safeColor.ULTRAMARINE40)
+  f.stroke(safeColor.ULTRAMARINE40)
+  f.play()
+  let a2 = arrow(-165, 0, -125, 0)
+  a2.configure({
+    arrowSize: 3,
+    arrowHeadColor: safeColor.GOLD20
+  })
+  let fx = createTeX('f(x)')
+  fx.position(210, height / 2 - 18)
+  fx.fill(safeColor.ULTRAMARINE40)
+  fx.stroke(safeColor.ULTRAMARINE40)
+  fx.play()
+  let a3 = arrow(-50, 0, -10, 0)
+  a3.configure({
+    arrowSize: 3,
+    arrowHeadColor: safeColor.GOLD20
+  })
+  
+  // Function g
+  stroke(safeColor.ORANGE40)
+  rect(5, -28, 50, 50)
+  let g = createTeX('g')
+  g.position(width / 2 + 22, height / 2 - 18)
+  g.fill(safeColor.ORANGE40)
+  g.stroke(safeColor.ORANGE40)
+  g.play()
+  let a4 = arrow(60, 0, 100, 0)
+  a4.configure({
+     arrowSize: 3.5,
+    arrowHeadColor: safeColor.ORANGE40
+  })
+  let gx = createTeX(`g \\textcolor{${safeColor.ORANGE40}}{(}f(x))`)
+  gx.position(435, height / 2 - 18)
+  gx.fill(safeColor.ORANGE40)
+  gx.stroke(safeColor.ORANGE40)
+  gx.play()
+  endGraph()
 }

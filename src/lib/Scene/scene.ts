@@ -7,6 +7,14 @@ export const GOLD20 = '#ffb000';
 export const INDIGO50 = '#785ef0';
 export const ORANGE40 = '#fe6100';
 
+export const safeColor = {
+  ULTRAMARINE40: "#648fff",
+  MAGENTA50: "#dc267f",
+  GOLD20: "#ffb000",
+  INDIGO50: "#785ef0",
+  ORANGE40: "#fe6100",
+};
+
 export let sceneContainer: HTMLDivElement;
 interface ISceneVariables {
   isGraph: any;
