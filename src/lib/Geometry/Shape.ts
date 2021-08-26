@@ -77,7 +77,7 @@ export class Graph extends GObject {
     //window.isGraph = 'true';
     super(x, y, svgWidth, svgHeight);
     this.config = {
-      graphColor: GOLD20,
+      graphColor: sceneVariables.currentPalette[0],
       graphStrokeWidth: 1,
       arrowSize: 3,
       xAxis: 'true',
@@ -88,17 +88,17 @@ export class Graph extends GObject {
       maxY: 10,
       scaleX: 1,
       scaleY: 1,
-      axisColor: INDIGO50,
+      axisColor: sceneVariables.currentPalette[1],
       grid: 'true',
-      smallGridColor: MAGENTA50,
-      gridColor: ORANGE40,
+      smallGridColor: sceneVariables.currentPalette[3],
+      gridColor: sceneVariables.currentPalette[4],
       stepX: 1,
       stepY: 1,
       originX: 0,
       originY: 0,
       tickX: 'false',
       tickY: 'false',
-      tickColor: ULTRAMARINE40,
+      tickColor: sceneVariables.currentPalette[1],
       tickMarginX: -0.5,
       tickMarginY: -0.5,
       pathElements: 1000,
@@ -119,7 +119,7 @@ export class Graph extends GObject {
       'path'
     );
     this.linePath.setAttribute('fill', 'none');
-    this.linePath.setAttribute('stroke', 'black');
+    this.linePath.setAttribute('stroke', `${this.config.graphColor}`);
     this.linePath.setAttribute(
       'stroke-width',
       `${this.config.graphStrokeWidth}`
