@@ -46,14 +46,14 @@ import {
   beginGraph,
   controlPoint,
   endGraph,
-  SVGControlPointPosition,
+  //SVGControlPointPosition,
   polyline
 } from './lib/Geometry/Shape';
 
 global.beginGraph = beginGraph;
 global.polyline = polyline;
 global.controlPoint = controlPoint;
-global.SVGControlPointPosition = SVGControlPointPosition;
+//global.SVGControlPointPosition = SVGControlPointPosition;
 global.endGraph = endGraph;
 
 import { transform } from './lib/Scene/transform';
@@ -91,3 +91,7 @@ global.create2DParametricGraph = create2DParametricGraph;
 
 import { arrow } from './lib/Geometry/arrow';
 global.arrow = arrow;
+
+import { safeColor, colorPalette } from './lib/Scene/scene';
+global.safeColor = safeColor;
+global.colorPalette = colorPalette;

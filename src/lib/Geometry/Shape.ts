@@ -1,17 +1,31 @@
 import anime from 'animejs';
-// import p5 from 'p5';
-import { animationTimeline } from '../Scene/controls';
-import { sceneContainer, sceneVariables } from '../Scene/scene';
-import { transform } from '../Scene/transform';
+import { GOLD20, INDIGO50, MAGENTA50, ORANGE40, sceneContainer, sceneVariables, ULTRAMARINE40 } from '../Scene/scene';
 import { GObject } from './GObject';
 
 const global: any = globalThis;
-const ULTRAMARINE40 = '#648fff';
-const MAGENTA50 = '#dc267f';
-const GOLD20 = '#ffb000';
-const INDIGO50 = '#785ef0';
-const ORANGE40 = '#fe6100';
+// const ULTRAMARINE40 = '#648fff';
+// const MAGENTA50 = '#dc267f';
+// const GOLD20 = '#ffb000';
+// const INDIGO50 = '#785ef0';
+// const ORANGE40 = '#fe6100';
 
+/**
+ * Graph
+ * <h1> functions available in Graph </h1>
+ * @function beginShape begins recording vertices for a shape
+ * @function endShape   stops recording vertices for a shape
+ * @function controlPoint
+ * @function polyline
+ * @function fill
+ * @function stroke
+ * @function strokeWeight
+ * @function rotate
+ * @function point
+ * @function circle
+ * @function ellipse
+ * @function rect
+ * @function line
+ */
 export class Graph extends GObject {
   plotting!: SVGGElement;
   coordinate!: SVGGElement;
@@ -44,15 +58,15 @@ export class Graph extends GObject {
     pathElements: any;
     graphBox: any;
   };
-  // pathData: any;
-  // graphObject: any;
-  // graphContainer: any;
-  // x: number;
-  // y: number;
-  // svgWidth: number;
-  // svgHeight: number;
-  // linePath: SVGPathElement;
 
+  /**
+   *
+   * @param x
+   * @param y
+   * @param svgWidth
+   * @param svgHeight
+   * @returns {Graph}
+   */
   constructor(
     x: number = 0,
     y: number = 0,
@@ -63,7 +77,7 @@ export class Graph extends GObject {
     //window.isGraph = 'true';
     super(x, y, svgWidth, svgHeight);
     this.config = {
-      graphColor: GOLD20,
+      graphColor: sceneVariables.currentPalette[0],
       graphStrokeWidth: 1,
       arrowSize: 3,
       xAxis: 'true',
@@ -74,17 +88,17 @@ export class Graph extends GObject {
       maxY: 10,
       scaleX: 1,
       scaleY: 1,
-      axisColor: INDIGO50,
+      axisColor: sceneVariables.currentPalette[1],
       grid: 'true',
-      smallGridColor: MAGENTA50,
-      gridColor: ORANGE40,
+      smallGridColor: sceneVariables.currentPalette[3],
+      gridColor: sceneVariables.currentPalette[4],
       stepX: 1,
       stepY: 1,
       originX: 0,
       originY: 0,
       tickX: 'false',
       tickY: 'false',
-      tickColor: ULTRAMARINE40,
+      tickColor: sceneVariables.currentPalette[1],
       tickMarginX: -0.5,
       tickMarginY: -0.5,
       pathElements: 1000,
@@ -97,11 +111,7 @@ export class Graph extends GObject {
     this.config.scaleY = abs(
       this.svgHeight / (this.config.maxY - this.config.minY)
     );
-    // this.x = x;
-    // this.y = y;
-    // this.svgWidth = svgWidth;
-    // this.svgHeight = svgHeight;
-    //this.pathData = createParametricSVGPath(this.xeqn, this.yeqn, this.parameterRange, this.config);
+
     this.graphContainer = createElement('div');
     this.graphContainer.parent(sceneContainer);
     this.linePath = document.createElementNS(
@@ -109,7 +119,7 @@ export class Graph extends GObject {
       'path'
     );
     this.linePath.setAttribute('fill', 'none');
-    this.linePath.setAttribute('stroke', 'black');
+    this.linePath.setAttribute('stroke', `${this.config.graphColor}`);
     this.linePath.setAttribute(
       'stroke-width',
       `${this.config.graphStrokeWidth}`
@@ -175,9 +185,23 @@ export class Graph extends GObject {
         : this.config.pathElements,
       graphBox: config.graphBox ? config.graphBox : this.config.graphBox
     };
-    //console.log(this.config);
+    ////console.log(this.config);
+  }
+
+  defs(content) {
+    let defines = this.graphObject.getElementsByTagName('defs');
+    defines[0].innerHTML += content;
+    //this.graphObject.appendChild(defines);
   }
 }
+
+/**
+ * beginGraph() begins a SVG graph
+ *
+ * @remarks
+ * This function is part of {@link Graph}
+ * @returns {Graph}
+ */
 
 export function beginGraph(
   x: number = 0,
@@ -190,7 +214,9 @@ export function beginGraph(
   sceneVariables.currentSVG = graphTemperoryObject.graphObject;
   return graphTemperoryObject;
 }
-
+/**
+ * endGraph() ends a SVG graph
+ */
 export function endGraph() {
   sceneVariables.isGraph = 'false';
 }
@@ -201,10 +227,10 @@ global.p5.prototype.rect = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
-    console.log('Canvas rect() called');
+    //console.log('Canvas rect() called');
     return this._rect(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
-    console.log('SVG rect() called');
+    //console.log('SVG rect() called');
     return new Rectangle(...Array.from(arguments));
   }
 };
@@ -271,6 +297,24 @@ class Rectangle {
       `transform : rotate(${sceneVariables.currAngle + this.shapeAngle}deg);`
     );
   }
+  play(timeDuration) {
+    //const pathElement = this.graphContainer.elt.querySelectorAll('path');
+    const lineDrawing = anime({
+      targets: this.shape, //this.graphContainer.elt.querySelectorAll('path'),
+      strokeDashoffset: [anime.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: timeDuration,
+      begin: function (anim) {
+        //pathElement[0].setAttribute('stroke', 'black');
+        //pathElement[0].setAttribute('fill', 'none');
+        //this.shape.setAttribute('fill', 'none');
+      },
+      complete: function (anim) {
+        //document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  }
 }
 
 global.p5.prototype._ellipse = global.p5.prototype.ellipse;
@@ -279,10 +323,10 @@ global.p5.prototype.ellipse = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
-    console.log('Canvas ellipse() called');
+    //console.log('Canvas ellipse() called');
     return this._ellipse(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
-    console.log('SVG ellipse() called');
+    //console.log('SVG ellipse() called');
     return new SVGEllipse(...Array.from(arguments));
   }
 };
@@ -335,6 +379,24 @@ class SVGEllipse {
   remove() {
     sceneVariables.currentSVG.removeChild(this.shape);
   }
+  play(timeDuration) {
+    //const pathElement = this.graphContainer.elt.querySelectorAll('path');
+    const lineDrawing = anime({
+      targets: this.shape, //this.graphContainer.elt.querySelectorAll('path'),
+      strokeDashoffset: [anime.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: timeDuration,
+      begin: function (anim) {
+        //pathElement[0].setAttribute('stroke', 'black');
+        //pathElement[0].setAttribute('fill', 'none');
+        //this.shape.setAttribute('fill', 'none');
+      },
+      complete: function (anim) {
+        //document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  }
 }
 
 global.p5.prototype._circle = global.p5.prototype.circle;
@@ -343,10 +405,10 @@ global.p5.prototype.circle = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
-    console.log('Canvas circle() called');
+    //console.log('Canvas circle() called');
     return this._circle(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
-    console.log('SVG circle() called');
+    //console.log('SVG circle() called');
     return new SVGCircle(...Array.from(arguments));
   }
 };
@@ -400,10 +462,10 @@ global.p5.prototype.point = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
-    console.log('Canvas point() called');
+    //console.log('Canvas point() called');
     return this._point(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
-    console.log('SVG point() called');
+    //console.log('SVG point() called');
 
     return new SVGPoint(...Array.from(arguments));
   }
@@ -455,6 +517,12 @@ class SVGPoint extends SVGEllipse {
   // }
 }
 
+/**
+ * controlPoint(x, y) creates a draggable point at (x,y)
+ * @param x
+ * @param y
+ * @returns co-ordinates of current position
+ */
 export function controlPoint(...args) {
   if (sceneVariables.isGraph === 'true') {
     return new SVGControlPoint(...args);
@@ -486,66 +554,10 @@ class SVGControlPoint extends SVGPoint {
   //   this.xco = x;
   //   // this.x = this.shape.getScreenCTM().e/ this.shape.getScreenCTM().a;
   //   // this.y = this.shape.getScreenCTM().f/ this.shape.getScreenCTM().d;
-  //   console.log(this.xco);
+  //   //console.log(this.xco);
   // }
 }
 
-export function SVGControlPointPosition(event) {
-  let svg = sceneVariables.currentSVG;
-  svg.addEventListener('mousedown', startDrag);
-  svg.addEventListener('mousemove', drag);
-  svg.addEventListener('mouseup', endDrag);
-  svg.addEventListener('mouseleave', endDrag);
-  let offset, transform;
-  function getMousePosition(event) {
-    let CTM: any = svg.getScreenCTM();
-    return {
-      x: (event.clientX - CTM.e) / CTM.a,
-      y: (event.clientY - CTM.f) / CTM.d
-    };
-  }
-  function startDrag(event) {
-    if (event.target.classList.contains('controlPoint')) {
-      sceneVariables.selectedPoint = event.target;
-      //console.log(sceneVariables.selectedPoint.x);
-
-      offset = getMousePosition(event);
-      // Get all the transforms currently on this element
-      var transforms = sceneVariables.selectedPoint.transform.baseVal;
-      // Ensure the first transform is a translate transform
-      if (
-        transforms.length === 0 ||
-        transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE
-      ) {
-        // Create an transform that translates by (0, 0)
-        var translate = svg.createSVGTransform();
-        translate.setTranslate(0, 0);
-        // Add the translation to the front of the transforms list
-        sceneVariables.selectedPoint.transform.baseVal.insertItemBefore(
-          translate,
-          0
-        );
-      }
-      // Get initial translation amount
-      transform = transforms.getItem(0);
-      offset.x -= transform.matrix.e;
-      offset.y -= transform.matrix.f;
-    }
-  }
-
-  function drag(event) {
-    if (sceneVariables.selectedPoint) {
-      event.preventDefault();
-      var coord = getMousePosition(event);
-      transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
-      sceneVariables.selectedPoint.setAttribute('posX', `${coord.x}`);
-      sceneVariables.selectedPoint.setAttribute('posY', `${coord.y}`);
-    }
-  }
-  function endDrag(event) {
-    sceneVariables.selectedPoint = null;
-  }
-}
 global.p5.prototype._line = global.p5.prototype.line;
 global.p5.prototype.line = function () {
   if (
@@ -650,14 +662,10 @@ global.p5.prototype.rotate = function () {
     this._rotate(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
     sceneVariables.currAngle += arguments[0];
-    //console.log(sceneVariables.currAngle);
+    ////console.log(sceneVariables.currAngle);
     //TODO : rotate currently takes only angles in degree
   }
 };
-
-/**
- * beginShape
- */
 
 global.p5.prototype._beginShape = global.p5.prototype.beginShape;
 global.p5.prototype.beginShape = function () {
@@ -665,13 +673,17 @@ global.p5.prototype.beginShape = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
-    console.log('Canvas beginShape() called');
+    //console.log('Canvas beginShape() called');
     return this._beginShape(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
-    console.log('SVG beginShape() called');
+    //console.log('SVG beginShape() called');
     return new SVGPolygon(...Array.from(arguments));
   }
 };
+
+/**
+ * beginShape() begins recording vertices for a shape and endShape() stops recording.
+ */
 
 class SVGPolygon {
   vertices;
@@ -712,6 +724,25 @@ class SVGPolygon {
   remove() {
     sceneVariables.currentSVG.removeChild(this.shape);
   }
+
+  play(timeDuration) {
+    //const pathElement = this.graphContainer.elt.querySelectorAll('path');
+    const lineDrawing = anime({
+      targets: this.shape, //this.graphContainer.elt.querySelectorAll('path'),
+      strokeDashoffset: [anime.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: timeDuration,
+      begin: function (anim) {
+        //pathElement[0].setAttribute('stroke', 'black');
+        //pathElement[0].setAttribute('fill', 'none');
+        //this.shape.setAttribute('fill', 'none');
+      },
+      complete: function (anim) {
+        //document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  }
 }
 
 global.p5.prototype._vertex = global.p5.prototype.vertex;
@@ -720,10 +751,10 @@ global.p5.prototype.vertex = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
-    console.log('Canvas beginShape() called');
+    //console.log('Canvas beginShape() called');
     return this._vertex(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
-    console.log('SVG beginShape() called');
+    //console.log('SVG beginShape() called');
     return new SVGVertex(...Array.from(arguments));
   }
 };
@@ -763,10 +794,10 @@ global.p5.prototype.endShape = function () {
     typeof sceneVariables.isGraph === 'undefined' ||
     sceneVariables.isGraph === 'false'
   ) {
-    console.log('Canvas beginShape() called');
+    //console.log('Canvas endShape() called');
     return this._endShape(...Array.from(arguments));
   } else if (sceneVariables.isGraph === 'true') {
-    console.log('SVG beginShape() called');
+    //console.log('SVG endShape() called');
     return SVGEndShape(...Array.from(arguments));
   }
 };
@@ -779,34 +810,133 @@ function SVGEndShape(...args) {
   sceneVariables.currentPolygon = null;
 }
 
-export function polyline(...args) {
-  let vertices = args;
-  let shape = document.createElementNS(
-    'http://www.w3.org/2000/svg',
-    'polyline'
-  );
-  shape.setAttribute('fill', `${sceneVariables.currFillColor.toString()}`);
-  shape.setAttribute('stroke', `${sceneVariables.currStrokeColor.toString()}`);
-  shape.setAttribute('stroke-width', `${sceneVariables.currStrokeWidth}`);
-  shape.setAttribute(
-    'style',
-    `transform : rotate(${sceneVariables.currAngle.toString()}deg);`
-  );
-  let scaledVertices = vertices.map((elt, i) => {
-    if (i % 2 === 0) {
-      return elt *
-        sceneVariables.graph.config.stepX *
-        sceneVariables.graph.config.scaleX;
-    }
-    else if (i%2 === 1){
-      return -elt *
-      sceneVariables.graph.config.stepY *
-      sceneVariables.graph.config.scaleY
-    }
-  });
-  
-  
-  shape.setAttribute('points', scaledVertices.toString());
-  sceneVariables.currentSVG.appendChild(shape);
-  return vertices;
+/**
+ * polyline is used to create any shape that consists of only straight lines
+ * @param vertices points attribute defines the list of points (pairs of x and y coordinates) required to draw the polyline
+ */
+export function polyline(arr) {
+  return new Polyline(arr);
 }
+class Polyline {
+  shape;
+  constructor(arr) {
+    let vertices = arr;
+    let shape = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'polyline'
+    );
+    shape.setAttribute('fill', `${sceneVariables.currFillColor.toString()}`);
+    shape.setAttribute(
+      'stroke',
+      `${sceneVariables.currStrokeColor.toString()}`
+    );
+    shape.setAttribute('stroke-width', `${sceneVariables.currStrokeWidth}`);
+    shape.setAttribute(
+      'style',
+      `transform : rotate(${sceneVariables.currAngle.toString()}deg);`
+    );
+    let scaledVertices = vertices.map((elt, i) => {
+      if (i % 2 === 0) {
+        return (
+          elt *
+          sceneVariables.graph.config.stepX *
+          sceneVariables.graph.config.scaleX
+        );
+      } else if (i % 2 === 1) {
+        return (
+          -elt *
+          sceneVariables.graph.config.stepY *
+          sceneVariables.graph.config.scaleY
+        );
+      }
+    });
+    console.log(scaledVertices);
+
+    shape.setAttribute('points', scaledVertices.toString());
+    sceneVariables.currentSVG.appendChild(shape);
+    this.shape = shape;
+    return this;
+  }
+  
+  play(timeDuration) {
+    //const pathElement = this.graphContainer.elt.querySelectorAll('path');
+    const lineDrawing = anime({
+      targets: this.shape, //this.graphContainer.elt.querySelectorAll('path'),
+      strokeDashoffset: [anime.setDashoffset, 0],
+      easing: 'easeOutSine',
+      duration: timeDuration,
+      begin: function (anim) {
+        //pathElement[0].setAttribute('stroke', 'black');
+        //pathElement[0].setAttribute('fill', 'none');
+        //this.shape.setAttribute('fill', 'none');
+      },
+      complete: function (anim) {
+        //document.querySelector('path').setAttribute("fill", "yellow");
+      },
+      autoplay: true
+    });
+  }
+}
+
+/**
+ * SVGControlPointPosition
+ * @param event
+ * @internal
+ */
+
+global.p5.prototype.SVGControlPointPosition = function (event) {
+  let svg = sceneVariables.currentSVG;
+  svg.addEventListener('mousedown', startDrag);
+  svg.addEventListener('mousemove', drag);
+  svg.addEventListener('mouseup', endDrag);
+  svg.addEventListener('mouseleave', endDrag);
+  let offset, transform;
+  function getMousePosition(event) {
+    let CTM: any = svg.getScreenCTM();
+    return {
+      x: (event.clientX - CTM.e) / CTM.a,
+      y: (event.clientY - CTM.f) / CTM.d
+    };
+  }
+  function startDrag(event) {
+    if (event.target.classList.contains('controlPoint')) {
+      sceneVariables.selectedPoint = event.target;
+      ////console.log(sceneVariables.selectedPoint.x);
+
+      offset = getMousePosition(event);
+      // Get all the transforms currently on this element
+      var transforms = sceneVariables.selectedPoint.transform.baseVal;
+      // Ensure the first transform is a translate transform
+      if (
+        transforms.length === 0 ||
+        transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE
+      ) {
+        // Create an transform that translates by (0, 0)
+        var translate = svg.createSVGTransform();
+        translate.setTranslate(0, 0);
+        // Add the translation to the front of the transforms list
+        sceneVariables.selectedPoint.transform.baseVal.insertItemBefore(
+          translate,
+          0
+        );
+      }
+      // Get initial translation amount
+      transform = transforms.getItem(0);
+      offset.x -= transform.matrix.e;
+      offset.y -= transform.matrix.f;
+    }
+  }
+
+  function drag(event) {
+    if (sceneVariables.selectedPoint) {
+      event.preventDefault();
+      var coord = getMousePosition(event);
+      transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
+      sceneVariables.selectedPoint.setAttribute('posX', `${coord.x}`);
+      sceneVariables.selectedPoint.setAttribute('posY', `${coord.y}`);
+    }
+  }
+  function endDrag(event) {
+    sceneVariables.selectedPoint = null;
+  }
+};
