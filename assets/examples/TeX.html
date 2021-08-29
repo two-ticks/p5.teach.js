@@ -9,24 +9,21 @@
   <body>
     <script>
       function setup() {
-        createCanvas(400, 400);
-        background(220);
-        equation();
+        createCanvas(650, 550);
+        overflow('hidden');
+        background(50);
+        writeTeX();
       }
 
-      function equation() {
-        tex = createTeX('\\frac{x}{5}+2 = -3', 115, 50, 28); //font-size : 28 px
-        tex.add();
-        tex.resizeTo(45, 1, 2); // font-size : 45 px
-        tex.moveTo(80, 150, 1, 2);
-        callAt(3, solve); //calls solve at 3 sec
-      }
-
-      function solve() {
-        tex.stroke('blue');
-        tex.fill('blue');
-        tex.position(115, 150);
-        tex.update('x = -25');
+      function writeTeX() {
+        let equation = createTeX(
+          '{\\displaystyle \\mathrm {H} (X)=-\\sum _{i=1}^{n}{\\mathrm {P} (x_{i})\\log \\mathrm {P} (x_{i})}}'
+        );
+        equation.position(20, 175);
+        equation.size(48);
+        equation.stroke(color('rgb(135, 206, 235)'));
+        equation.fill(color('rgb(135, 206, 235)'));
+        equation.play('createFill', 0, 2.5);
       }
     </script>
   </body>

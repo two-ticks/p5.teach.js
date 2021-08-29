@@ -25,7 +25,7 @@ export class TeX extends MObject {
   /**
    * creates a tex object
    *
-   * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+   * <iframe src="../../assets/examples/tex.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
    *
    * @param    {String} - escaped TeX input
    * @param    {number} - x
@@ -199,7 +199,7 @@ export class TeX extends MObject {
  * );
  * ```
  * <br/>
- * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+ * <iframe src="../../assets/examples/tex.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
  *
  * @returns
  */
