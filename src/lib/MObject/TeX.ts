@@ -199,7 +199,7 @@ export class TeX extends MObject {
  * );
  * ```
  * <br/>
- * <iframe src="../../assets/examples/tex.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+ * <iframe src="../../assets/examples/tex.html" scrolling="no" width="650" height="550" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
  *
  * @returns
  */
