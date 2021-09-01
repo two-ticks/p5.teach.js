@@ -162,6 +162,8 @@ export class Text extends MObject {
  * @param {number} y-coordinate y-coordinate of text
  * @param {number} font-size font-size of the text
  * @returns {Text} MObject of type Text
+ * 
+ * <iframe src="../../assets/examples/tex.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe> 
  */
 
 export function createText(...args: any[]) {
