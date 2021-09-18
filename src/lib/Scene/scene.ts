@@ -1,5 +1,6 @@
 // import p5 from 'p5';
 
+//TODO : delete incdividual exports and safeColor object
 //IBM's color blind safe palette https://github.com/IBM-Design/colors
 export const ULTRAMARINE40 = '#648fff';
 export const MAGENTA50 = '#dc267f';
@@ -27,6 +28,8 @@ interface ISceneVariables {
   selectedPoint: any;
   currentPolygon;
   currentPalette: string[];
+  yMode: number;
+  xMode: number;
 }
 export let sceneVariables: ISceneVariables = {
   isGraph: 'false',
@@ -41,7 +44,9 @@ export let sceneVariables: ISceneVariables = {
     'circle'
   ),
   currentPolygon: 'false',
-  currentPalette: ['#ca0020', '#f4a582', '#f7f7f7', '#92c5de', '#0571b0']
+  currentPalette: ['#ca0020', '#f4a582', '#f7f7f7', '#92c5de', '#0571b0'],
+  yMode: 1,
+  xMode: 1
 };
 //export
 

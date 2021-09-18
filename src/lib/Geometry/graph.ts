@@ -567,8 +567,11 @@ export function createSVGPath(eqn: Function, config) {
     // SVG_path = SVG_path.concat(` L${1000*i},${1000*Math.sin(Math.PI / 2 * Math.pow(i, 1.5))/i}`);
     SVG_path = SVG_path.concat(
       ` L${
-        config.stepX * (config.scaleX * x + config.originX * config.scaleX)
+        sceneVariables.xMode *
+        config.stepX *
+        (config.scaleX * x + config.originX * config.scaleX)
       }, ${
+        sceneVariables.yMode *
         config.stepY *
         (config.scaleY * -eqn(x) - config.originY * config.scaleY)
       }`
