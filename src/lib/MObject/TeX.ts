@@ -21,6 +21,7 @@ export class TeX extends MObject {
   // svgHeight: number;
   _strokeWidth: number;
   strokeColor: p5.Color;
+  id: number;
 
   /**
    * creates a tex object
@@ -47,7 +48,16 @@ export class TeX extends MObject {
     // this._size = _size; //px
     // this.svgWidth = svgWidth;
     // this.svgHeight = svgHeight;
+
+    //generate unique id and attach it to tex div
+    let uniqueId = 0;
+    while (document.getElementById(`mobj-tex-${uniqueId}`)) {
+      uniqueId++;
+    }
+    this.id = uniqueId;
+
     this.writeElement = createElement('div');
+    this.writeElement.id(`mobj-tex-${this.id}`);
     this.svgEquation = TeXToSVG(_tex);
     this._strokeWidth = 8;
     this.strokeColor = color('black');
