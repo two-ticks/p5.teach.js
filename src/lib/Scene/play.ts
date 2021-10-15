@@ -393,32 +393,69 @@ function writeAnimatorTeX(
   delayDuration: string | number
 ) {
   const g = object.writeElement.elt.querySelectorAll('g');
-  animationTimeline.add(
-    {
-      targets: [
-        object.writeElement.elt.querySelectorAll('use'),
-        object.writeElement.elt.querySelectorAll('rect')
-      ],
-      //scale: [4, 1],
-      fill: [object.fillColor.toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
-      //stroke : "black",     //TODO : customisable through config
-      //stroke-width: "10px", //customisable through config
-      strokeDashoffset: [anime.setDashoffset, 0],
-      opacity: [0, 1],
-      begin: function (anim) {
-        g[0].setAttribute('fill', 'none');
-        g[0].setAttribute('stroke-width', '10px');
+  const use = object.writeElement.elt.querySelectorAll('use');
+  const staggerDelay =
+    timeDuration /
+    (use.length +
+      object.writeElement.elt.querySelectorAll('path').length +
+      object.writeElement.elt.querySelectorAll('line').length +
+      object.writeElement.elt.querySelectorAll('rect').length +
+      1);
+  animationTimeline
+    .add(
+      {
+        targets: [
+          //document.querySelectorAll(`#mobj-tex-${object.id} .mobj-tex-${object.id}`),
+          object.writeElement.elt.querySelectorAll('path'),
+          object.writeElement.elt.querySelectorAll('rect'),
+          object.writeElement.elt.querySelectorAll('line')
+        ],
+        //scale: [4, 1],
+        //fill: [`${object.fillColor.toString('#rgb')}0` , object.fillColor.toString()], //TODO : fill is black by default can be customised through set fill methods
+        //stroke : "black",     //TODO : customisable through config
+        //stroke-width: "10px", //customisable through config
+        strokeDashoffset: [anime.setDashoffset, 0],
+        //opacity: [0, 0.2, 1],
+        // begin: function (anim) {
+        //   g[0].setAttribute('fill', 'none');
+        //   g[0].setAttribute('stroke-width', '10px');
+        // },
+        // complete: function (anim) {
+        //   //g[0].setAttribute('fill', object.fillColor.toString());
+        // },
+        easing: 'easeOutSine',
+        //duration: timeDuration,
+        delay: anime.stagger(staggerDelay)
+        //delay: anime.stagger(400)
       },
-      complete: function (anim) {
-        g[0].setAttribute('fill', object.fillColor.toString());
+      delayDuration
+    )
+    .add(
+      {
+        targets: [g],
+        //scale: [4, 1],
+        fill: [
+          `${object.fillColor.toString('#rgb')}0`,
+          object.fillColor.toString()
+        ], //TODO : fill is black by default can be customised through set fill methods
+        //stroke : "black",     //TODO : customisable through config
+        //stroke-width: "10px", //customisable through config
+        //strokeDashoffset: [anime.setDashoffset, 0],
+        //opacity: [0, 0.2, 1],
+        // begin: function (anim) {
+        //   //g[0].setAttribute('fill', 'none');
+        //   //g[0].setAttribute('stroke-width', '10px');
+        // },
+        // complete: function (anim) {
+        //   //g[0].setAttribute('fill', object.fillColor.toString());
+        // },
+        easing: 'easeInOutCubic',
+        //duration: timeDuration,
+        delay: anime.stagger(staggerDelay)
+        //delay: anime.stagger(400)
       },
-      easing: 'easeInOutCubic',
-      duration: timeDuration,
-      delay: anime.stagger(timeDuration / (object.sentence.length + 1))
-      //delay: anime.stagger(400)
-    },
-    delayDuration
-  );
+      delayDuration
+    );
 }
 
 function growFromCenterAnimatorTeX(
@@ -427,113 +464,174 @@ function growFromCenterAnimatorTeX(
   delayDuration: string | number
 ) {
   const g = object.writeElement.elt.querySelectorAll('g');
-  animationTimeline.add(
-    {
-      targets: object.writeElement.elt.querySelectorAll('path'),
-      //scale: [4, 1],
-      fill: [object.fillColor.toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
-      //stroke : "black",     //TODO : customisable through config
-      //stroke-width: "10px", //customisable through config
-      strokeDashoffset: [anime.setDashoffset, 0],
-      opacity: [0, 1],
-      begin: function (anim) {
-        g[0].setAttribute('fill', 'none');
-        g[0].setAttribute('stroke-width', '10px');
+  const use = object.writeElement.elt.querySelectorAll('use');
+
+  animationTimeline
+    .add(
+      {
+        targets: [
+          //document.querySelectorAll(`#mobj-tex-${object.id} .mobj-tex-${object.id}`),
+          object.writeElement.elt.querySelectorAll('path'),
+          object.writeElement.elt.querySelectorAll('rect')
+        ],
+        //scale: [4, 1],
+        //fill: [`${object.fillColor.toString('#rgb')}0` , object.fillColor.toString()], //TODO : fill is black by default can be customised through set fill methods
+        //stroke : "black",     //TODO : customisable through config
+        //stroke-width: "10px", //customisable through config
+        strokeDashoffset: [anime.setDashoffset, 0],
+        //opacity: [0, 0.2, 1],
+        // begin: function (anim) {
+        //   g[0].setAttribute('fill', 'none');
+        //   g[0].setAttribute('stroke-width', '10px');
+        // },
+        // complete: function (anim) {
+        //   //g[0].setAttribute('fill', object.fillColor.toString());
+        // },
+        easing: 'easeOutSine',
+        //duration: timeDuration
+        delay: anime.stagger(
+          timeDuration /
+            (use.length +
+              object.writeElement.elt.querySelectorAll('rect').length +
+              1),
+          { from: 'center' }
+        )
+        //delay: anime.stagger(400)
       },
-      complete: function (anim) {
-        g[0].setAttribute('fill', 'black');
+      delayDuration
+    )
+    .add(
+      {
+        targets: [
+          object.writeElement.elt.querySelectorAll('path'),
+          object.writeElement.elt.querySelectorAll('rect')
+        ],
+        //scale: [4, 1],
+        fill: [
+          `${object.fillColor.toString('#rgb')}0`,
+          object.fillColor.toString()
+        ], //TODO : fill is black by default can be customised through set fill methods
+        //stroke : "black",     //TODO : customisable through config
+        //stroke-width: "10px", //customisable through config
+        //strokeDashoffset: [anime.setDashoffset, 0],
+        //opacity: [0, 0.2, 1],
+        // begin: function (anim) {
+        //   //g[0].setAttribute('fill', 'none');
+        //   //g[0].setAttribute('stroke-width', '10px');
+        // },
+        complete: function (anim) {
+          //g[0].setAttribute('fill', object.fillColor.toString());
+        },
+        easing: 'easeInOutQuad',
+        //duration: timeDuration,
+        delay: anime.stagger(
+          timeDuration /
+            (use.length +
+              object.writeElement.elt.querySelectorAll('rect').length +
+              1),
+          { from: 'center' }
+        )
+        //delay: anime.stagger(400)
       },
-      easing: 'easeInOutCubic',
-      duration: timeDuration,
-      delay: anime.stagger(400, { from: 'center' })
-    },
-    delayDuration
-  );
+      delayDuration
+    );
+
+  // const g = object.writeElement.elt.querySelectorAll('g');
+  // animationTimeline.add(
+  //   {
+  //     targets: object.writeElement.elt.querySelectorAll('path'),
+  //     //scale: [4, 1],
+  //     fill: [object.fillColor.toString(), object.fillColor], //TODO : fill is black by default can be customised through set fill methods
+  //     //stroke : "black",     //TODO : customisable through config
+  //     //stroke-width: "10px", //customisable through config
+  //     strokeDashoffset: [anime.setDashoffset, 0],
+  //     opacity: [0, 1],
+  //     begin: function (anim) {
+  //       g[0].setAttribute('fill', 'none');
+  //       g[0].setAttribute('stroke-width', '10px');
+  //     },
+  //     complete: function (anim) {
+  //       g[0].setAttribute('fill', 'black');
+  //     },
+  //     easing: 'easeInOutCubic',
+  //     duration: timeDuration,
+  //     delay: anime.stagger(400, { from: 'center' })
+  //   },
+  //   delayDuration
+  // );
 }
 function createFillAnimatorTeX(
   object: TeX,
   timeDuration: number,
   delayDuration: string | number
 ) {
-  //TODO: fix overlapping of tex animations
-  // want to select <use> and animate
-  // lets try layering - one layer for stroke and other for fill
-  // form a copy of the tex and then play each with different .add method
-
   const g = object.writeElement.elt.querySelectorAll('g');
   const use = object.writeElement.elt.querySelectorAll('use');
-  // let p: any[] = [];
-  // use.forEach(
-  //   (
-  //     element: { getAttribute: (arg0: string) => any },
-  //     index: string | number
-  //   ) => {
-  //     p[index] = object.writeElement.elt.querySelectorAll(
-  //       element.getAttribute('xlink:href')
-  //     );
-  //   }
-  // );
 
-  //adding id with each element
-
-  //console.log(p);
-
-  // setting fill none
-  //g[0].setAttribute('fill', 'none');
-
-  animationTimeline.add(
-    {
-      targets: [
-        //document.querySelectorAll(`#mobj-tex-${object.id} .mobj-tex-${object.id}`),
-        object.writeElement.elt.querySelectorAll('path'),
-        object.writeElement.elt.querySelectorAll('rect')
-      ],
-      //scale: [4, 1],
-      //fill: [`${object.fillColor.toString('#rgb')}0` , object.fillColor.toString()], //TODO : fill is black by default can be customised through set fill methods
-      //stroke : "black",     //TODO : customisable through config
-      //stroke-width: "10px", //customisable through config
-      strokeDashoffset: [anime.setDashoffset, 0],
-      //opacity: [0, 0.2, 1],
-      // begin: function (anim) {
-      //   g[0].setAttribute('fill', 'none');
-      //   g[0].setAttribute('stroke-width', '10px');
-      // },
-      // complete: function (anim) {
-      //   //g[0].setAttribute('fill', object.fillColor.toString());
-      // },
-      easing: 'easeOutSine',
-      //duration: timeDuration
-      delay: anime.stagger(timeDuration / (use.length + object.writeElement.elt.querySelectorAll('rect').length + 1))
-      //delay: anime.stagger(400)
-    },
-    delayDuration
-  )
-  .add(
-    {
-      targets: [use, g],
-      //scale: [4, 1],
-      fill: [
-        `${object.fillColor.toString('#rgb')}0`,
-        object.fillColor.toString()
-      ], //TODO : fill is black by default can be customised through set fill methods
-      //stroke : "black",     //TODO : customisable through config
-      //stroke-width: "10px", //customisable through config
-      //strokeDashoffset: [anime.setDashoffset, 0],
-      //opacity: [0, 0.2, 1],
-      // begin: function (anim) {
-      //   //g[0].setAttribute('fill', 'none');
-      //   //g[0].setAttribute('stroke-width', '10px');
-      // },
-      complete: function (anim) {
-        //g[0].setAttribute('fill', object.fillColor.toString());
+  animationTimeline
+    .add(
+      {
+        targets: [
+          //document.querySelectorAll(`#mobj-tex-${object.id} .mobj-tex-${object.id}`),
+          object.writeElement.elt.querySelectorAll('path'),
+          object.writeElement.elt.querySelectorAll('rect')
+        ],
+        //scale: [4, 1],
+        //fill: [`${object.fillColor.toString('#rgb')}0` , object.fillColor.toString()], //TODO : fill is black by default can be customised through set fill methods
+        //stroke : "black",     //TODO : customisable through config
+        //stroke-width: "10px", //customisable through config
+        strokeDashoffset: [anime.setDashoffset, 0],
+        //opacity: [0, 0.2, 1],
+        // begin: function (anim) {
+        //   g[0].setAttribute('fill', 'none');
+        //   g[0].setAttribute('stroke-width', '10px');
+        // },
+        // complete: function (anim) {
+        //   //g[0].setAttribute('fill', object.fillColor.toString());
+        // },
+        easing: 'easeOutSine',
+        duration: timeDuration
+        // delay: anime.stagger(
+        //   timeDuration /
+        //     (use.length +
+        //       object.writeElement.elt.querySelectorAll('rect').length +
+        //       1)
+        // )
+        //delay: anime.stagger(400)
       },
-      easing: 'easeInOutQuad',
-      //duration: timeDuration,
-      delay: anime.stagger(timeDuration / (use.length + object.writeElement.elt.querySelectorAll('rect').length + 1))
-      //delay: anime.stagger(400)
-    },
-    delayDuration
-  );
+      delayDuration
+    )
+    .add(
+      {
+        targets: [use, g],
+        //scale: [4, 1],
+        fill: [
+          `${object.fillColor.toString('#rgb')}0`,
+          object.fillColor.toString()
+        ], //TODO : fill is black by default can be customised through set fill methods
+        //stroke : "black",     //TODO : customisable through config
+        //stroke-width: "10px", //customisable through config
+        //strokeDashoffset: [anime.setDashoffset, 0],
+        //opacity: [0, 0.2, 1],
+        // begin: function (anim) {
+        //   //g[0].setAttribute('fill', 'none');
+        //   //g[0].setAttribute('stroke-width', '10px');
+        // },
+        complete: function (anim) {
+          //g[0].setAttribute('fill', object.fillColor.toString());
+        },
+        easing: 'easeInOutQuad',
+        duration: timeDuration
+        // delay: anime.stagger(
+        //   timeDuration /
+        //     (use.length +
+        //       object.writeElement.elt.querySelectorAll('rect').length +
+        //       1)
+        // )
+        //delay: anime.stagger(400)
+      },
+      delayDuration
+    );
 }
 //TODO : fix timeline
 function allAtOnceAnimatorTeX(
