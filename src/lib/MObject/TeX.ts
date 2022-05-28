@@ -2,7 +2,7 @@ import TeXToSVG from 'tex-to-svg';
 import { TexObject } from '../interfaces';
 import { add } from '../Scene/add';
 //import { animationTimeline } from '../Scene/controls';
-import { play } from '../Scene/play';
+import { play, overwriteAnimatorTeX } from '../Scene/play';
 import { MObject } from './MObject';
 
 //TODO : add test cases
@@ -192,6 +192,11 @@ export class TeX extends MObject {
     endTime: number = 0
   ) {
     play(this, animationType, startTime, endTime);
+  }
+
+  //TODO : extend write to continue writing equation after pause 
+  overwrite(_tex, timeDuration: number, delayDuration: string | number) {
+    overwriteAnimatorTeX(this, _tex, timeDuration, delayDuration);
   }
 }
 

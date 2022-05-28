@@ -80,7 +80,9 @@ class SVGArrow {
       this.arrowConfig.arrowSize
     }" markerWidth="${2 * this.arrowConfig.arrowSize}" markerHeight="${
       2 * this.arrowConfig.arrowSize
-    }" id="marker-arrow-${this.id}" class="marker" orient="auto-start-reverse"><path d="M 0 0 L ${
+    }" id="marker-arrow-${
+      this.id
+    }" class="marker" orient="auto-start-reverse"><path d="M 0 0 L ${
       2 * this.arrowConfig.arrowSize
     } ${this.arrowConfig.arrowSize} L 0 ${
       2 * this.arrowConfig.arrowSize
@@ -110,7 +112,9 @@ class SVGArrow {
       this.arrowConfig.arrowSize
     }" markerWidth="${2 * this.arrowConfig.arrowSize}" markerHeight="${
       2 * this.arrowConfig.arrowSize
-    }" id="marker-arrow-${this.id}" class="marker" orient="auto-start-reverse"><path d="M 0 0 L ${
+    }" id="marker-arrow-${
+      this.id
+    }" class="marker" orient="auto-start-reverse"><path d="M 0 0 L ${
       2 * this.arrowConfig.arrowSize
     } ${this.arrowConfig.arrowSize} L 0 ${
       2 * this.arrowConfig.arrowSize

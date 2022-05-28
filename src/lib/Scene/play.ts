@@ -1,9 +1,10 @@
 import { Text } from '../MObject/Text';
-import { TeX } from '../MObject/TeX';
+import { createTeX, TeX } from '../MObject/TeX';
 import anime from 'animejs';
 import { add } from './add';
 import * as CONFIG from '../config.js';
-import { animationTimeline } from './controls';
+import { animationTimeline, callAt } from './controls';
+import TeXToSVG from 'tex-to-svg'; //TODO : minimise import : this will increase size of library
 
 //TODO : fix relative time
 //TODO : text animation for all-at-once
@@ -449,6 +450,87 @@ function writeAnimatorTeX(
         // complete: function (anim) {
         //   //g[0].setAttribute('fill', object.fillColor.toString());
         // },
+        easing: 'easeInOutCubic',
+        //duration: timeDuration,
+        delay: anime.stagger(staggerDelay)
+        //delay: anime.stagger(400)
+      },
+      delayDuration
+    );
+}
+
+//TODO : complete overwrite function
+// find unique <g> nodes and animate them only
+//
+export function overwriteAnimatorTeX(
+  object: TeX,
+  _tex,
+  timeDuration: number,
+  delayDuration: string | number
+) {
+  const g = object.writeElement.elt.querySelectorAll('g');
+  const use = object.writeElement.elt.querySelectorAll('use');
+  const svgFinal = document.createElement('div');
+  svgFinal.innerHTML = TeXToSVG(_tex);
+  const gFinal = svgFinal.querySelectorAll('g');
+  const useFinal = svgFinal.querySelectorAll('use');
+
+  let gUnique: any[] = [];
+  //console.log(g);
+  let index = 0;
+  gFinal.forEach((element) => {
+    let flag: any = 0;
+    g.forEach((ele) => {
+      if (element.innerHTML === ele.innerHTML) {
+        flag = element;
+        //console.log('found', element, ele);
+      }
+    });
+    if (!(flag === 0)) {
+      gUnique[index++] = element;
+    }
+  });
+
+  //console.log(svgFinal, gUnique); //uncommon <g>
+
+  //replace svg
+
+  const staggerDelay = timeDuration / (use.length + 1);
+  animationTimeline
+    .add(
+      {
+        targets: [
+          //document.querySelectorAll(`#mobj-tex-${object.id} .mobj-tex-${object.id}`),
+          object.writeElement.elt.querySelectorAll('path'),
+          object.writeElement.elt.querySelectorAll('rect'),
+          object.writeElement.elt.querySelectorAll('line'),
+          gUnique
+        ],
+        begin: function (anim) {
+          //object.remove();
+        },
+        strokeDashoffset: [anime.setDashoffset, 0],
+
+        easing: 'easeOutSine',
+        //duration: timeDuration,
+        delay: anime.stagger(staggerDelay)
+        //delay: anime.stagger(400)
+      },
+      delayDuration
+    )
+    .add(
+      {
+        targets: [
+          object.writeElement.elt.querySelectorAll('path'),
+          object.writeElement.elt.querySelectorAll('rect'),
+          object.writeElement.elt.querySelectorAll('line'),
+          gUnique
+        ],
+        //scale: [4, 1],
+        fill: [
+          `${object.fillColor.toString('#rgb')}0`,
+          object.fillColor.toString()
+        ],
         easing: 'easeInOutCubic',
         //duration: timeDuration,
         delay: anime.stagger(staggerDelay)
