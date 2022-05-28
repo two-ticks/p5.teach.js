@@ -2,7 +2,7 @@ import TeXToSVG from 'tex-to-svg';
 import { TexObject } from '../interfaces';
 import { add } from '../Scene/add';
 //import { animationTimeline } from '../Scene/controls';
-import { play } from '../Scene/play';
+import { play, overwriteAnimatorTeX } from '../Scene/play';
 import { MObject } from './MObject';
 
 //TODO : add test cases
@@ -21,11 +21,12 @@ export class TeX extends MObject {
   // svgHeight: number;
   _strokeWidth: number;
   strokeColor: p5.Color;
+  id: number;
 
   /**
    * creates a tex object
    *
-   * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+   * <iframe src="../../assets/examples/tex.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
    *
    * @param    {String} - escaped TeX input
    * @param    {number} - x
@@ -47,7 +48,16 @@ export class TeX extends MObject {
     // this._size = _size; //px
     // this.svgWidth = svgWidth;
     // this.svgHeight = svgHeight;
+
+    //generate unique id and attach it to tex div
+    let uniqueId = 0;
+    while (document.getElementById(`mobj-tex-${uniqueId}`)) {
+      uniqueId++;
+    }
+    this.id = uniqueId;
+
     this.writeElement = createElement('div');
+    this.writeElement.id(`mobj-tex-${this.id}`);
     this.svgEquation = TeXToSVG(_tex);
     this._strokeWidth = 8;
     this.strokeColor = color('black');
@@ -183,6 +193,11 @@ export class TeX extends MObject {
   ) {
     play(this, animationType, startTime, endTime);
   }
+
+  //TODO : extend write to continue writing equation after pause 
+  overwrite(_tex, timeDuration: number, delayDuration: string | number) {
+    overwriteAnimatorTeX(this, _tex, timeDuration, delayDuration);
+  }
 }
 
 /**
@@ -199,7 +214,7 @@ export class TeX extends MObject {
  * );
  * ```
  * <br/>
- * <iframe src="../../assets/examples/TeX.html" scrolling="no" width="400" height="400" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
+ * <iframe src="../../assets/examples/tex.html" scrolling="no" width="650" height="550" allowfullscreen frameborder="0" marginwidth="0" marginheight="0"></iframe>
  *
  * @returns
  */

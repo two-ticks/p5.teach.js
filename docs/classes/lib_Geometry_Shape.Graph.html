@@ -68,6 +68,55 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Graph</p>
+						<h1> functions available in Graph </h1>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>function</dt>
+						<dd><p>beginShape begins recording vertices for a shape</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>endShape   stops recording vertices for a shape</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>controlPoint</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>polyline</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>fill</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>stroke</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>strokeWeight</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>rotate</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>point</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>circle</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>ellipse</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>rect</p>
+						</dd>
+						<dt>function</dt>
+						<dd><p>line</p>
+						</dd>
+					</dl>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -107,9 +156,11 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="lib_Geometry_Shape.Graph.html#y" class="tsd-kind-icon">y</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-inherited">
+						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="lib_Geometry_Shape.Graph.html#configure" class="tsd-kind-icon">configure</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="lib_Geometry_Shape.Graph.html#defs" class="tsd-kind-icon">defs</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="lib_Geometry_Shape.Graph.html#moveTo" class="tsd-kind-icon">move<wbr>To</a></li>
 							</ul>
 						</section>
@@ -129,16 +180,16 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/Shape.ts#L54">Geometry/Shape.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/Shape.ts#L70">Geometry/Shape.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>x: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 10</span></h5>
+									<h5>x: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
 								</li>
 								<li>
-									<h5>y: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 10</span></h5>
+									<h5>y: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></h5>
 								</li>
 								<li>
 									<h5>svgWidth: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 300</span></h5>
@@ -157,18 +208,15 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="config" class="tsd-anchor"></a>
 					<h3>config</h3>
-					<div class="tsd-signature tsd-kind-icon">config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>arrowFollowerColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>arrowSize<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>axisColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>graphColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>graphStrokeWidth<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>gridColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>maxX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>maxY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>minX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>minY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>originX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>originY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>scaleX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>scaleY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>smallGridColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>stepX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>stepY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickMarginX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickMarginY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>xAxis<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>yAxis<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>arrowSize<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>axisColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>graphBox<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>graphColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>graphStrokeWidth<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>grid<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>gridColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>maxX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>maxY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>minX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>minY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>originX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>originY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>pathElements<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>scaleX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>scaleY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>smallGridColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>stepX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>stepY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickColor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickMarginX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickMarginY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>tickY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>xAxis<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>yAxis<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/Shape.ts#L18">Geometry/Shape.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/Shape.ts#L32">Geometry/Shape.ts:32</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5>arrow<wbr>Follower<wbr>Color<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
-							</li>
 							<li class="tsd-parameter">
 								<h5>arrow<wbr>Size<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
 							</li>
@@ -176,10 +224,16 @@
 								<h5>axis<wbr>Color<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
 							</li>
 							<li class="tsd-parameter">
+								<h5>graph<wbr>Box<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+							</li>
+							<li class="tsd-parameter">
 								<h5>graph<wbr>Color<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
 							</li>
 							<li class="tsd-parameter">
 								<h5>graph<wbr>Stroke<wbr>Width<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>grid<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
 							</li>
 							<li class="tsd-parameter">
 								<h5>grid<wbr>Color<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
@@ -201,6 +255,9 @@
 							</li>
 							<li class="tsd-parameter">
 								<h5>originY<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>path<wbr>Elements<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
 							</li>
 							<li class="tsd-parameter">
 								<h5>scaleX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
@@ -247,7 +304,7 @@
 					<div class="tsd-signature tsd-kind-icon">coordinate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">SVGGElement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/Shape.ts#L17">Geometry/Shape.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/Shape.ts#L31">Geometry/Shape.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -258,7 +315,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#graphContainer">graphContainer</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/GObject.ts#L7">Geometry/GObject.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/GObject.ts#L7">Geometry/GObject.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -269,7 +326,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#graphObject">graphObject</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/GObject.ts#L6">Geometry/GObject.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/GObject.ts#L6">Geometry/GObject.ts:6</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -280,7 +337,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#linePath">linePath</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/GObject.ts#L8">Geometry/GObject.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/GObject.ts#L8">Geometry/GObject.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -291,7 +348,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#pathData">pathData</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/GObject.ts#L5">Geometry/GObject.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/GObject.ts#L5">Geometry/GObject.ts:5</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -301,7 +358,7 @@
 					<div class="tsd-signature tsd-kind-icon">plotting<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">SVGGElement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/Shape.ts#L16">Geometry/Shape.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/Shape.ts#L30">Geometry/Shape.ts:30</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -312,7 +369,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#svgHeight">svgHeight</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/GObject.ts#L12">Geometry/GObject.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/GObject.ts#L12">Geometry/GObject.ts:12</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -323,7 +380,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#svgWidth">svgWidth</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/GObject.ts#L11">Geometry/GObject.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/GObject.ts#L11">Geometry/GObject.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -334,7 +391,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#x">x</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/GObject.ts#L9">Geometry/GObject.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/GObject.ts#L9">Geometry/GObject.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -345,13 +402,59 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#y">y</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/GObject.ts#L10">Geometry/GObject.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/GObject.ts#L10">Geometry/GObject.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-inherited">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="configure" class="tsd-anchor"></a>
+					<h3>configure</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">configure<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/Shape.ts#L147">Geometry/Shape.ts:147</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>config: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="defs" class="tsd-anchor"></a>
+					<h3>defs</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">defs<span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/Shape.ts#L191">Geometry/Shape.ts:191</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>content: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="moveTo" class="tsd-anchor"></a>
 					<h3>move<wbr>To</h3>
@@ -363,7 +466,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="lib_Geometry_GObject.GObject.html">GObject</a>.<a href="lib_Geometry_GObject.GObject.html#moveTo">moveTo</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/0d6b937/src/lib/Geometry/GObject.ts#L26">Geometry/GObject.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/two-ticks/p5.teach.js/blob/c693522/src/lib/Geometry/GObject.ts#L26">Geometry/GObject.ts:26</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -427,6 +530,9 @@
 						<a href="../modules/lib_Scene_controls.html">lib/<wbr>Scene/controls</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/lib_Scene_coordinateMode.html">lib/<wbr>Scene/coordinate<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/lib_Scene_group.html">lib/<wbr>Scene/group</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -486,6 +592,12 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 								<a href="lib_Geometry_Shape.Graph.html#y" class="tsd-kind-icon">y</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="lib_Geometry_Shape.Graph.html#configure" class="tsd-kind-icon">configure</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="lib_Geometry_Shape.Graph.html#defs" class="tsd-kind-icon">defs</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="lib_Geometry_Shape.Graph.html#moveTo" class="tsd-kind-icon">move<wbr>To</a>
 							</li>
@@ -494,9 +606,6 @@
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="../modules/lib_Geometry_Shape.html#SVGControlPointPosition" class="tsd-kind-icon">SVGControl<wbr>Point<wbr>Position</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/lib_Geometry_Shape.html#beginGraph" class="tsd-kind-icon">begin<wbr>Graph</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
@@ -504,6 +613,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/lib_Geometry_Shape.html#endGraph" class="tsd-kind-icon">end<wbr>Graph</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/lib_Geometry_Shape.html#polyline" class="tsd-kind-icon">polyline</a>
 					</li>
 				</ul>
 			</nav>
@@ -518,6 +630,7 @@
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>

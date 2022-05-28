@@ -95,3 +95,6 @@ global.arrow = arrow;
 import { safeColor, colorPalette } from './lib/Scene/scene';
 global.safeColor = safeColor;
 global.colorPalette = colorPalette;
+
+import { coordinateMode } from './lib/Scene/coordinateMode';
+global.coordinateMode = coordinateMode;
